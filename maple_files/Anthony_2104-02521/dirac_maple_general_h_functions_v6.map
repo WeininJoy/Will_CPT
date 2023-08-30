@@ -1,0 +1,330 @@
+# Maple routines to do general h overbar and underbar applied to arbitrary multivector
+
+# assumes just that the gu||ii and gd||ii have been set up
+
+form_hob := proc()
+
+	local result,tmp,tmp1,ii,jj;
+
+        global hob1,hob2,hob3,hob4,hob5,hob6,hob7,hob8,hob9,
+ 	       hob10,hob11,hob12,hob13,hob14,hob15,hob16,hobg0,hobg1,hobg2,hobg3;
+
+# this routine makes the hob basis elements
+
+        hob1:=ds(1);
+
+        for ii from 0 to 3 do
+
+		hob||(ii+2):=ds(0);
+
+		for jj from 0 to 3 do
+
+			tmp1:=ds(gam||ii&@ed||jj)[1];
+			hob||(ii+2):=ds(hob||(ii+2)+tmp1*gu||jj);
+
+		od:
+	od:
+
+        hobg0:=hob2; hobg1:=hob3; hobg2:=hob4; hobg3:=hob5;
+
+
+        tmp:=ds(hobg3&@hobg2);
+        hob6:=dbpart(tmp);
+
+        tmp:=ds(hobg1&@hobg3);
+        hob7:=dbpart(tmp);
+
+        tmp:=ds(hobg2&@hobg1);
+        hob8:=dbpart(tmp);
+
+        tmp:=ds(hobg1&@hobg0);
+        hob9:=dbpart(tmp);
+
+        tmp:=ds(hobg2&@hobg0);
+        hob10:=dbpart(tmp);
+
+        tmp:=ds(hobg3&@hobg0);
+        hob11:=dbpart(tmp);
+
+        tmp:=ds(-hobg1&@hobg2&@hobg3);
+        hob12:=dtpart(tmp);
+
+        tmp:=ds(-hobg0&@hobg2&@hobg3);
+        hob13:=dtpart(tmp);
+
+        tmp:=ds(hobg0&@hobg1&@hobg3);
+        hob14:=dtpart(tmp);
+
+        tmp:=ds(-hobg0&@hobg1&@hobg2);
+        hob15:=dtpart(tmp);
+
+        tmp1:=ds(hobg0&@hobg1&@hobg2&@hobg3)[16];
+        hob16:=ds(tmp1*ps);
+
+end:
+
+hob := proc(multi)
+
+	local ii,result;
+
+	result:=ds(0);
+
+	for ii from 1 to 16 do
+
+		result:=ds(result+multi[ii]*hob||ii);
+
+	od:
+
+end:
+	
+############### now h underbar stuff
+
+form_hub := proc()
+
+	local result,tmp,tmp1,ii,jj;
+
+        global hub1,hub2,hub3,hub4,hub5,hub6,hub7,hub8,hub9,
+               hub10,hub11,hub12,hub13,hub14,hub15,hub16,hubg0,hubg1,hubg2,hubg3;
+ 
+# this routine makes the hub basis elements
+
+        hub1:=ds(1);
+
+        for ii from 0 to 3 do
+
+		hub||(ii+2):=ds(0);
+
+		for jj from 0 to 3 do
+
+			tmp1:=ds(gam||ii&@gu||jj)[1];
+			hub||(ii+2):=ds(hub||(ii+2)+tmp1*ed||jj);
+
+		od:
+	od:
+
+        hubg0:=hub2; hubg1:=hub3; hubg2:=hub4; hubg3:=hub5;
+
+
+        tmp:=ds(hubg3&@hubg2);
+        hub6:=dbpart(tmp);
+
+        tmp:=ds(hubg1&@hubg3);
+        hub7:=dbpart(tmp);
+
+        tmp:=ds(hubg2&@hubg1);
+        hub8:=dbpart(tmp);
+
+        tmp:=ds(hubg1&@hubg0);
+        hub9:=dbpart(tmp);
+
+        tmp:=ds(hubg2&@hubg0);
+        hub10:=dbpart(tmp);
+
+        tmp:=ds(hubg3&@hubg0);
+        hub11:=dbpart(tmp);
+
+        tmp:=ds(-hubg1&@hubg2&@hubg3);
+        hub12:=dtpart(tmp);
+
+        tmp:=ds(-hubg0&@hubg2&@hubg3);
+        hub13:=dtpart(tmp);
+
+        tmp:=ds(hubg0&@hubg1&@hubg3);
+        hub14:=dtpart(tmp);
+
+        tmp:=ds(-hubg0&@hubg1&@hubg2);
+        hub15:=dtpart(tmp);
+
+        tmp1:=ds(hubg0&@hubg1&@hubg2&@hubg3)[16];
+        hub16:=ds(tmp1*ps);
+
+end:
+
+hub := proc(multi)
+
+	local ii,result;
+
+	result:=ds(0);
+
+	for ii from 1 to 16 do
+
+		result:=ds(result+multi[ii]*hub||ii);
+
+	od:
+
+end:
+	
+##################### now h overbar inverse
+
+
+form_hobi := proc()
+
+	local result,tmp,tmp1,ii,jj;
+
+        global hobi1,hobi2,hobi3,hobi4,hobi5,hobi6,hobi7,hobi8,hobi9,
+               hobi10,hobi11,hobi12,hobi13,hobi14,hobi15,hobi16,
+               hobig0,hobig1,hobig2,hobig3;
+ 
+# this routine makes the hobi basis elements
+
+        hobi1:=ds(1);
+
+        for ii from 0 to 3 do
+
+		hobi||(ii+2):=ds(0);
+
+		for jj from 0 to 3 do
+
+			tmp1:=ds(gam||ii&@gd||jj)[1];
+			hobi||(ii+2):=ds(hobi||(ii+2)+tmp1*eu||jj);
+
+		od:
+	od:
+
+        hobig0:=hobi2; hobig1:=hobi3; hobig2:=hobi4; hobig3:=hobi5;
+
+
+        tmp:=ds(hobig3&@hobig2);
+        hobi6:=dbpart(tmp);
+
+        tmp:=ds(hobig1&@hobig3);
+        hobi7:=dbpart(tmp);
+
+        tmp:=ds(hobig2&@hobig1);
+        hobi8:=dbpart(tmp);
+
+        tmp:=ds(hobig1&@hobig0);
+        hobi9:=dbpart(tmp);
+
+        tmp:=ds(hobig2&@hobig0);
+        hobi10:=dbpart(tmp);
+
+        tmp:=ds(hobig3&@hobig0);
+        hobi11:=dbpart(tmp);
+
+        tmp:=ds(-hobig1&@hobig2&@hobig3);
+        hobi12:=dtpart(tmp);
+
+        tmp:=ds(-hobig0&@hobig2&@hobig3);
+        hobi13:=dtpart(tmp);
+
+        tmp:=ds(hobig0&@hobig1&@hobig3);
+        hobi14:=dtpart(tmp);
+
+        tmp:=ds(-hobig0&@hobig1&@hobig2);
+        hobi15:=dtpart(tmp);
+
+        tmp1:=ds(hobig0&@hobig1&@hobig2&@hobig3)[16];
+        hobi16:=ds(tmp1*ps);
+
+end:
+
+hobi := proc(multi)
+
+	local ii,result;
+
+	result:=ds(0);
+
+	for ii from 1 to 16 do
+
+		result:=ds(result+multi[ii]*hobi||ii);
+
+	od:
+
+end:
+
+
+##################### and finally h underbar inverse
+
+form_hubi := proc()
+
+	local result,tmp,tmp1,ii,jj;
+
+        global hubi1,hubi2,hubi3,hubi4,hubi5,hubi6,hubi7,hubi8,hubi9,
+               hubi10,hubi11,hubi12,hubi13,hubi14,hubi15,hubi16,
+               hubig0,hubig1,hubig2,hubig3;
+
+# this routine makes the hubi basis elements
+
+        hubi1:=ds(1);
+
+        for ii from 0 to 3 do
+
+		hubi||(ii+2):=ds(0);
+
+		for jj from 0 to 3 do
+
+			tmp1:=ds(gam||ii&@eu||jj)[1];
+			hubi||(ii+2):=ds(hubi||(ii+2)+tmp1*gd||jj);
+
+		od:
+	od:
+
+        hubig0:=hubi2; hubig1:=hubi3; hubig2:=hubi4; hubig3:=hubi5;
+
+
+        tmp:=ds(hubig3&@hubig2);
+        hubi6:=dbpart(tmp);
+
+        tmp:=ds(hubig1&@hubig3);
+        hubi7:=dbpart(tmp);
+
+        tmp:=ds(hubig2&@hubig1);
+        hubi8:=dbpart(tmp);
+
+        tmp:=ds(hubig1&@hubig0);
+        hubi9:=dbpart(tmp);
+
+        tmp:=ds(hubig2&@hubig0);
+        hubi10:=dbpart(tmp);
+
+        tmp:=ds(hubig3&@hubig0);
+        hubi11:=dbpart(tmp);
+
+        tmp:=ds(-hubig1&@hubig2&@hubig3);
+        hubi12:=dtpart(tmp);
+
+        tmp:=ds(-hubig0&@hubig2&@hubig3);
+        hubi13:=dtpart(tmp);
+
+        tmp:=ds(hubig0&@hubig1&@hubig3);
+        hubi14:=dtpart(tmp);
+
+        tmp:=ds(-hubig0&@hubig1&@hubig2);
+        hubi15:=dtpart(tmp);
+
+        tmp1:=ds(hubig0&@hubig1&@hubig2&@hubig3)[16];
+        hubi16:=ds(tmp1*ps);
+
+end:
+
+hubi := proc(multi)
+
+	local ii,result;
+
+	result:=ds(0);
+
+	for ii from 1 to 16 do
+
+		result:=ds(result+multi[ii]*hubi||ii);
+
+	od:
+
+end:
+
+form_hob(); form_hub(); form_hobi(); form_hubi();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

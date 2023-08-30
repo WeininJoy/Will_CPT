@@ -1,0 +1,207 @@
+alias(ds=dirac[simp]);
+
+
+
+ed0:= gam0; ed1:= gam1; ed2:= gam2; ed3:= gam3;
+
+eu0:= gam0; eu1:= ds(-gam1); eu2:= ds(-gam2); eu3:= ds(-gam3);
+
+x0:= t; x1:= x; x2:= y; x3:= z;
+
+dirac[rect_grad] := proc(vecin)
+
+	local vec,result,i;
+
+        vec:=vecin;
+  	if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+        result:=add('eu||i&@map(diff,vec,x||i)',i=0..3);
+	dirac[simp](result);
+end:
+
+alias(drg=dirac[rect_grad]);
+
+dirac[tri_part] := proc(vecin)
+
+	local vec,i;
+
+	vec:=vecin;
+	if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+	for i from 1 to 11 do
+		vec:=subsop(i=0,vec);
+	od;
+	i:=16;
+	vec:=subsop(i=0,vec);
+end:
+
+alias(dtpart=dirac[tri_part]);
+
+dirac[bi_part] := proc(vecin)
+
+	local vec,i;
+
+	vec:=vecin;
+	if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+	for i from 1 to 5 do
+		vec:=subsop(i=0,vec);
+	od;
+	for i from 12 to 16 do
+		vec:=subsop(i=0,vec);
+	od;
+RETURN(vec);
+end:
+
+alias(dbpart=dirac[bi_part]);
+
+dirac[vec_part] := proc(vecin)
+
+	local vec,i;
+
+	vec:=vecin;
+	if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+        i:=1;
+	vec:=subsop(i=0,vec);
+	for i from 6 to 16 do
+		vec:=subsop(i=0,vec);
+	od;
+RETURN(vec);
+end:
+
+alias(dvpart=dirac[vec_part]);
+
+dirac[make_gd] := proc()
+
+	local tmp,Ainv;
+	global gd0,gd1,gd2,gd3;
+
+	tmp:=ds(gu0&@gu1&@gu2&@gu3);
+	Ainv:=ds(-ps/tmp[16]);
+	gd0:=ds(dtpart(gu1&@gu2&@gu3)&@Ainv);
+	gd1:=ds(dtpart(-gu0&@gu2&@gu3)&@Ainv);
+	gd2:=ds(dtpart(gu0&@gu1&@gu3)&@Ainv);
+	gd3:=ds(dtpart(-gu0&@gu1&@gu2)&@Ainv);
+end:
+
+#dirac[make_gd]();
+
+dirac[form_hOmj] := proc()
+
+	local i,j,tmp,dot,tmp1,tmp2;
+
+	for j from 0 to 3 do
+		tmp:=0;
+		for i from 0 to 3 do
+			tmp:= tmp+gu||i&@map(diff,gu||j,x||i);
+		od;
+		B||j:=dbpart(tmp);
+	od;
+	for j from 0 to 3 do
+ 		print(`forming hOm`,j);
+		tmp:=ds(0);
+		for i from 0 to 3 do
+			print(`at i = `,i);
+			dot:=ds(gd||i&@gd||j);
+                        tmp2:=dot[1];
+			tmp1:=dvpart(gd||j&@B||i);
+			tmp:= ds(tmp+1/2*gd||i&@tmp1+1/2*tmp2*B||i);
+		od;
+		hOm||j:=dbpart(tmp);
+      		Om||j:=hOm||j;
+	od;
+end:
+
+#dirac[form_hOmj]();
+
+dirac[cald] := proc(vecin)
+
+	local vec,result,i;
+
+	vec:=vecin;
+	if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+        result:=add('gu||i&@(map(diff,vec,x||i) + 1/2*(Om||i&@vec - vec&@Om||i))',i=0..3);
+	dirac[simp](result);
+end:
+
+alias(dcd=dirac[cald]);
+
+dirac[form_Rij] := proc()
+
+	local i,j,tmp;
+
+	for i from 0 to 3 do
+         	for j from 0 to 3 do
+		print(`doing R`,i,j);
+		
+		tmp := map(diff,Om||j,x||i)-map(diff,Om||i,x||j)+1/2*(Om||i&@Om||j-
+			Om||j&@Om||i);
+		R||i||j := dirac[simp](tmp);
+
+	od; od;
+end:
+
+alias(dfR=dirac[form_Rij]);
+
+dirac[form_Ricj] := proc()
+
+	local i,j,tmp;
+
+	for j from 0 to 3 do
+		print(`doing R`,j);
+		tmp:=0;
+		for i from 0 to 3 do
+			tmp:= tmp+gu||i&@R||i||j;
+		od;
+		Ric||j:=dvpart(tmp);
+	od;
+end:
+
+alias(dfRicci=dirac[form_Ricj]);
+
+dirac[proj_polar_bi] := proc(vecin)
+
+	local vec,result,tmp,i,ii;
+
+	vec:=dbpart(vecin);
+	result:=[seq(0,ii=1..6)];
+        i:=1;
+	tmp:=ds(eu0&@eu1&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=2;
+	tmp:=ds(eu0&@eu2&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=3;
+	tmp:=ds(eu0&@eu3&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=4;
+	tmp:=ds(eu1&@eu2&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=5;
+	tmp:=ds(eu1&@eu3&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=6;
+	tmp:=ds(eu2&@eu3&@vec);
+	result:=subsop(i=tmp[1],result);
+end:
+
+alias(dppb=dirac[proj_polar_bi]);
+
+dirac[proj_polar_vec] := proc(vecin)
+
+	local vec,result,tmp,i,ii;
+
+	vec:=dvpart(vecin);
+	result:=[seq(0,ii=1..4)];
+        i:=1;
+	tmp:=ds(eu0&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=2;
+	tmp:=ds(eu1&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=3;
+	tmp:=ds(eu2&@vec);
+	result:=subsop(i=tmp[1],result);
+        i:=4;
+	tmp:=ds(eu3&@vec);
+	result:=subsop(i=tmp[1],result);
+end:
+
+alias(dppv=dirac[proj_polar_vec]);

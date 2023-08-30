@@ -1,0 +1,4753 @@
+# This is attempt to work through material in 'GR Perturbations' chapter in
+# Lyth and Liddle book (Chap. 8).
+
+# Based on closed_uni_perturbs_perfect_fluid_for_lecture.map.
+
+# read `c:\\anl\\maple\\attempt_at_gr_perturbs_for_la_palma_lectures_with_Lambda.map`; 
+
+read `dirac_maple_test_r6.map`; 
+with(dirac); 
+read `rectangular_gravity_for_r10.map`;
+
+# Use Theta as well as Phi in metric, i.e. conformal Newtonian gauge,
+# and work in conformal time (so t here is in fact eta).
+
+# Note we use Theta instead of Psi, since lattter is a special function in Maple.
+
+# This version we attempt to get straight to results for radiation, and also
+# include Lambda (for comparison with Riemann squared work).
+
+fs:=proc(func)
+
+    func;
+    simplify(%);
+end:
+
+term2:=1/sqrt(1+2*epsilon*Theta(t,x,y,z));
+
+term3:=1/sqrt(1-2*epsilon*Phi(t,x,y,z));
+
+gu0:=ds(1/a(t)*term2*eu0);
+gu1:=ds(1/a(t)*term3*eu1);
+gu2:=ds(1/a(t)*term3*eu2);
+gu3:=ds(1/a(t)*term3*eu3);
+
+dirac[make_gd]();
+
+# Check metric is what we intended.
+
+for ii from 0 to 3 do
+	for jj from 0 to 3 do
+		ds(gd||ii&@gd||jj)[1];
+		factor(simplify(%));
+		print(ii,jj,%);
+	od:
+od:
+
+# Fine.
+
+dirac[form_hOmj]();
+
+for ii from 0 to 3 do
+        print(`doing ii = `,ii);
+        hom||ii||p:=dppb(Om||ii);
+od:
+
+read `c:\\anl\\maple\\dirac_maple_general_h_functions_v6.map`;
+
+# Get little omegas.
+
+for ii from 0 to 3 do
+
+        tmp:=hub(ed||ii);
+        om_fromh||ii:=ds(0);
+
+        for jj from 0 to 3 do
+
+                print(`doing ii,jj = `,ii,jj);
+                tmp1:=ds(tmp&@eu||jj)[1];
+                om_fromh||ii:=ds(om_fromh||ii+tmp1*Om||jj);
+        od:
+od:
+
+# see what components we have
+
+for ii from 0 to 3 do
+
+        om_fromhp||ii:=dppb(om_fromh||ii);
+
+od;
+
+dfR():
+dfRicci():
+
+bigr:=ds(gu0&@Ric0+gu1&@Ric1+gu2&@Ric2+gu3&@Ric3)[1]:
+
+for ii from 0 to 3 do
+        Rich||ii:=ds(0);
+        for jj from 0 to 3 do
+                tmp:=ds(gu||jj&@ed||ii)[1];
+                Rich||ii:=ds(Rich||ii+tmp*Ric||jj);
+        od;
+od:
+
+# and now Einstein
+
+for ii from 0 to 3 do
+
+        Ein||ii:=ds(Rich||ii-1/2*ed||ii*bigr);
+
+od:
+
+# At this point insert some code from 
+# 'attempt_at_grav_wave_photon_geodesics_for_la_palma_lectures.map'.
+
+for ii from 0 to 3 do
+	
+	Ein||ii;
+	map(series,%,epsilon,2);
+	map(convert,%,polynom);
+	factor(simplify(%));
+#	print(ii,%);
+	Ein||ii:=%;
+od:
+
+for ii from 0 to 3 do
+
+        e||ii||p:=dppv(Ein||ii);
+
+od:
+
+# Now divide out the Einstein into zeroth and first order bits.
+
+for ii from 0 to 3 do
+
+	Ein_zeroth||ii:=factor(simplify(subs(epsilon=0,Ein||ii)));
+	Ein_first||ii:=factor(simplify(ds(Ein||ii-Ein_zeroth||ii)));
+
+od:
+
+####################
+
+Ein_zeroth0[2]-8*Pi*rho-Lambda;
+
+solve(%,rho);
+
+tmp_rho_subs:=%;
+
+tmp_adot_subs := H(t)*a(t)^2;
+
+####################
+
+# Ok, now jump straight to what we did sucessfully before as regards radiation perturbations.
+
+Ein_zeroth1[3]+8*Pi*w(t)*tmp_rho_subs-Lambda:
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%);
+
+solve(%,diff(H(t),t));
+
+tmp_Ht_from_w:=fs(%);
+
+# Make transition to k space, plus bring in r.h.s. of equations, i.e. perturbed SET.
+
+tmp_comp:=epsilon*exp(+I*(kx*x+ky*y+kz*z));
+
+tmp_non_rel_v:=(v1(t)*gam1+v2(t)*gam2+v3(t)*gam3);
+
+tmp_SET0:=ds((delta_rho(t)*gam0+(rho(t)+P(t))*tmp_non_rel_v)*tmp_comp);
+
+for ii from 1 to 3 do
+
+    tmp_SET||ii:=ds((-delta_P(t)*gam||ii+(rho(t)+P(t))
+    *ds(ed||ii&@tmp_non_rel_v)[1]*gam0)*tmp_comp);
+    
+od:
+
+# Note a general point here - by using this, and particularly by using
+# the rho substitution in tmp_rho_subs, we are effectively limiting
+# ourselves to a single fluid component.
+
+for ii from 0 to 3 do
+
+    Ein_first||ii;
+    
+    subs(Phi(t,x,y,z)=Phi(t)*exp(+I*(kx*x+ky*y+kz*z)),
+    Theta(t,x,y,z)=Theta(t)*exp(+I*(kx*x+ky*y+kz*z)),%);
+    
+    ds(%-8*Pi*tmp_SET||ii);
+    
+    subs(v1(t)=-I*kx/k*V(t),%):
+    subs(v2(t)=-I*ky/k*V(t),%):
+    subs(v3(t)=-I*kz/k*V(t),%):
+    
+    ds(%*exp(-I*(kx*x+ky*y+kz*z)));
+    
+    subs(kx^2=k^2-ky^2-kz^2,%):
+    
+    subs(Theta(t)=Phi(t),%);
+    subs(delta_rho(t)=delta(t)*rho(t),%):
+    subs(P(t)=w(t)*rho(t),delta_P(t)=w(t)*rho(t)*delta(t),%):
+    subs(rho(t)=tmp_rho_subs,%):
+    fs(%);
+    
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%):
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%);
+    
+    subs(diff(H(t),t)=tmp_Ht_from_w,%):
+    
+    tmp_SET_eqn||ii:=fs(%);
+    
+    print(ii,%);
+    
+od:
+
+# This cleans things up quite well.
+
+# Based on previous experience, we would probably regard this as
+# two constraint equations (in 0th vector) and 1 propagation
+# equation (for Phitt).
+
+# Obviously, constraints give us Phit as well, so use this in subs.
+
+# Also constraint on delta as well, to help clean things up.
+
+tmp_SET_eqn0[3]:
+
+solve(%,diff(Phi(t),t));
+
+tmp_Phit:=fs(%);
+
+tmp_SET_eqn0[2]:
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%);
+
+solve(%,delta(t));
+
+tmp_delta_from_constraint:=fs(%);
+
+tmp_SET_eqn1[3]:
+
+solve(%,diff(Phi(t),t,t));
+
+tmp_Phitt:=fs(%);
+
+tmp_SET_eqn0[2]:
+diff(%,t):
+subs(diff(Phi(t),t,t)=tmp_Phitt,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%);
+
+solve(%,diff(delta(t),t));
+
+subs(delta(t)=tmp_delta_from_constraint,%):
+fs(%):
+
+tmp_deltat:=%;
+
+tmp_SET_eqn0[3]:
+diff(%,t):
+subs(diff(Phi(t),t,t)=tmp_Phitt,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%);
+
+solve(%,diff(V(t),t));
+
+# Here not so useful to subs for delta, so leave as is.
+
+tmp_Vt:=fs(%);
+
+# Ok, so have got these.
+
+#########
+
+# Now, for Riemann^2 purposes, want to look at getting explicit equation and solution
+# for radiation-only perturbations.
+
+# Just like for matter-dominated cse, looks as though easiest variable in which
+# to get second order equation for that variable alone, is Phi.
+
+diff(Phi(t),t)-tmp_Phit:
+
+solve(%,V(t));
+
+tmp_V_from_Phi:=fs(%);
+
+tmp_delta_from_constraint:
+subs(V(t)=tmp_V_from_Phi,%):
+
+tmp_delta_from_Phi:=fs(%);
+
+diff(V(t),t)-tmp_Vt:
+subs(delta(t)=tmp_delta_from_Phi,V(t)=tmp_V_from_Phi,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+fs(%);
+
+solve(%,diff(Phi(t),t,t));
+
+tmp_Phitt_eqn_gen:=diff(Phi(t),t,t)-fs(%);
+
+# Excellent. Try out in two cases where we know the a(t)'s.
+
+###############
+
+# Will have to do this numerically now, since getting expressions for H and a
+# involves elliptic integrals.
+
+# So get series to start things off.
+
+# Do for w=1/3 first.
+
+tmp_w_use:=1/3;
+
+diff(H(t),t)-tmp_Ht_from_w:;
+
+solve(%,a(t));
+
+subs(w(t)=tmp_w_use,%):
+
+tmp_a_from_H:=%;
+
+diff(a(t),t)-tmp_adot_subs;
+subs(a(t)=tmp_a_from_H,%):
+fs(%);
+
+subs(w(t)=tmp_w_use,%):
+fs(%):
+
+tmp_H_eqn:=numer(%)/3;
+
+tmp_H_ser_try:=1/t^2*sum('h||i'*t^i,i=0..8);
+
+tmp_H_eqn:
+subs(H(t)=tmp_H_ser_try,%):
+fs(%):
+series(%,t,6):
+
+tmp_H_ser:=fs(%);
+
+subs(h1=0,h2=0,h3=0,%):
+fs(%);
+
+op(1,%):
+
+solve(%,h4);
+
+tmp_h4:=%;
+
+# Have a series for Phi as well.
+
+tmp_Phi_ser_try:=sum('p||i'*t^i,i=0..8);
+
+tmp_Phitt_eqn_gen:
+subs(w(t)=tmp_w_use,%):
+subs(a(t)=tmp_a_from_H,%):
+
+tmp_Phitt_eqn_use:=numer(fs(%));
+
+subs(H(t)=tmp_H_ser_try,%):
+subs(Phi(t)=tmp_Phi_ser_try,%):
+fs(%):
+series(%,t,6):
+fs(%);
+
+subs(h1=0,h2=0,h3=0,%):
+subs(h4=tmp_h4,%):
+subs(p1=0,%):
+fs(%);
+
+tmp:=%:
+
+solve({op(1,tmp),op(3,tmp),op(5,tmp)},{p2,p3,p4});
+
+tmp_p2p3p4_sol:=expand(%);
+
+# Ok, do a solution! First prepare series.
+
+tmp_Phi_ser_try:
+subs(p1=0,%):
+subs(tmp_p2p3p4_sol,%):
+subs(p5=0,p6=0,p7=0,p8=0,%):
+
+tmp_Phi_ser_use:=%;
+
+tmp_H_ser_try:
+subs(h1=0,h2=0,h3=0,%):
+subs(h4=tmp_h4,%):
+subs(h5=0,h6=0,h7=0,h8=0,%):
+
+tmp_H_ser_use:=%;
+
+#####################
+
+with(plots):
+
+Digits:=40;
+
+tmp_Lambda_num:=0.1;
+
+tmp_h0_num:=1;
+
+tmp_p0_num:=1;
+
+tmp_k_num:=10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=400;
+
+t_max:=4.33;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+####################
+
+# So this establishes what these look like, but now attempt to get analytically.
+
+# In rie2_perturbations_with_even_more_torsion_second_go.map we work with a itself
+# as the independent variable, so try this same route here.
+
+# Use same code as much as possible.
+
+tmp_background_eqn_in_Hofa:=diff(H(a),a)*a*H(a)-2*Lambda/3+2*H(a)^2;
+
+tmp_Hofa_try:=sqrt(3*a^4*Lambda+9*C)/(3*a^2);
+
+# Check:
+
+tmp_background_eqn_in_Hofa:
+subs(H(a)=tmp_Hofa_try,%):
+fs(%);
+
+# Can do it automatically using dchange, in a way we have discovered which might
+# be useful elsewhere.
+
+with(PDEtools);
+
+tmp_background_eqn_in_Hofa;
+
+solve(%,diff(H(a),a));
+
+tmp_HA:=subs(a=A,%);
+
+tmp_HofA_try:=subs(a=A,tmp_Hofa_try);
+
+simp_proc:=proc(func) 
+
+    func; 
+    
+    subs(diff(ai(A),A)=1/A^2/H(A),%): 
+    fs(%): 
+    subs(diff(H(A),A)=tmp_HA,%); 
+    fs(%); 
+    subs(H(A)=tmp_HofA_try,%): 
+    fs(%); 
+
+end:
+
+tmp_itr:={A=a(t)};
+
+tmp_tr:={t=ai(A)};
+
+# Ok, here's where we set up the particular Phitt eqn we want to transform here.
+
+tmp_Phitt_eqn_to_transform:=fs(subs(w(t)=1/3,tmp_Phitt_eqn_gen));
+
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+
+tmp_Phi_eqn_in_a:=numer(%);
+
+# Fine.
+
+################
+
+# Now attempt to understand what values we should use for C, Lambda
+# beta etc., in a 'realistic' case, so that we can see how
+# Phi and other variables behave during early universe stages.
+
+# Now consult notes p28-30 for next part.
+
+# Basically looking at early universe to get value of C.
+
+H(t)^2-tmp_Hofa_try^2:
+subs(a=a(t),Lambda=0,%):
+subs(H(t)=2/A^2/t^2,a(t)=A^2/2*t,%):
+fs(%);
+
+solve(%,C);
+
+# We also believe this means C=Lambda/3.
+
+# Then use this to get form of equation we want to actually solve.
+
+tmp_Phi_eqn_in_a:
+subs(C=Lambda/3,%):
+#subs(GG0=0,%):
+fs(%):
+
+tmp_Phi_eqn_to_solve:=%;
+
+# There's a scaling we can use to reduce complexity.
+
+tmp_Phi_eqn_to_solve:
+subs(k=K*sqrt(Lambda),%):
+fs(%);
+
+# In this form it can come up with something reasonably sensible as the 'solution'.
+
+dsolve(%,Phi(a));
+
+tmp_Phi_sol:=fs(rhs(%));
+
+# Figure out what C1 and C2 need to be.
+
+series(tmp_Phi_sol,a,5):
+fs(%);
+
+# So we'll put
+
+subs(_C1=0,_C2=exp(-1/8*I*Pi),%):
+fs(%);
+
+# Fine.
+
+tmp_Phi_sol:
+subs(_C1=0,_C2=exp(-1/8*I*Pi),%):
+fs(%):
+
+tmp_Phi_Heun_sol_use:=%;
+
+# This is normalised to 1 at origin.
+
+# Look at series again.
+
+tmp_Phi_Heun_sol_use:
+series(%,a,10):
+fs(%):
+
+tmp_Phi_Heun_ser_use:=convert(%,polynom);
+
+# Wholly real, which is good.
+
+# Now try plotting for some given K.
+
+# Actually, soon find that we need to be careful, and looks as though it is
+# choosing the wrong 'branch' beyond a=2.5.
+
+tmp_Phi_Heun_sol_use:
+
+tmp:=subs(K=10,%):
+
+subs(a=2.4,tmp):
+evalf(%);
+
+subs(a=2.6,tmp):
+evalf(%);
+
+#########
+
+# Little interpolation at this point to look at getting first order
+# equation for H in conformal time (haven't worked this out before).
+
+tmp_Ht_in_H:=C1*(3*H(t)^2-Lambda)^(3/4);
+
+# Check this out.
+
+tmp_H_eqn:
+subs(diff(H(t),t)=tmp_Ht_in_H,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_in_H,%):
+fs(%);
+
+# To match what we've already got, then
+
+tmp_C1:=-2/3*(3*C)^(1/4);
+
+# End of interpolation.
+
+#########
+
+# Next bit gets establishes expression for background eta vs a development.
+
+1/a^2/tmp_Hofa_try;
+
+int(%,a);
+
+# So:
+
+tmp_eta_try:=sqrt(-I*sqrt(3)/(sqrt(Lambda)*sqrt(C)))*EllipticF(a*3^(3/4)
+*sqrt(sqrt(Lambda)*I/sqrt(C))/3,I);
+
+# Let's plot this in a_eq=1 case.
+
+tmp_eta_try:
+subs(C=1/3,Lambda=1,%):
+
+tmp:=%;
+
+###*** Fig. 1
+
+ans:=plot([subs(a=10^x,tmp),x,x=-3..3]);
+Export("a_vs_eta.csv",op([1,1],ans));
+
+###########
+
+# Next look at Phi solution again. Want to get version of integral solution we
+# found in Riemann^2 case.
+
+tmp_Phi_eqn_to_solve:
+subs(k=K*sqrt(Lambda),%):
+tmp_eqn:=fs(%);
+
+# Now form of Phi we are trying, is
+
+# Phi(a)=exp(int(f(a)/(sqrt(1+a^4)*g(a)),a))*sqrt(g(a))/a^3,%):
+
+# Then soon find f is propto a^2, and g has to be:
+
+tmptmp_g := C*(1+a^2*K^2+a^4)/(-(K^2-2)*(K^2+2))^(1/2)/K;
+
+tmp_Phi_from_int_try:=exp(Int(C*a^2/(sqrt(1+a^4)*tmptmp_g),a))*sqrt(tmptmp_g)/a^3;
+
+tmp_eqn:
+subs(Phi(a)=tmp_Phi_from_int_try,%):
+fs(%);
+
+# Fine. Note could be done in terms of elliptic functions.
+
+int(C*a^2/(sqrt(1+a^4)*tmptmp_g),a);
+
+# Ok, now set up as something we could plot, and with right initial conditions.
+
+# First set up constant factors better:
+
+tmp1:=exp(Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4)*(-(K^2-2)*(K^2+2))^(1/2)*K,a))
+*(1+a^2*K^2+a^4)^(1/2)/a^3;
+
+# Check still a solution:
+
+tmp_eqn:
+subs(Phi(a)=tmp1,%):
+fs(%);
+
+tmp2:=exp(-Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4)*(-(K^2-2)*(K^2+2))^(1/2)*K,a))
+*(1+a^2*K^2+a^4)^(1/2)/a^3;
+
+# Check still a solution:
+
+tmp_eqn:
+subs(Phi(a)=tmp2,%):
+fs(%);
+
+# Both fine.
+
+C1*tmp1+C2*tmp2:
+series(%,a,5):
+fs(%);
+
+# So need:
+
+C1*tmp1+C2*tmp2:
+subs(C2=-C1,C1=3/2/(-(K^2-2)*(K^2+2))^(1/2)/K,%):
+fs(%):
+
+tmp_Phi_int_sol:=%;
+
+# Worth comparing this solution with Heun one in terms of starting series:
+
+series(tmp_Phi_int_sol,a,8):
+fs(%);
+
+series(tmp_Phi_Heun_sol_use,a):
+fs(%);
+
+# Impressive!
+
+# Now do actual plot, which should be able to get further than Heun one.
+
+tmp_Phi_int_sol:
+subs(Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4),a)=temp,%):
+subs(a=ad,%):
+subs(temp=Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4),a=0..ad),%):
+
+tmp_Phi_for_plotting:=%;
+
+# Try out.
+
+subs(K=10,tmp_Phi_for_plotting);
+
+plot(%,ad=0..2.5);
+
+# Cf with:
+
+subs(K=10,tmp_Phi_Heun_sol_use);
+
+###*** Think Fig. 2 is following plot (preceding plot would give same function
+# but from range of a for plot in paper looks as though it's the following one).
+
+ans:=plot(Re(%),a=0..2.4);
+Export("heun_function.csv",op([1,1],ans));
+
+# Looks good!
+
+###########
+
+# Would also be good to redo numerical stuff above for these values, to check
+# agrees (useful also since has delta and V also).
+
+# Note in rough notes (p32), have shown h0 we want in order to
+# tie in with the C appearing in the density is
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=400;
+
+t_max:=2.5;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+# Ok, need to plot Phi versus a to compare.
+
+plot([seq([10^pointsa||i[2],pointsPhi||i[2]],i=1..Ntot)],color=red,title=`Phi vs a`);
+
+# Brilliant.
+
+#####################
+
+# Now, if see work below, have come to believe that Phi equation, when it's
+# the actual *metric* perturbation we consider, a^2*Phi, should be invariant
+# under a->1/a.
+
+# Test this out.
+
+# Equation in form we want it is still in:
+
+tmp_eqn:
+subs(Phi(a)=psi(a)/a^2,%):
+
+tmp_hold:=fs(%);
+
+dchange({a=1/s},%):
+fs(%):
+subs(s=a,%): 
+fs(%);
+
+# Cf with 
+
+tmp_hold;
+
+# Indeed identical!
+
+# We have got to this whilst thinking about fact that delta and V in above solutions
+# look as though they are marching on in pretty perfect sine waves, then what
+# happens when they get to future conformal singularity?
+
+# We think this means both Phi and Phidot have to go to zero at end of range (again
+# see below), so would be good to have analytic expression for what Phi at
+# a=infinity is.
+
+# Can hopefully get this from integral form.
+
+tmp_int_arg:=a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4);
+
+int(tmp_int_arg,a=0..infinity);
+
+tmp_hold:=%;
+
+# In fact can force evaluation by using sum rather than Sum!
+
+tmp_hold:
+subs((Sum(-_alpha^2/((-2*K^2+4)*_alpha^2+2*K^2-4),_alpha = RootOf(1+_Z^2*K^2+_Z^4)))=
+(sum(-_alpha^2/((-2*K^2+4)*_alpha^2+2*K^2-4),_alpha = RootOf(1+_Z^2*K^2+_Z^4))),%);
+
+# Quite pretty! Test this out.
+
+tmp_int_bit_ans:=fs(%);
+
+Int(subs(K=10,tmp_int_arg),a=0..infinity):
+evalf(%);
+
+subs(K=10,tmp_int_bit_ans);
+evalf(%);
+
+# Looks good.
+
+tmp_Phi_int_sol:
+subs(Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4),a)=tmp_int_bit_ans,%):
+fs(%);
+
+# On the basis of this, find right criterion is
+
+tmp_Phi_crit:=sin((K^4-4)^(1/2)*K*(EllipticK(1/2*2^(1/2))-EllipticPi(1/2-1/4*K^2,1/2*2^(1/2)))/(K^2-2));
+
+plot(Re(tmp_Phi_crit),K=sqrt(2)..11);
+
+# Find that this settles down very quickly into a very regular sine.
+
+# Can get period by looking at slope of argument:
+
+(K^4-4)^(1/2)*K*(EllipticK(1/2*2^(1/2))-EllipticPi(1/2-1/4*K^2,1/2*2^(1/2)))/(K^2-2):
+
+diff(%,K):
+fs(%);
+
+asympt(%,K);
+
+evalf(op(1,%));
+
+# So now show how results look for one of these special values.
+
+# E.g. above have been plotting for K=10.
+
+fsolve(Re(tmp_Phi_crit),K,9..11);
+
+tmp_root_for_K_near_10:=%;
+
+# So do a plot with this value.
+
+##################
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=tmp_root_for_K_near_10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=400;
+
+t_max:=3.21;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+# Ok, this time plot a^2*Phi, which should be symmetric in conformal time. 
+
+plot([seq([pointsa||i[1],(10^pointsa||i[2])^2*pointsPhi||i[2]],i=1..Ntot)]
+,color=red,title=`a^2*Phi vs eta`);
+
+# Very good!
+
+# Following is plot against cosmic time.
+
+plot([seq([1/2/sqrt(tmp_Lambda_num/3)*arcsinh((10^pointsa||i[2])^2),pointsdelta||i[2]],i=1..Ntot-1)]
+,color=red);
+
+# So is this what 'freezing out' is??
+
+# Note by the way total extent in conformal time is:
+
+sqrt(3)*GAMMA(1/4)*GAMMA(5/4)/GAMMA(1/2):
+evalf(%):
+
+tmp_eta_tot:=%;
+
+# Also save this symbolically.
+
+sqrt(3)*GAMMA(1/4)*GAMMA(5/4)/GAMMA(1/2):
+fs(%):
+
+tmp_eta_tot_symb:=%;
+
+############
+
+# Also, let's get some numbers in place so can understand what 'k's are affected by 
+# quantisation.
+
+###########
+
+# Get usual numbers set up.
+
+# Set them as in test_my_interior_and_exterior_metrics.map.
+
+parsec_in_m:=3.087e16;
+
+year_in_sec:=evalf(3600*24*365.25);
+
+bigG:=6.6732e-11;
+
+lightc:=2.998e8;
+
+hbar:=1.0546e-34;
+
+# Going to use units in which hbar=c=1.
+
+bigGd:=hbar*bigG/lightc^3;
+
+# First, what is Lambda in natural units, if Oml=0.7 and H0=72?
+
+H0_in_sm1:=72e3/parsec_in_m/1e6;
+
+Lambda_in_sm2:=3*H0_in_sm1^2*0.7;
+
+Lambda_in_mm2:=Lambda_in_sm2/lightc^2;
+
+Lambda_in_plm2:=Lambda_in_mm2/(1/sqrt(bigGd))^2;
+
+# Departing a bit from what we've had before at this point.
+
+# How big is 1kpc, in natural units?
+
+1e3*parsec_in_m/sqrt(bigGd);
+
+tmp_1kpc_nat:=%;
+
+# Also get one solar mass in natural units.
+
+2e30*bigG/lightc^2;
+
+%/sqrt(bigGd);
+
+tmp_Msun_nat:=%;
+
+# Would be useful to have something the scale of the Solar System as well.
+
+# Use Pluto orbit semi major axis.
+
+tmp_Pluto_semi_major:=5906376272e3;
+
+tmp_Pluto_sm_nat:=%/sqrt(bigGd);
+
+########################
+
+# So what is lambda if we use 1 kpc as unit of length?
+
+Lambda_in_mm2*(1e3*parsec_in_m)^2;
+
+tmp_lambda_for_1kpc:=%;
+
+# Let's in fact get various things set up for 1Mpc units, which we'll do cosmology in.
+
+# Following should give H0 in correct units.
+
+H0_in_sm1/lightc:
+3*%^2/8/Pi:
+%*(parsec_in_m*1e6)^2:
+evalf(%):
+
+tmp_rho0_crit_1Mpc:=%;
+
+3*H0^2/(8*Pi)=%;
+
+solve(%,H0);
+
+tmp_H0_1Mpc:=%[1];
+
+# (Bit of a convoluted route! - note following is easier:)
+
+72/lightc;
+
+# Also get Lambda in right units.
+
+lambda/3/tmp_H0_1Mpc^2=0.7:
+
+solve(%,lambda);
+
+tmp_Lambda_1Mpc:=%;
+
+# Check it's what we'd get if done directly:
+
+Lambda_in_mm2*(parsec_in_m*1e6)^2;
+
+# Fine.
+
+#####################
+
+# Have a go at integral expression to see if can get in terms of easier functions
+# than Heun.
+
+# By explicitly doing the sum over the roots which Maple gives when evaluating
+# the integral
+
+tmp_int_bit:=Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4),a);
+
+# Changing Int to int get something which is gievn by a sum over roots.
+
+# Do that explcitly here.
+
+RootOf(1+_Z^2*K^2+_Z^4);
+
+allvalues(%);
+
+tmp_roots:=[%];
+
+tmp_thing:=_alpha/(2*K^2+4*_alpha^2)*(-1/2*1/(-_alpha^2*K^2)^(1/2)*arctanh(_alpha^2*(-_alpha^2+a^2-K^2)/(-_alpha^2*K^2)^(1/2)/(a^4+1)^(1/2))+(-1)^(3/4)*(-_alpha^3-_alpha*K^2)*(1-I*a^2)^(1/2)*(a^2*I+1)^(1/2)/(a^4+1)^(1/2)*EllipticPi((-1)^(1/4)*a,_alpha^2*I+K^2*I,(-I)^(1/2)*(-1)^(3/4)));
+
+tmp_sum:=0:
+
+for ii from 1 to 4 do
+
+    tmp_sum:=tmp_sum+subs(_alpha=tmp_roots[ii],tmp_thing):
+    
+od:
+
+tmp_sum:
+fs(%);
+
+# Can sort out 1+a^4 bit and exp(I*Pi/4) bits in this to get:
+
+tmp_int_res:=exp(-I*Pi/4)*(-EllipticPi(exp(I*Pi/4)*a,1/2*I*(K^2
++(K^4-4)^(1/2)),I)+EllipticPi(exp(I*Pi/4)*a,1/2*I
+*(K^2-(K^4-4)^(1/2)),I))/(K^4-4)^(1/2);
+
+# Check this one:
+
+tmptmp:=Int(a^2/(a^4+1)^(1/2)/(1+a^2*K^2+a^4),a=0..ad);
+
+tmp1:=subs(K=10,tmptmp):
+
+tmp_plot1:=plot([seq([i/5,evalf(subs(ad=i/5,tmp1))],i=0..50)],color=red):
+
+tmp2:=subs(K=10,tmp_int_res):
+
+tmp_plot2:=plot([seq([i/5,evalf(subs(a=i/5,tmp2))],i=0..50)],color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Agrees!
+
+# Also, can check series.
+
+tmp_int_res:
+series(%,a,8):
+fs(%);
+
+tmp_int_bit:
+series(%,a,8):
+fs(%);
+
+# Fine.
+
+# So use in result for Phi.
+
+tmp_Phi_int_sol:
+subs(tmp_int_bit=thing,%);
+
+subs((-(K^2-2)*(K^2+2))^(1/2)=I*((K^2-2)*(K^2+2))^(1/2),%):
+subs((-(K^2-2)*(K^2+2))^(-1/2)=1/(I*((K^2-2)*(K^2+2))^(1/2)),%):
+convert(%,trig):
+
+tmp_Phi_expr_schem:=%;
+
+subs(thing=tmp_int_res,%):
+
+tmp_Phi_expr_use:=fs(%);
+
+####################
+
+# Ok, now want to write up what happens re initial values at big bang.
+
+tmp_Phi_ser_in_a_try:=a^nu*(c0+c1*a+c2*a^2+c3*a^3+c4*a^4+c5*a^5+c6*a^6);
+
+# Eqn in a in form we want is still in tmp_eqn (ought to change this at some point!):
+
+tmp_eqn:
+subs(Phi(a)=tmp_Phi_ser_in_a_try,%/Lambda):
+fs(%/a^nu):
+series(%,a):
+fs(%);
+
+# So possible indicial indices are -3 and 0.
+
+# Check -3 leads to a solution.
+
+tmp_ser_hold:=%:
+
+subs(nu=-3,%):
+fs(%);
+subs(c1=0,c3=0,%):
+
+tmp:=%;
+
+solve({op(1,tmp),op(3,tmp)},{c2,c4});
+
+tmp_c2c4_sing:=fs(%);
+
+# Do same in non-singular case (where we should already know entries!).
+
+tmp_ser_hold:
+subs(nu=0,%):
+fs(%);
+subs(c1=0,c3=0,%):
+
+tmp:=%;
+
+solve({op(1,tmp),op(3,tmp)},{c2,c4});
+
+tmp_c2c4_non_sing:=fs(%);
+
+# Excellent (matches up).
+
+# Make up Phi series in form we can use.
+
+tmp_Phi_ser_in_a_try:
+subs(nu=0,%):
+subs(c1=0,c3=0,%):
+subs(tmp_c2c4_non_sing,%):
+subs(c5=0,c6=0,%):
+
+tmp_Phi_ser_non_sing_use:=%;
+
+tmp_Phi_ser_in_a_try:
+subs(nu=-3,%):
+subs(c1=0,c3=0,%):
+subs(tmp_c2c4_sing,%):
+subs(c5=0,c6=0,%):
+
+tmp_Phi_ser_sing_use:=%;
+
+############
+
+# Also get equivalent expressions (i.e. expansions in a) for delta and V.
+
+tmp_delta_from_Phi:
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+subs(C=Lambda/3,%):
+subs(k=K*sqrt(Lambda),%):
+fs(%):
+
+tmp_delta_via_a:=%;
+
+tmp_V_from_Phi:
+subs(w(t)=1/3,%):
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+subs(C=Lambda/3,%):
+subs(k=K*sqrt(Lambda),%):
+fs(%);
+
+simplify(%,symbolic):
+
+tmp_V_via_a:=%;
+
+# Get series.
+
+tmp_delta_via_a:
+subs(Phi(a)=tmp_Phi_ser_non_sing_use,%):
+fs(%):
+series(%,a):
+fs(%):
+expand(%):
+convert(%,polynom):
+
+tmp_delta_ser_non_sing:=%;
+
+tmp_delta_via_a:
+subs(Phi(a)=tmp_Phi_ser_sing_use,%):
+fs(%):
+series(%,a):
+fs(%):
+expand(%):
+convert(%,polynom):
+
+tmp_delta_ser_sing:=%;
+
+##########
+
+# Now same for V.
+
+tmp_V_via_a:
+subs(Phi(a)=tmp_Phi_ser_non_sing_use,%):
+fs(%):
+series(%,a,4):
+fs(%):
+expand(%):
+convert(%,polynom):
+
+tmp_V_ser_non_sing:=%;
+
+tmp_V_via_a:
+subs(Phi(a)=tmp_Phi_ser_sing_use,%):
+fs(%):
+series(%,a):
+fs(%):
+expand(%):
+convert(%,polynom):
+
+tmp_V_ser_sing:=%;
+
+# (Have only bothered with the first two terms of these.)
+
+###################
+
+# Want to be able to look at Weyl tensor.
+
+make_Rh:=proc(ii,jj)
+
+    local tmp1,tmp2,tmp3,tmp4,tmp5,tmp6;
+
+    tmp1:=ds(ds(dbpart(ed||ii&@ed||jj)&@dbpart(gu1&@gu0))[1]*R01);
+    tmp2:=ds(ds(dbpart(ed||ii&@ed||jj)&@dbpart(gu2&@gu0))[1]*R02);
+    tmp3:=ds(ds(dbpart(ed||ii&@ed||jj)&@dbpart(gu3&@gu0))[1]*R03);
+    tmp4:=ds(ds(dbpart(ed||ii&@ed||jj)&@dbpart(gu2&@gu1))[1]*R12);
+    tmp5:=ds(ds(dbpart(ed||ii&@ed||jj)&@dbpart(gu3&@gu1))[1]*R13);
+    tmp6:=ds(ds(dbpart(ed||ii&@ed||jj)&@dbpart(gu3&@gu2))[1]*R23);
+    ds(tmp1+tmp2+tmp3+tmp4+tmp5+tmp6);
+end:
+
+for ii from 0 to 3 do
+
+        for jj from 0 to 3 do
+
+                tmp_Weyl||ii||jj:=dbpart(ds(make_Rh(ii,jj)-
+                        1/2*(ed||ii&@Rich||jj+Rich||ii&@ed||jj-1/3*ed||ii&@ed||jj*bigr)));
+
+        od:
+od:
+
+for ii from 0 to 3 do
+
+        for jj from 0 to 3 do
+
+            tmp_Weyl||ii||jj;
+        	map(series,%,epsilon,2);
+            fs(%);
+	        map(convert,%,polynom);
+
+            Weyl||ii||jj:=%;
+
+        od:
+od:
+
+eval_W:= proc(biv)
+
+	local tmp1,tmp2,tmp3,tmp4,tmp5,tmp6,result;
+
+	tmp1:=ds(biv&@(eu1&@eu0))[1];
+	tmp2:=ds(biv&@(eu2&@eu0))[1];
+	tmp3:=ds(biv&@(eu3&@eu0))[1];
+	tmp4:=ds(biv&@(eu2&@eu1))[1];
+	tmp5:=ds(biv&@(eu3&@eu1))[1];
+	tmp6:=ds(biv&@(eu3&@eu2))[1];
+
+	result:=ds(tmp1*Weyl01+tmp2*Weyl02+tmp3*Weyl03
+                  +tmp4*Weyl12+tmp5*Weyl13+tmp6*Weyl23);
+
+end:
+
+# Set up bivector basis in case we need it.
+
+Ed1:=ds(ed0&@ed1);
+Ed2:=ds(ed0&@ed2);
+Ed3:=ds(ed0&@ed3);
+Ed4:=ds(ed1&@ed2);
+Ed5:=ds(ed1&@ed3);
+Ed6:=ds(ed2&@ed3);
+
+Eu1:=ds(eu1&@eu0);
+Eu2:=ds(eu2&@eu0);
+Eu3:=ds(eu3&@eu0);
+Eu4:=ds(eu2&@eu1);
+Eu5:=ds(eu3&@eu1);
+Eu6:=ds(eu3&@eu2);
+
+# Now, first check Weyl is self-dual.
+
+spatial_biv:=ds(p1*ed0&@ed1+p2*ed0&@ed2+p3*ed0&@ed3);
+
+ds(ps&@eval_W(spatial_biv)-eval_W(ps&@spatial_biv));
+
+# Fine. So look at eigenvalues. Soon find we don't need a pseudoscalar bit in eigenvalue.
+
+ds(eval_W(spatial_biv)-epsilon*alpha(t,x,y,z)*spatial_biv):
+
+tmp_hold:=dppb(%):
+
+# Have a routine which converts to Fourier domain - need to include alpha this time.
+
+conv_to_fourier:=proc(func);
+
+    func;
+    
+    subs(Phi(t,x,y,z)=Phi(t)*exp(+I*(kx*x+ky*y+kz*z)),
+    Theta(t,x,y,z)=Theta(t)*exp(+I*(kx*x+ky*y+kz*z)),%);
+    
+    subs(alpha(t,x,y,z)=alpha(t)*exp(+I*(kx*x+ky*y+kz*z)),%);
+
+    subs(v1(t)=-I*kx/k*V(t),%):
+    subs(v2(t)=-I*ky/k*V(t),%):
+    subs(v3(t)=-I*kz/k*V(t),%):
+    
+    ds(%*exp(-I*(kx*x+ky*y+kz*z)));
+    
+    subs(kx^2=k^2-ky^2-kz^2,%):
+    
+    subs(Theta(t)=Phi(t),%);
+    subs(delta_rho(t)=delta(t)*rho(t),%):
+    subs(P(t)=w(t)*rho(t),delta_P(t)=w(t)*rho(t)*delta(t),%):
+    subs(rho(t)=tmp_rho_subs,%):
+    fs(%);
+    
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%):
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%);
+    
+    subs(diff(H(t),t)=tmp_Ht_from_w,%):
+    
+    fs(%);
+    
+end:
+
+for kk from 1 to 3 do 
+
+    conv_to_fourier(tmp_hold[kk]); 
+    
+    tmp_res||kk:=%[1]; # Only has scalar components.
+    
+od:
+
+tmp_keep:=solve({tmp_res2,tmp_res3},{p1,p2});
+
+subs(tmp_keep,tmp_res1):
+fs(%);
+
+subs(kx^2=k^2-ky^2-kz^2,%):
+fs(%);
+
+# Very good!
+
+solve(%,alpha(t));
+
+# Preserve order via:
+
+tmp_alpha_sols:=[-2/3*Phi(t)*k^2/a(t)^2, 1/3*Phi(t)*k^2/a(t)^2];
+
+tmp_keep:
+subs(alpha(t)=tmp_alpha_sols[1],%):
+fs(%);
+
+# So this is an relative eigenvector in same direction as k.
+
+tmp_keep:
+subs(alpha(t)=tmp_alpha_sols[2],%):
+fs(%);
+
+# So presumably this is orthogonal to k?
+
+subs(%,kx*p1+ky*p2+kz*p3):
+fs(%);
+
+# Just so. Note they'll be two of these, so end up traceless overall.
+
+# Anyway, pretty clear Weyl eigenvalues are not going vanish
+# on initial surface, though could at end.
+
+# Have a look now at endpoint series for Phi, delta and V.
+
+###############################
+
+# Now do series for Phi at a=infinity.
+
+tmp_eqn/Lambda:
+dchange({a=1/s},%):
+fs(%);
+
+tmp_Phi_eqn_in_s:=s^3*%;
+
+tmp_Phi_ser_in_s_try:=s^nu*(c0+c1*s+c2*s^2+c3*s^3+c4*s^4+c5*s^5+c6*s^6);
+
+subs(Phi(s)=tmp_Phi_ser_in_s_try,tmp_Phi_eqn_in_s):
+fs(%/s^nu):
+series(%,s):
+fs(%);
+
+# So possible indicial indices are 1 and 4.
+
+tmp_ser_hold:=%:
+
+# Do the two cases.
+
+tmp_ser_hold:
+subs(nu=1,%):
+fs(%);
+subs(c1=0,c3=0,%):
+
+tmp:=%;
+
+solve({op(1,tmp),op(3,tmp)},{c2,c4});
+
+tmp_c2c4_nu_1:=fs(%);
+
+# Save this series since will use below.
+
+tmp_Phi_ser_in_s_try:
+subs(nu=1,tmp_c2c4_nu_1,c1=0,c3=0,%):
+subs(c5=0,c6=0,%):
+
+tmp_Phi_ser_in_s_nu_1_use:=%;
+
+tmp_ser_hold:
+subs(nu=4,%):
+fs(%);
+subs(c1=0,c3=0,%):
+
+tmp:=%;
+
+solve({op(1,tmp),op(3,tmp)},{c2,c4});
+
+tmp_c2c4_nu_4:=fs(%);
+
+# Also save this version.
+
+tmp_Phi_ser_in_s_try:
+subs(nu=4,tmp_c2c4_nu_4,c1=0,c3=0,%):
+subs(c5=0,c6=0,%):
+
+tmp_Phi_ser_in_s_nu_4_use:=%;
+
+# Assemble equivalent series for delta and V.
+
+tmp_delta_via_a:
+dchange({a=1/s},%):
+tmp:=fs(%);
+
+# Get coeffs for write up.
+
+coeff(tmp,diff(Phi(s),s)):
+fs(%);
+
+tmp:
+subs(diff(Phi(s),s)=0,%):
+coeff(%,Phi(s)):
+fs(%);
+
+# Now get series.
+
+tmp:
+subs(Phi(s)=tmp_Phi_ser_in_s_nu_1_use,%):
+fs(%):
+series(%,s,10):
+fs(%):
+expand(%);
+
+tmp_delta_ser_in_s_nu_1_use:=convert(%,polynom);
+
+tmp:
+subs(Phi(s)=tmp_Phi_ser_in_s_nu_4_use,%):
+fs(%):
+series(%,s,8):
+fs(%):
+expand(%);
+
+tmp_delta_ser_in_s_nu_4_use:=convert(%,polynom);
+
+#####
+
+# Do same for V.
+
+tmp_V_via_a:
+dchange({a=1/s},%):
+tmp:=fs(%);
+
+# Get coeffs for write up.
+
+coeff(tmp,diff(Phi(s),s)):
+fs(%);
+
+tmp:
+subs(diff(Phi(s),s)=0,%):
+coeff(%,Phi(s)):
+fs(%);
+
+# Now get series.
+
+tmp:
+subs(Phi(s)=tmp_Phi_ser_in_s_nu_1_use,%):
+fs(%):
+series(%,s,6):
+fs(%):
+expand(%);
+
+tmp_V_ser_in_s_nu_1_use:=convert(%,polynom);
+
+tmp:
+subs(Phi(s)=tmp_Phi_ser_in_s_nu_4_use,%):
+fs(%):
+series(%,s,6):
+fs(%):
+expand(%);
+
+tmp_V_ser_in_s_nu_4_use:=convert(%,polynom);
+
+###############################
+
+# Would like to get plots for write up which are *not* for special K value
+# but nevertheless go all the wa to the end, both in conformal and cosmic time.
+
+# Use an increased number of points and go slightly further in eta,
+# since then get to larger cosmic time.
+
+##################
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=tmp_root_for_K_near_10-0.5;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=3.2105;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+# Following builds up the plot against cosmic time.
+
+tmp_plot1:=plot([seq([1/2/sqrt(tmp_Lambda_num/3)*arcsinh((10^pointsa||i[2])^2)
+,pointsPhi||i[2]],i=1..Ntot-2)],thickness=2,color=red):
+
+tmp_plot2:=plot([seq([1/2/sqrt(tmp_Lambda_num/3)*arcsinh((10^pointsa||i[2])^2)
+,pointsdelta||i[2]],i=1..Ntot-2)],thickness=2,color=black):
+
+tmp_plot3:=plot([seq([1/2/sqrt(tmp_Lambda_num/3)*arcsinh((10^pointsa||i[2])^2)
+,pointsV||i[2]],i=1..Ntot-2)],thickness=2,color=blue):
+
+display([tmp_plot1,tmp_plot2,tmp_plot3]);
+
+# Export a version of this.
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+###*** Fig. 4
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\delta_V_cosmic_time.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans:=display([tmp_plot1,tmp_plot2,tmp_plot3],labels=[`t`,`delta and V`],labeldirections=[horizontal,vertical]);
+Export("delta_V_cosmic_time_1.csv",op([1,1],ans));
+Export("delta_V_cosmic_time_2.csv",op([2,1],ans));
+Export("delta_V_cosmic_time_3.csv",op([3,1],ans));
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+##############
+
+# Also export the plot w.r.t. conformal time. Note have to remake them due to problems
+# with last points.
+
+tmp_plot1:=plot([seq([pointsPhi||i[1],pointsPhi||i[2]],i=1..Ntot-2)],thickness=2,color=red):
+
+tmp_plot2:=plot([seq([pointsPhi||i[1]
+,pointsdelta||i[2]],i=1..Ntot-2)],thickness=2,color=black):
+
+tmp_plot3:=plot([seq([pointsPhi||i[1]
+,pointsV||i[2]],i=1..Ntot-2)],thickness=2,color=blue):
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+###*** Fig. 3
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\delta_V_Phi_conformal_time.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans:=display([tmp_plot1,tmp_plot2,tmp_plot3],labels=[`eta`,`delta, Phi and V`],labeldirections=[horizontal,vertical]);
+Export("delta_V_Phi_conformal_time_1.csv",op([1,1],ans));
+Export("delta_V_Phi_conformal_time_2.csv",op([2,1],ans));
+Export("delta_V_Phi_conformal_time_3.csv",op([3,1],ans));
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+#################################
+
+# Now want to look properly at what's happening near conformal boundary.
+
+# What might be quite convincing is to work with s(t)=1/a(t), but start
+# solution at halfway point of 'first epoch' and let function develop from
+# there. Then should go smoothly through t=t_tot. (Remember our t here is
+# really conformal time eta.)
+
+# So first need equations in s=1/a.
+
+Ein_zeroth0[2]:
+subs(a(t)=1/s(t),%):
+fs(%):
+
+%-(8*Pi*rho(t)+Lambda):
+
+tmp_eqn1:=%;
+
+Ein_zeroth1[3]:
+subs(a(t)=1/s(t),%):
+fs(%):
+
+%-(-1/3*8*Pi*rho(t)+Lambda):
+
+tmp_eqn2:=%;
+
+# Use rho subs and C subs from above.
+
+tmp_eqn1:
+subs(rho(t)=3*C/(8*Pi)*s(t)^4,%):
+subs(C=Lambda/3,%):
+
+tmp_eqn1_new:=fs(%);
+
+tmp_eqn2:
+subs(rho(t)=3*C/(8*Pi)*s(t)^4,%):
+subs(C=Lambda/3,%):
+
+tmp_eqn2_new:=fs(%);
+
+# Note in both of these that there is a family of solutions where t just scales
+# with sqrt(Lambda).
+
+# So can put Lambda=1 wlog.
+
+# Note difference of these gives a nice second order eqn:
+
+tmp_eqn1_new-tmp_eqn2_new:
+fs(%);
+
+# but have found that some nice solutions of this don't satisfy
+# first order eqn, so had better work with this.
+
+# Believe solutions are Jacobi elliptic functions, and want to find
+# the one appropriate to starting at halfway point in first epoch.
+
+# Not having much luck in this as yet, so try something which definitely works,
+# which is finding a function which does what we are expecting at the FCB.
+
+tmp_try:=a*JacobiSD(b*t,1/sqrt(2));
+
+tmp_eqn1_new:
+subs(s(t)=tmp_try,Lambda=1,%):
+fs(%):
+
+tmp:=numer(%);
+
+coeff(tmp,JacobiSN(b*t,1/2*2^(1/2)),4);
+
+subs(a^4=-1/4,tmp):
+fs(%);
+
+solve(%,b^2);
+
+# So following gives form we are expecting:
+
+tmp_try:
+subs(b=-1/sqrt(3)/a,%):
+
+series(%,t,10):
+fs(%);
+
+subs(a=(-1/4)^(1/4),%);
+
+# Fine.
+
+# So we think:
+
+tmp_s_sol_at_FCB:=-a*JacobiSD(1/3*3^(1/2)/a*t,1/2*2^(1/2));
+
+# satisfies equation for any of 4 roots of a^4=-1/4.
+
+# Try a plot.
+
+tmp_s_sol_at_FCB:
+subs(a=(1/2*(1+I)),%):
+
+plot(log10(%),t=-3.21..-0.01);
+
+# Very good. Note slope at origin in forced, we didn't have to fix anything.
+
+# Also show explicitly satisfies both equations.
+
+tmp_eqn1_new:
+subs(s(t)=tmp_s_sol_at_FCB,%):
+subs(Lambda=1,%):
+fs(%);
+
+# Now:
+
+(2*a^2-2*a+1)*(2*a^2+2*a+1);
+
+expand(%);
+
+# So fine.
+
+tmp_eqn2_new:
+subs(s(t)=tmp_s_sol_at_FCB,%):
+subs(Lambda=1,%):
+fs(%);
+
+# Also fine. Note:
+
+tmp_eqn1_new-tmp_eqn2_new:
+fs(%);
+
+subs(s(t)=tmp_s_sol_at_FCB,%):
+subs(Lambda=1,%):
+fs(%);
+
+# also fixes a, but think when we were working with just this equation, we didn't
+# end up with b going as 1/a, so hadn't got a fixed slope at origin. (Not
+# sure re this.)
+
+# Now, what would be good, is to understand how we could work at halfway point instead.
+
+# What change of argument is this re table 16.8 in A+S?
+
+# Actually, before that have found a nice way of expressing our solution
+# based on FCB.
+
+tmp_s_sol_at_FCB_alt:=-JacobiSN(1/sqrt(3)*t,1/sqrt(2))*JacobiDN(1/sqrt(3)*t,1/sqrt(2))/JacobiCN(1/sqrt(3)*t,1/sqrt(2));
+
+tmp_eqn1_new:
+subs(s(t)=tmp_s_sol_at_FCB_alt,%):
+subs(Lambda=1,%):
+fs(%);
+
+# This is using just the basic 3 real functions, and in a configuration like tan!
+
+# Maybe in light of this, more sensible to use 1/sqrt(Lambda/3) as time unit instead
+# of 1/sqrt(Lambda)? Then would just have t's as arguments in this function.
+
+# Anyway, do a plot for writeup of function just found.
+
+###*** Fig. 5
+
+ans := plot(tmp_s_sol_at_FCB_alt,t=-3..3);
+Export("elliptical_tan.csv",op([1,1],ans));
+
+# Also do one in which we simulate Penrose proposal.
+
+tmp_plot1:=plot(tmp_s_sol_at_FCB_alt,t=-3..0):
+
+tmp_plot2:=plot(subs(t=x-tmp_eta_tot,tmp_s_sol_at_FCB_alt),x=-3+tmp_eta_tot..tmp_eta_tot):
+
+###*** Fig. 6
+
+display([tmp_plot1,tmp_plot2]);
+
+Export("Penrose_tan_1.csv",op([1,1],tmp_plot1));
+Export("Penrose_tan_2.csv",op([1,1],tmp_plot2));
+
+######################################
+
+# Ok, next want to pursue question of perturbations going through the FCB, 
+# and what happens after that.
+
+# Think to do this, we will probably have to see what combination of series in
+# s we want coming out of s=0, and relate this to series in eta.
+
+# Then can integrate this in eta numerically from this starting point (going
+# in either direction).
+
+# So establish series in eta about FCB for Phi.
+
+# We already have the series in s for this, so just need to relate s to eta.
+
+# We can do this via our analytic expression of course, but just note following
+# first, which we didn't know 'solve' could do.
+
+# Note where we are saying eta here, we mean conformal time which is of course
+# currently t in the program.
+
+# We know ds/deta=-H, so:
+
+-1/tmp_Hofa_try:
+subs(a=1/s,%):
+subs(C=Lambda/3,Lambda=1,%):
+fs(%):
+simplify(%,symbolic);
+
+# So this is ds/deta.
+
+series(tmp,s,10);
+
+tmptmp:=int(%,s);
+
+# So the new thing we didn't know solve could do, is invert this series!
+# (Note have to increase Order parameter manually to get this.)
+
+Order:=10;
+
+solve(tmptmp=eta,s);
+
+# Can compare this with: 
+
+tmp_s_sol_at_FCB_alt:
+
+series(%,t,10);
+
+# Very good.
+
+# Use latter now to get what we want in terms of Phi series (work to 3 terms).
+
+tmp_s_from_conf_time_ser:=convert(%,polynom);
+
+# (Put Order back to usual value.)
+
+Order:=6;
+
+tmp_Phi_ser_in_s_nu_1_use:
+subs(s=tmp_s_from_conf_time_ser,%):
+series(%,t,6):
+fs(%);
+
+tmp_Phi_ser_in_t_nu_1_use:=convert(%,polynom);
+
+tmp_Phi_ser_in_s_nu_4_use:
+subs(s=tmp_s_from_conf_time_ser,%):
+series(%,t,10):
+fs(%);
+
+tmp_Phi_ser_in_t_nu_4_use:=convert(%,polynom);
+
+# Do the same for delta and V series.
+
+tmp_delta_ser_in_s_nu_1_use:
+subs(s=tmp_s_from_conf_time_ser,%):
+series(%,t,6):
+fs(%);
+
+tmp_delta_ser_in_t_nu_1_use:=convert(%,polynom);
+
+tmp_delta_ser_in_s_nu_4_use:
+subs(s=tmp_s_from_conf_time_ser,%):
+series(%,t,6):
+fs(%);
+
+tmp_delta_ser_in_t_nu_4_use:=convert(%,polynom);
+
+tmp_V_ser_in_s_nu_1_use:
+subs(s=tmp_s_from_conf_time_ser,%):
+series(%,t,6):
+fs(%);
+
+tmp_V_ser_in_t_nu_1_use:=convert(%,polynom);
+
+tmp_V_ser_in_s_nu_4_use:
+subs(s=tmp_s_from_conf_time_ser,%):
+series(%,t,6):
+fs(%);
+
+tmp_V_ser_in_t_nu_4_use:=convert(%,polynom);
+
+###############
+
+# Ok, with these in place, now integrate up to just short of the FCB to get some
+# values we can use in conjunction with these series.
+
+# Repeat last numerically integration, but now going to eta=3.2.
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=tmp_root_for_K_near_10-0.5;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=3.2;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+tmptmp_save:=tmptmp;
+
+# Also save Phi, V and delta plots.
+
+plotPhi_save:=plotPhi:
+
+plotV_save:=plotV:
+
+plotdelta_save:=plotdelta:
+
+# Ok, set up what we need to describe transition.
+
+tmp_K_num:=tmp_k_num/sqrt(tmp_Lambda_num);
+
+tmp_eta_num:=subs(tmptmp_save,t)-tmp_eta_tot;
+
+subs(c0=c01,tmp_Phi_ser_in_t_nu_1_use)+subs(c0=c04,tmp_Phi_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+tmp_hold:=%;
+
+tmp1:=subs(t=tmp_eta_num,tmp_hold)-subs(tmptmp_save,Phi(t));
+
+tmp2:=subs(t=tmp_eta_num,diff(tmp_hold,t))-subs(tmptmp_save,diff(Phi(t),t));
+
+solve({tmp1,tmp2},{c01,c04});
+
+tmp_c01c04_sol:=%;
+
+# So could do plot of what things look like in vicinity of FCB.
+
+tmp_hold:
+subs(tmp_c01c04_sol,%):
+
+tmp_Phi_near_FCB:=%;
+
+tmp_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_Phi_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([tmp_plot,plotPhi],view=[3..3.3,-0.0002..0.0002]);
+
+# Looks good!
+
+###############
+
+# Ok, now continue integration from the point symmetrically the other side
+# of the boundary.
+
+tmp_Phi_near_FCB:
+subs(t=-tmp_eta_num,%):
+
+tmp_Phi_restart:=evalf(%);
+
+tmp_Phi_near_FCB:
+diff(%,t):
+subs(t=-tmp_eta_num,%):
+
+tmp_Phit_restart:=evalf(%);
+
+# Have got to set up initial H value and derivative as well.
+
+tmp_s_from_conf_time_ser:
+diff(%,t):
+tmp:=%:
+
+subs(t=-tmp_eta_num,%):
+
+tmp_H_restart:=-evalf(%);
+
+diff(tmp,t):
+
+subs(t=-tmp_eta_num,%):
+
+tmp_Ht_restart:=-evalf(%);
+
+###################################
+
+tmp_Phi_start_num:=tmp_Phi_restart;
+
+tmp_Phit_start_num:=tmp_Phit_restart;
+
+tmp_H_start_num:=tmp_H_restart;
+
+tmp_Ht_start_num:=tmp_Ht_restart;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+t_start:=tmp_eta_tot-tmp_eta_num;
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=2*tmp_eta_tot-0.1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(-tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+# Now see how perturbs line up.
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save],
+view=[2.8..3.5,-10..10]);
+
+# Looks excellent!
+
+# Also plot the total sequence.
+
+###*** Fig. 7
+
+ans := display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save]);
+Export("full_range_wrong_K_1.csv",op([1,1],ans));
+Export("full_range_wrong_K_2.csv",op([2,1],ans));
+Export("full_range_wrong_K_3.csv",op([3,1],ans));
+Export("full_range_wrong_K_4.csv",op([4,1],ans));
+Export("full_range_wrong_K_5.csv",op([5,1],ans));
+Export("full_range_wrong_K_6.csv",op([6,1],ans));
+
+#######################
+
+# Now repeat all this again, but with K equal to a magic value.
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=tmp_root_for_K_near_10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+# Go to a value we've determined gives good results for this range.
+
+t_max:=3.195;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+tmptmp_save:=tmptmp;
+
+# Also save Phi, V and delta plots. (And for this case make psi plot as well, so can plot
+# a^2 Phi over full range here.)
+
+plotPhi_save:=plotPhi:
+
+plotV_save:=plotV:
+
+plotdelta_save:=plotdelta:
+
+# Save 100 x psi points so can see more easily.
+
+plotpsi_save:=plot([seq([pointsa||i[1],100*(10^pointsa||i[2])^2*pointsPhi||i[2]],i=1..Ntot)]
+,color=red):
+
+# Ok, set up what we need to describe transition.
+
+tmp_K_num:=tmp_k_num/sqrt(tmp_Lambda_num);
+
+tmp_eta_num:=subs(tmptmp_save,t)-tmp_eta_tot;
+
+subs(c0=c01,tmp_Phi_ser_in_t_nu_1_use)+subs(c0=c04,tmp_Phi_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+tmp_hold:=%;
+
+tmp1:=subs(t=tmp_eta_num,tmp_hold)-subs(tmptmp_save,Phi(t));
+
+tmp2:=subs(t=tmp_eta_num,diff(tmp_hold,t))-subs(tmptmp_save,diff(Phi(t),t));
+
+solve({tmp1,tmp2},{c01,c04});
+
+tmp_c01c04_sol:=%;
+
+# So could do plot of what things look like in vicinity of FCB.
+
+tmp_hold:
+subs(tmp_c01c04_sol,%):
+
+tmp_Phi_near_FCB:=%;
+
+tmp_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_Phi_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([tmp_plot,plotPhi],view=[3..3.3,-0.0002..0.0002]);
+
+# Looks good!
+
+###############
+
+# Ok, now continue integration from the point symmetrically the other side
+# of the boundary.
+
+tmp_Phi_near_FCB:
+subs(t=-tmp_eta_num,%):
+
+tmp_Phi_restart:=evalf(%);
+
+tmp_Phi_near_FCB:
+diff(%,t):
+subs(t=-tmp_eta_num,%):
+
+tmp_Phit_restart:=evalf(%);
+
+# Have got to set up initial H value and derivative as well.
+
+tmp_s_from_conf_time_ser:
+diff(%,t):
+tmp:=%:
+
+subs(t=-tmp_eta_num,%):
+
+tmp_H_restart:=-evalf(%);
+
+diff(tmp,t):
+
+subs(t=-tmp_eta_num,%):
+
+tmp_Ht_restart:=-evalf(%);
+
+###################################
+
+tmp_Phi_start_num:=tmp_Phi_restart;
+
+tmp_Phit_start_num:=tmp_Phit_restart;
+
+tmp_H_start_num:=tmp_H_restart;
+
+tmp_Ht_start_num:=tmp_Ht_restart;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+t_start:=tmp_eta_tot-tmp_eta_num;
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+# Go to a value we've determined looks ok for this case!
+
+t_max:=2*tmp_eta_tot-0.02;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(-tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+# Now see how perturbs line up. For this case, include a^2*Phi instead of Phi.
+
+# Save 100 x psi points so can see more easily.
+
+plotpsi:=plot([seq([pointsa||i[1],100*(-10^pointsa||i[2])^2*pointsPhi||i[2]],i=1..Ntot)]
+,color=red):
+
+display([plotpsi,plotV,plotdelta,plotpsi_save,plotV_save,plotdelta_save],
+view=[2.8..3.5,-10..10]);
+
+# And full range.
+
+display([plotpsi,plotV,plotdelta,plotpsi_save,plotV_save,plotdelta_save]);
+
+# Again looks excellent in terms of lining up, and now perturbs
+# are remaining finite going into new big bang!
+
+# Next bit in fact copied from below, since we only realised later on we
+# wanted to fill in the gaps here.
+
+# Would be worth filling in the gaps on this plot.
+
+subs(c0=c01,tmp_delta_ser_in_t_nu_1_use)+subs(c0=c04,tmp_delta_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_delta_near_FCB:=%;
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=black):
+
+# Now V.
+
+subs(c0=c01,tmp_V_ser_in_t_nu_1_use)+subs(c0=c04,tmp_V_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_V_near_FCB:=%;
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot]);
+
+# This is going 10 times further out than gap itself, and still looks pretty good!
+
+# Do again only going once out.
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=black):
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot]);
+
+# Can't see the join!
+
+# Let's save this one properly.
+
+# Do save of full range plot.
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+###*** Fig. 12
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\full_range_higher_K.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans := display([plotpsi,plotV,plotdelta,plotpsi_save,plotV_save,plotdelta_save
+,tmp_delta_plot,tmp_V_plot],labels=[`eta`,`delta, a^2 Phi and V`],labeldirections=[horizontal,vertical]);
+
+Export("full_range_higher_K_no_V_1.csv",op([1,1],ans));
+Export("full_range_higher_K_no_V_2.csv",op([2,1],ans));
+Export("full_range_higher_K_no_V_3.csv",op([3,1],ans));
+Export("full_range_higher_K_no_V_4.csv",op([4,1],ans));
+Export("full_range_higher_K_no_V_5.csv",op([5,1],ans));
+Export("full_range_higher_K_no_V_6.csv",op([6,1],ans));
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+#####################
+
+# Now want to try another value of K. Looking at plots, realise
+# that probably we are missing out half the possible modes!
+
+# In ptic, ones which will be antisymmetric in Phi and delta, and symmetric in V.
+
+# Presumably these will satisfy:
+
+tmp_Phi_crit_other:=cos((K^4-4)^(1/2)*K*(EllipticK(1/2*2^(1/2))-EllipticPi(1/2-1/4*K^2,1/2*2^(1/2)))/(K^2-2));
+
+# So this lowers first acceptable mode to (we think):
+
+fsolve(tmp_Phi_crit_other,K,2..2.5);
+
+tmp_K_first:=%;
+
+# So try out this value. Note need to integrate to less close than before to the
+# FCB, since seems to run into problems earlier.
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=tmp_K_first;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=3.15;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+tmptmp_save:=tmptmp;
+
+# Also save Phi, V and delta plots.
+
+plotPhi_save:=plotPhi:
+
+plotV_save:=plotV:
+
+plotdelta_save:=plotdelta:
+
+# Ok, set up what we need to describe transition.
+
+tmp_K_num:=tmp_k_num/sqrt(tmp_Lambda_num);
+
+tmp_eta_num:=subs(tmptmp_save,t)-tmp_eta_tot;
+
+subs(c0=c01,tmp_Phi_ser_in_t_nu_1_use)+subs(c0=c04,tmp_Phi_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+tmp_hold:=%;
+
+tmp1:=subs(t=tmp_eta_num,tmp_hold)-subs(tmptmp_save,Phi(t));
+
+tmp2:=subs(t=tmp_eta_num,diff(tmp_hold,t))-subs(tmptmp_save,diff(Phi(t),t));
+
+solve({tmp1,tmp2},{c01,c04});
+
+tmp_c01c04_sol:=%;
+
+# So could do plot of what things look like in vicinity of FCB.
+
+tmp_hold:
+subs(tmp_c01c04_sol,%):
+
+tmp_Phi_near_FCB:=%;
+
+tmp_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_Phi_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([tmp_plot,plotPhi],view=[3..3.3,-0.0002..0.0002]);
+
+# Looks good!
+
+###############
+
+# Ok, now continue integration from the point symmetrically the other side
+# of the boundary.
+
+tmp_Phi_near_FCB:
+subs(t=-tmp_eta_num,%):
+
+tmp_Phi_restart:=evalf(%);
+
+tmp_Phi_near_FCB:
+diff(%,t):
+subs(t=-tmp_eta_num,%):
+
+tmp_Phit_restart:=evalf(%);
+
+# Have got to set up initial H value and derivative as well.
+
+tmp_s_from_conf_time_ser:
+diff(%,t):
+tmp:=%:
+
+subs(t=-tmp_eta_num,%):
+
+tmp_H_restart:=-evalf(%);
+
+diff(tmp,t):
+
+subs(t=-tmp_eta_num,%):
+
+tmp_Ht_restart:=-evalf(%);
+
+###################################
+
+tmp_Phi_start_num:=tmp_Phi_restart;
+
+tmp_Phit_start_num:=tmp_Phit_restart;
+
+tmp_H_start_num:=tmp_H_restart;
+
+tmp_Ht_start_num:=tmp_Ht_restart;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+t_start:=tmp_eta_tot-tmp_eta_num;
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=2*tmp_eta_tot-0.1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(-tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+# Now see how perturbs line up.
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save],
+view=[2.8..3.5,-10..10]);
+
+# and look at full range:
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save]);
+
+# Very interesting!
+
+# Would be worth filling in the gaps on this plot.
+
+subs(c0=c01,tmp_delta_ser_in_t_nu_1_use)+subs(c0=c04,tmp_delta_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_delta_near_FCB:=%;
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=black):
+
+# Now V.
+
+subs(c0=c01,tmp_V_ser_in_t_nu_1_use)+subs(c0=c04,tmp_V_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_V_near_FCB:=%;
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot]);
+
+# This is going 10 times further out than gap itself, and still looks pretty good!
+
+# Do again only going once out.
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=black):
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot]);
+
+# Can't see the join!
+
+# Let's save this one properly.
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+###*** Fig. 10
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\full_range_first_K.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans := display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot],labels=[`eta`,`delta, Phi and V`],labeldirections=[horizontal,vertical]);
+
+
+Export("full_range_first_K_1.csv",op([1,1],ans));
+Export("full_range_first_K_2.csv",op([2,1],ans));
+Export("full_range_first_K_3.csv",op([3,1],ans));
+Export("full_range_first_K_4.csv",op([4,1],ans));
+Export("full_range_first_K_5.csv",op([5,1],ans));
+Export("full_range_first_K_6.csv",op([6,1],ans));
+
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+##########################
+
+# Next thing to understand is relation of our k to cosmic scales in Mpc.
+
+# First, we think we can form comving horizon and compare it to
+# k via comparing 1/(a*H) with 1/k.
+
+# Do this and compare with what we've just called tmp_K_first.
+
+-tmp_s_sol_at_FCB_alt/diff(tmp_s_sol_at_FCB_alt,t):
+
+tmp_aH_recip:=fs(%);
+
+display([plot(tmp_aH_recip,t=-3.2..3.2),plot([[-3.2,1/tmp_K_first],[3.2,1/tmp_K_first]],color=blue)]);
+
+# Think that k value in Mpc^-1 corresponding to tmp_K_first is
+
+tmp_K_first*sqrt(tmp_Lambda_1Mpc):
+evalf(%);
+
+# Again, pretty interesting!
+
+#######################
+
+# For writeup, want to do plot of Phi criterion, i.e. the function of K,
+# with Pi/2 multiples superposed.
+
+tmp_crit_arg:=(K^4-4)^(1/2)*K*(EllipticK(1/2*2^(1/2))-EllipticPi(1/2-1/4*K^2,1/2*2^(1/2)))/(K^2-2):
+
+# Find first 4 values (already have first).
+
+tmp_K_1:=tmp_K_first;
+
+fsolve(tmp_crit_arg-Pi,K,2.5..3.5);
+
+tmp_K_2:=%;
+
+# Note for next values, need to take real part.
+
+fsolve(Re(tmp_crit_arg)-3*Pi/2,K,3.5..4.5);
+
+tmp_K_3:=%;
+
+fsolve(Re(tmp_crit_arg)-2*Pi,K,4.5..5.5);
+
+tmp_K_4:=%;
+
+tmp_max:=6;
+
+tmp_plot:=plot(tmp_crit_arg,K=sqrt(2)+0.001..tmp_max,color=blue):
+
+display([tmp_plot,
+plot([[sqrt(2),Pi/2],[tmp_max,Pi/2]]),
+plot([[tmp_K_1,0],[tmp_K_1,7]],thickness=2,color=black),
+plot([[sqrt(2),Pi],[tmp_max,Pi]]),
+plot([[tmp_K_2,0],[tmp_K_2,7]],thickness=2,color=black),
+plot([[sqrt(2),3*Pi/2],[tmp_max,3*Pi/2]]),
+plot([[tmp_K_3,0],[tmp_K_3,7]],thickness=2,color=black),
+plot([[sqrt(2),2*Pi],[tmp_max,2*Pi]]),
+plot([[tmp_K_4,0],[tmp_K_4,7]],thickness=2,color=black)
+]);
+
+# Let's save this one properly.
+
+###*** Fig. 8
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\K_crit.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans := display([tmp_plot,
+plot([[sqrt(2),Pi/2],[tmp_max,Pi/2]]),
+plot([[tmp_K_1,0],[tmp_K_1,7]],thickness=2,color=black),
+plot([[sqrt(2),Pi],[tmp_max,Pi]]),
+plot([[tmp_K_2,0],[tmp_K_2,7]],thickness=2,color=black),
+plot([[sqrt(2),3*Pi/2],[tmp_max,3*Pi/2]]),
+plot([[tmp_K_3,0],[tmp_K_3,7]],thickness=2,color=black),
+plot([[sqrt(2),2*Pi],[tmp_max,2*Pi]]),
+plot([[tmp_K_4,0],[tmp_K_4,7]],thickness=2,color=black)
+],labels=[`K`,`n Pi/2`],labeldirections=[horizontal,vertical]);
+
+Export("K_crit.csv",op([1,1],ans));
+tmp_K_1, tmp_K_2, tmp_K_3, tmp_K_4;
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+# Remind ourselves of slope again.
+
+diff(tmp_crit_arg,K):
+fs(%);
+
+asympt(%,K);
+
+evalf(op(1,%));
+
+# Note also following on getting expansion at small K-sqrt(2).
+
+tmp_crit_arg:
+subs(K=sqrt(2)+delta^2,%):
+fs(%):
+
+series(%,delta,5):
+fs(%);
+
+# First term in fact vanishes, and can get next (power of delta^1), via:
+
+op(3,%):
+subs(Sum=sum,%):
+simplify(%);
+
+tmp_hold:=%;
+
+# Interesting! Now we have (Armitage & Eberlein, p49)
+
+tmp_Elk_spec:=1/4*1/sqrt(Pi)*GAMMA(1/4)^2;
+
+# as the value of EllipticK at 1/sqrt(2) (Maple doesn't seem to know about this).
+
+# Also, using A&S 17.3.13 (p591) (Legendre's relation), we know:
+
+(1/2*Pi+tmp_Elk_spec^2)/2/tmp_Elk_spec:
+fs(%);
+
+# is
+
+tmp_Ele_spec:=%;
+
+# Thus:
+
+tmp_hold:
+subs(EllipticK(1/2*2^(1/2))=tmp_Elk_spec,%):
+subs(EllipticE(1/2*2^(1/2))=tmp_Ele_spec,%):
+fs(%);
+
+tmp_K_crit_origin_slope:=%;
+
+# May be amusing to get this in terms of eta_tot.
+
+tmp_eta_tot_symb=eta;
+subs(GAMMA(3/4)^(-2)=thing,%);
+
+solve(%,thing);
+
+tmp_thing:=%;
+
+subs(GAMMA(3/4)=1/sqrt(%),tmp_K_crit_origin_slope):
+fs(%);
+
+tmp_K_crit_origin_slope_via_eta_tot:=subs(eta=eta_tot,%);
+
+# Express eventual slope of line in same way:
+
+tmp_Elk_spec:
+subs(GAMMA(3/4)=1/sqrt(tmp_thing),%):
+fs(%);
+
+tmp_K_crit_eventual_slope_via_eta_tot:=subs(eta=eta_tot,%);
+
+###################
+
+# Let's have an explicit plot with K=sqrt(2), to demonstrate it doesn't work
+# (we think).
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=sqrt(2);
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=3.15;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+tmptmp_save:=tmptmp;
+
+# Also save Phi, V and delta plots.
+
+plotPhi_save:=plotPhi:
+
+plotV_save:=plotV:
+
+plotdelta_save:=plotdelta:
+
+# Ok, set up what we need to describe transition.
+
+tmp_K_num:=tmp_k_num/sqrt(tmp_Lambda_num);
+
+tmp_eta_num:=subs(tmptmp_save,t)-tmp_eta_tot;
+
+subs(c0=c01,tmp_Phi_ser_in_t_nu_1_use)+subs(c0=c04,tmp_Phi_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+tmp_hold:=%;
+
+tmp1:=subs(t=tmp_eta_num,tmp_hold)-subs(tmptmp_save,Phi(t));
+
+tmp2:=subs(t=tmp_eta_num,diff(tmp_hold,t))-subs(tmptmp_save,diff(Phi(t),t));
+
+solve({tmp1,tmp2},{c01,c04});
+
+tmp_c01c04_sol:=%;
+
+# So could do plot of what things look like in vicinity of FCB.
+
+tmp_hold:
+subs(tmp_c01c04_sol,%):
+
+tmp_Phi_near_FCB:=%;
+
+tmp_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_Phi_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([tmp_plot,plotPhi],view=[3..3.3,-0.0002..0.0002]);
+
+# Looks good!
+
+###############
+
+# Ok, now continue integration from the point symmetrically the other side
+# of the boundary.
+
+tmp_Phi_near_FCB:
+subs(t=-tmp_eta_num,%):
+
+tmp_Phi_restart:=evalf(%);
+
+tmp_Phi_near_FCB:
+diff(%,t):
+subs(t=-tmp_eta_num,%):
+
+tmp_Phit_restart:=evalf(%);
+
+# Have got to set up initial H value and derivative as well.
+
+tmp_s_from_conf_time_ser:
+diff(%,t):
+tmp:=%:
+
+subs(t=-tmp_eta_num,%):
+
+tmp_H_restart:=-evalf(%);
+
+diff(tmp,t):
+
+subs(t=-tmp_eta_num,%):
+
+tmp_Ht_restart:=-evalf(%);
+
+###################################
+
+tmp_Phi_start_num:=tmp_Phi_restart;
+
+tmp_Phit_start_num:=tmp_Phit_restart;
+
+tmp_H_start_num:=tmp_H_restart;
+
+tmp_Ht_start_num:=tmp_Ht_restart;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+t_start:=tmp_eta_tot-tmp_eta_num;
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=2*tmp_eta_tot-0.1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(-tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+# Now see how perturbs line up.
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save],
+view=[2.8..3.5,-10..10]);
+
+# and look at full range:
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save]);
+
+# Very interesting!
+
+# Would be worth filling in the gaps on this plot.
+
+subs(c0=c01,tmp_delta_ser_in_t_nu_1_use)+subs(c0=c04,tmp_delta_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_delta_near_FCB:=%;
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=black):
+
+# Now V.
+
+subs(c0=c01,tmp_V_ser_in_t_nu_1_use)+subs(c0=c04,tmp_V_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_V_near_FCB:=%;
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot],view=[0..6,-10..4]);
+
+# This is going 10 times further out than gap itself, and still looks pretty good!
+
+# Do again only going once out.
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=black):
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot],view=[0..6,-10..4]);
+
+# Can't see the join!
+
+# Let's save this one properly.
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+###*** Fig. 9
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\full_range_K_root_2.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans := display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot],labels=[`eta`,`delta, Phi and V`]
+,labeldirections=[horizontal,vertical],view=[0..6,-10..4]);
+
+Export("full_range_K_root_2_1.csv",op([1,1],ans));
+Export("full_range_K_root_2_2.csv",op([2,1],ans));
+Export("full_range_K_root_2_3.csv",op([3,1],ans));
+Export("full_range_K_root_2_4.csv",op([4,1],ans));
+Export("full_range_K_root_2_5.csv",op([5,1],ans));
+Export("full_range_K_root_2_6.csv",op([6,1],ans));
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+# Indeed doesn't work, and these demonstrate it quite nicely.
+
+##############
+
+# Also plot the second mode.
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=tmp_K_2;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=3.15;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+############
+
+tmptmp_save:=tmptmp;
+
+# Also save Phi, V and delta plots.
+
+plotPhi_save:=plotPhi:
+
+plotV_save:=plotV:
+
+plotdelta_save:=plotdelta:
+
+# Ok, set up what we need to describe transition.
+
+tmp_K_num:=tmp_k_num/sqrt(tmp_Lambda_num);
+
+tmp_eta_num:=subs(tmptmp_save,t)-tmp_eta_tot;
+
+subs(c0=c01,tmp_Phi_ser_in_t_nu_1_use)+subs(c0=c04,tmp_Phi_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+tmp_hold:=%;
+
+tmp1:=subs(t=tmp_eta_num,tmp_hold)-subs(tmptmp_save,Phi(t));
+
+tmp2:=subs(t=tmp_eta_num,diff(tmp_hold,t))-subs(tmptmp_save,diff(Phi(t),t));
+
+solve({tmp1,tmp2},{c01,c04});
+
+tmp_c01c04_sol:=%;
+
+# So could do plot of what things look like in vicinity of FCB.
+
+tmp_hold:
+subs(tmp_c01c04_sol,%):
+
+tmp_Phi_near_FCB:=%;
+
+tmp_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_Phi_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([tmp_plot,plotPhi],view=[3..3.3,-0.0002..0.0002]);
+
+# Looks good!
+
+###############
+
+# Ok, now continue integration from the point symmetrically the other side
+# of the boundary.
+
+tmp_Phi_near_FCB:
+subs(t=-tmp_eta_num,%):
+
+tmp_Phi_restart:=evalf(%);
+
+tmp_Phi_near_FCB:
+diff(%,t):
+subs(t=-tmp_eta_num,%):
+
+tmp_Phit_restart:=evalf(%);
+
+# Have got to set up initial H value and derivative as well.
+
+tmp_s_from_conf_time_ser:
+diff(%,t):
+tmp:=%:
+
+subs(t=-tmp_eta_num,%):
+
+tmp_H_restart:=-evalf(%);
+
+diff(tmp,t):
+
+subs(t=-tmp_eta_num,%):
+
+tmp_Ht_restart:=-evalf(%);
+
+###################################
+
+tmp_Phi_start_num:=tmp_Phi_restart;
+
+tmp_Phit_start_num:=tmp_Phit_restart;
+
+tmp_H_start_num:=tmp_H_restart;
+
+tmp_Ht_start_num:=tmp_Ht_restart;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+t_start:=tmp_eta_tot-tmp_eta_num;
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+t_max:=2*tmp_eta_tot-0.1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(-tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+# Now see how perturbs line up.
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save],
+view=[2.8..3.5,-10..10]);
+
+# and look at full range:
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save]);
+
+# Very interesting!
+
+# Would be worth filling in the gaps on this plot.
+
+subs(c0=c01,tmp_delta_ser_in_t_nu_1_use)+subs(c0=c04,tmp_delta_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_delta_near_FCB:=%;
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=black):
+
+# Now V.
+
+subs(c0=c01,tmp_V_ser_in_t_nu_1_use)+subs(c0=c04,tmp_V_ser_in_t_nu_4_use):
+subs(K=tmp_K_num,%):
+
+subs(tmp_c01c04_sol,%):
+
+tmp_V_near_FCB:=%;
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+10*tmp_eta_num..tmp_eta_tot-10*tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot]);
+
+# This is going 10 times further out than gap itself, and still looks pretty good!
+
+# Do again only going once out.
+
+tmp_delta_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_delta_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=black):
+
+tmp_V_plot:=plot(subs(t=-tmp_eta_tot+x,tmp_V_near_FCB)
+,x=tmp_eta_tot+tmp_eta_num..tmp_eta_tot-tmp_eta_num,color=blue):
+
+display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot]);
+
+# Can't see the join!
+
+# Let's save this one properly.
+
+tmp_ps_save:=ps;
+
+ps:='ps';
+
+###*** Fig. 11
+
+plotsetup(cps,plotoutput=`C:\\anl\\papers\\symmetry_breaking\\prd_example\\full_range_second_K.eps`,plotoptions=`portrait,width=6in,height=4in`);
+
+ans := display([plotPhi,plotV,plotdelta,plotPhi_save,plotV_save,plotdelta_save,
+tmp_delta_plot,tmp_V_plot],labels=[`eta`,`delta, Phi and V`],labeldirections=[horizontal,vertical]);
+
+Export("full_range_second_K_1.csv",op([1,1],ans));
+Export("full_range_second_K_2.csv",op([2,1],ans));
+Export("full_range_second_K_3.csv",op([3,1],ans));
+Export("full_range_second_K_4.csv",op([4,1],ans));
+Export("full_range_second_K_5.csv",op([5,1],ans));
+Export("full_range_second_K_6.csv",op([6,1],ans));
+
+
+# Then to get back from this:
+
+plotsetup(default);
+
+ps:=tmp_ps_save;
+
+############################
+
+# Could maybe try to have a go at predicting what we would see in the CMB using 
+# Sachs-Wolfe Plateau stuff in Lyth & Liddle (p162).
+
+tmp_jl:=(Pi/2/arg)^(1/2)*BesselJ(l+1/2,arg);
+
+# So use 10.43 in L&L with assumption of a delta function for P(k) at a given k.
+
+tmp_Cl:=4*Pi/25*subs(arg=k*eta0,tmp_jl)^2/k;
+
+tmp_K_first*sqrt(tmp_Lambda_1Mpc):
+evalf(%);
+
+tmp:=subs(eta0=14000,k=%,tmp_Cl);
+
+# Want to plot this for l=2 upwards.
+
+for ii from 2 to 30 do
+
+    tmp_C||ii:=evalf(subs(l=ii,tmp));
+    
+    print(ii,%);
+    
+od:
+
+plot([seq([i,tmp_C||i],i=2..30)]);
+
+# Ok, really need to get say first 10 zeroes. Alreadt have first 4.
+
+fsolve(Re(tmp_crit_arg)-5/2*Pi,K,5.5..6.5);
+
+tmp_K_5:=%;
+
+fsolve(Re(tmp_crit_arg)-6/2*Pi,K,tmp_K_5+0.35..tmp_K_5+1.35);
+
+tmp_K_6:=%;
+
+fsolve(Re(tmp_crit_arg)-7/2*Pi,K,tmp_K_6+0.35..tmp_K_6+1.35);
+
+tmp_K_7:=%;
+
+fsolve(Re(tmp_crit_arg)-8/2*Pi,K,tmp_K_7+0.35..tmp_K_7+1.35);
+
+tmp_K_8:=%;
+
+fsolve(Re(tmp_crit_arg)-9/2*Pi,K,tmp_K_8+0.35..tmp_K_8+1.35);
+
+tmp_K_9:=%;
+
+fsolve(Re(tmp_crit_arg)-10/2*Pi,K,tmp_K_9+0.35..tmp_K_9+1.35);
+
+tmp_K_10:=%;
+
+# Automate some more!
+
+tmp_K_last:=tmp_K_10;
+
+for kk from 11 to 40 do
+
+    fsolve(Re(tmp_crit_arg)-kk/2*Pi,K,tmp_K_last+0.35..tmp_K_last+1.35);
+
+    tmp_K_||kk:=%;
+    
+    tmp_K_last:=%;
+    
+    print(kk,%);
+    
+od:
+
+############
+
+# Ok, now want to sum up effects of all of these.
+
+tmp_K_max:=40;
+
+tmp_l_max:=100;
+
+# Want to plot this for l=2 upwards.
+
+for ii from 2 to tmp_l_max do
+
+    tmp_sum:=0;
+    
+    for kk from 1 to tmp_K_max do
+    
+        tmp_K_||kk*sqrt(tmp_Lambda_1Mpc):
+        evalf(%);
+
+        tmp:=subs(eta0=14000,k=%,tmp_Cl);
+        
+        tmp_sum:=tmp_sum+evalf(subs(l=ii,tmp));
+        
+    od:
+        
+    tmp_C||ii:=tmp_sum;
+    
+    print(ii,%);
+    
+od:
+
+plot([seq([i,i*(i+1)*tmp_C||i],i=2..tmp_l_max)]);
+
+#################################
+
+# Notice how we get a very different picture, if eta0 we should be using were smaller.
+
+for ii from 2 to tmp_l_max do
+
+    tmp_sum:=0;
+    
+    for kk from 1 to tmp_K_max do
+    
+        tmp_K_||kk*sqrt(tmp_Lambda_1Mpc):
+        evalf(%);
+
+        tmp:=subs(eta0=7000,k=%,tmp_Cl);
+        
+        tmp_sum:=tmp_sum+evalf(subs(l=ii,tmp));
+        
+    od:
+        
+    tmp_C||ii:=tmp_sum;
+    
+    print(ii,%);
+    
+od:
+
+plot([seq([i,i*(i+1)*tmp_C||i],i=2..30)]);
+
+#####################################
+
+# A bit added later. Have realised that we can have nice analytic expressions
+# for everything centred at s=0, via what we know about invariance of
+# equation satisfied by a^2*Phi(a).
+
+tmp_Phi_expr_use:
+
+tmp_Phi_expr_in_s_from_sin:=s^4*subs(a=s,%);
+
+# Check:
+
+tmp_Phi_eqn_in_s:
+subs(Phi(s)=tmp_Phi_expr_in_s_from_sin,%):
+fs(%);
+
+# Very good.
+
+# Point about the _from_sin, is that we can also do a cos version.
+
+tmp_Phi_expr_use:
+subs(sin=cos,%):
+
+tmp_Phi_expr_in_s_from_cos:=s^4*subs(a=s,%);
+
+# Check:
+
+tmp_Phi_eqn_in_s:
+subs(Phi(s)=tmp_Phi_expr_in_s_from_cos,%):
+fs(%);
+
+# Fine.
+
+# These correspond to the two series we have already developed for Phi at s=0.
+
+tmp_Phi_expr_in_s_from_sin:
+series(%,s,10):
+fs(%);
+
+tmp_Phi_expr_in_s_from_cos:
+series(%,s,10):
+fs(%);
+
+##############
+
+# Now have run into a problem trying to use these expressions to get plots.
+
+# The argument of the cos or sin seems to have a big jump at e.g.
+
+tmp_s_jump:=11.0836231;
+
+# for K=10th mode. Will demonstrate this.
+
+(-1/2+1/2*I)*K*2^(1/2)*(EllipticPi((1/2+1/2*I)*2^(1/2)*s,1/2*I*(K^2+((K^2-2)*(K^2+2))^(1/2)),I)-EllipticPi((1/2+1/2*I)*2^(1/2)*s,1/2*I*(K^2-((K^2-2)*(K^2+2))^(1/2)),I));
+
+tmp:=subs(K=tmp_K_10,%):
+
+subs(s=11.0836230,tmp):
+evalf(%);
+
+subs(s=11.0836232,tmp):
+evalf(%);
+
+# Not sure what's going on here. Have thought it would be useful to set this up
+# in Mathematica, to see what effect we get there.
+
+# So following is some Mathematica code that we run by taking away the #s
+# and then we'll copy result back. Actually, instead will save this, and some code below
+# in attempt_at_gr_perturbs_for_la_palma_lectures_with_Lambda_Mathematica_part.map.
+
+#########################
+
+# Mathematica bit.
+
+# Set up the integral bit. 
+
+# tmp = a^2/(a^4 + 1)^(1/2)/(1 + a^2*K^2 + a^4)
+
+# Integrate[tmp, a]
+
+# tmphold = %
+
+# tmpnext = tmphold /. K -> 10
+
+# Plot[Re[tmpnext], {a, 0, 13}, PlotRange -> Full]
+
+# tmpnext/.a->12
+
+# %//N
+
+#########################
+
+# Last bit was just to save syntax for numerical evaluation.
+
+# Ok, this has n=vu in a form that looks basically reciprocal to what
+# we were using in Maple. So might provide a better answer for us.
+
+# Translating from Mathematic to Maple notation (see bit in Working Notes on this)
+# we believe the equivalent object is
+
+tmp_int_res_new:=(-1)^(1/4)*(EllipticPi((-1)^(3/4)*a,2*I/(-K^2+(-4+K^4)^(1/2)),I)-EllipticPi((-1)^(3/4)*a,-2*I/(K^2+(-4+K^4)^(1/2)),I))/(-4+K^4)^(1/2);
+
+# Could attempt to verify via series.
+
+tmp_int_res:
+series(%,a,8):
+fs(%);
+
+tmp_int_res_new:
+series(%,a,8):
+tmp:=fs(%);
+
+# This doesn't look similar, but
+
+op(3,tmp):
+numer(%)/expand(denom(%));
+
+op(5,tmp):
+numer(%)/expand(denom(%));
+
+# shows it works!
+
+# So see whether using this gives better behaviour.
+
+tmp_Phi_expr_schem:
+
+subs(thing=tmp_int_res_new,%):
+
+tmp_Phi_expr_use_new:=fs(%);
+
+#############
+
+# So repeat above about generating 's' versions, but now using this.
+
+# (Write on top of previous ones, since they had bad properties.)
+
+tmp_Phi_expr_use_new:
+
+tmp_Phi_expr_in_s_from_sin:=s^4*subs(a=s,%);
+
+# Check:
+
+tmp_Phi_eqn_in_s:
+subs(Phi(s)=tmp_Phi_expr_in_s_from_sin,%):
+fs(%);
+
+# Very good.
+
+# Point about the _from_sin, is that we can also do a cos version.
+
+tmp_Phi_expr_use_new:
+subs(sin=cos,%):
+
+tmp_Phi_expr_in_s_from_cos:=s^4*subs(a=s,%);
+
+# Check:
+
+tmp_Phi_eqn_in_s:
+subs(Phi(s)=tmp_Phi_expr_in_s_from_cos,%):
+fs(%);
+
+# Fine.
+
+# These correspond to the two series we have already developed for Phi at s=0.
+
+tmp_Phi_expr_in_s_from_sin:
+series(%,s,10):
+fs(%);
+
+tmp_Phi_expr_in_s_from_cos:
+series(%,s,10):
+fs(%);
+
+# These would need clearing up on a term by term basis of course.
+
+##############
+
+# Now check we can run these to large s.
+
+# Actually, if try to plot out in Maple, soon run into trouble, so instead go back
+# to Mathematica run for plotting.
+
+# Can use new integral result inside same structure as previously.
+
+# Note Jacobi elliptic functions also use m not k.
+
+# 3*(1+a^2*K^2+a^4)^(1/2)*Sin[(((K^2-2)*(K^2+2))^(1/2)*K*tmphold)]/((K^2-2)*(K^2+2))^(1/2)/K/a^3
+
+# tmpPhiinssin = s^4*(%/.a->s)
+
+# 3*(1+a^2*K^2+a^4)^(1/2)*Cos[(((K^2-2)*(K^2+2))^(1/2)*K*tmphold)]/((K^2-2)*(K^2+2))^(1/2)/K/a^3
+
+# tmpPhiinscos = s^4*(%/.a->s)
+
+# tmpK10 = 10.07650976751230287493200490617898849441
+
+# tmpK9 = 9.221079755457968435987808484679128623838
+
+# tmpetatot = 3.211351542112846797951466577542935452863
+
+# tmpsfromt = -JacobiSN[1/3*3^(1/2)*t,1/2]*JacobiDN[1/3*3^(1/2)*t,1/2]/JacobiCN[1/3*3^(1/2)*t,1/2]
+
+# Plot[tmpsfromt, {t, 0, 3}, PlotRange -> Full]
+
+# Plot[Re[(tmpPhiinssin/.K->tmpK10)/.s->tmpsfromt], {t,-tmpetatot+0.0001,tmpetatot-0.0001}, PlotRange -> Full]
+
+# Plot[Re[(tmpPhiinscos/.K->tmpK9)/.s->tmpsfromt], {t,-tmpetatot+0.0001,tmpetatot-0.0001}, PlotRange -> Full]
+
+# (*Plot for more extended range.*)
+
+# Plot[Re[(tmpPhiinssin/.K->tmpK10)/.s->tmpsfromt], {t,-13,13}, PlotRange -> Full]
+
+# Plot[Re[(tmpPhiinscos/.K->tmpK9)/.s->tmpsfromt], {t,-13,13}, PlotRange -> Full]
+
+(* Note there's a jump in the cos at 'big bangs'. *)
+
+# Plot[Re[(tmpPhiinscos /. K -> tmpK9) /. s -> tmpsfromt], {t, 2.5, 5}, PlotRange -> Full]
+
+####################
+
+# Excellent! Finally have plots we intended.
+
+
+
+                         
+
+
+
+
+

@@ -1,3 +1,9 @@
+f := z -> exp ( -a_1*ln(4*k^2*z^2 + z^4 - 2*z^2 + 1)/4 - a_1*arctan(z^3/(2*k) - z/(2*k) + 2*z*k)*I/2 - a_1*arctan(z/(2*k))*I/2 - a_3*ln(4*k^2*z^2 + z^4 - 2*z^2 + 1)/4 - a_3*arctan(z^3/(2*k) - z/(2*k) + 2*z*k)*I/2 - a_3*arctan(z/(2*k))*I/2 + arctan((-2*z + 2*I*k)/(2*sqrt(k^2 - 1)))*a_1*k*I/sqrt(k^2 - 1) - arctan((-2*z + 2*I*k)/(2*sqrt(k^2 - 1)))*k*a_3*I/sqrt(k^2 - 1) + arctan((-2*z + 2*I*k)/(2*sqrt(k^2 - 1)))*a_2/sqrt(k^2 - 1) + a_3*ln(z) );
+
+
+
+
+
 # odeFlat := diff(w(z), z$2) + (9*z^2 - 2*z - 5)/(2*z*(z - 1)*(z + 1))* diff(w(z), z$1) + (10*z - 5 + k^2*I)/(4*z*(z - 1)*(z + 1))*w(z) = 0 ;
 # dsolve(odeFlat);
 

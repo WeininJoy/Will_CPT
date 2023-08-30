@@ -1,0 +1,2944 @@
+# This program uses Weierstrass elliptic functions, and we found a bug in the simplification
+# rules for these within Maple.
+
+# Maple have provided a patch which should cure it in Maple 2019, so use
+# this until Maple 2020 comes out.
+
+# Note seem to need to do it right at beginning.
+
+#libname:="C:/Users/anlas/Dropbox (Cambridge University)/anl_maple/SimplifyWeierstrassFix.mla",libname;
+
+# If this has worked then following should give 0.
+
+WeierstrassP(t, 0, 1)^3*WeierstrassPPrime(t, 0, 1);
+% - simplify(%);
+simplify(%); 
+
+# This program is attempt to work through material in 'GR Perturbations' chapter in
+# Lyth and Liddle book (Chap. 8).
+
+# Based on closed_uni_perturbs_perfect_fluid_for_lecture.map.
+
+# read `c:\\anl\\maple\\attempt_at_gr_perturbs_for_la_palma_lectures_with_Lambda.map`; 
+
+read `dirac_maple_test_r6.map`; 
+with(dirac); 
+read `rectangular_gravity_for_r10.map`;
+
+# Use Theta as well as Phi in metric, i.e. conformal Newtonian gauge,
+# and work in conformal time (so t here is in fact eta).
+
+# Note we use Theta instead of Psi, since lattter is a special function in Maple.
+
+# This version we attempt to get straight to results for radiation, and also
+# include Lambda (for comparison with Riemann squared work).
+
+# This version same, except we are looking at a CDM only universe.
+
+fs:=proc(func)
+
+    func;
+    simplify(%);
+end:
+
+term2:=1/sqrt(1+2*epsilon*Theta(t,x,y,z));
+
+term3:=1/sqrt(1-2*epsilon*Phi(t,x,y,z));
+
+gu0:=ds(1/a(t)*term2*eu0);
+gu1:=ds(1/a(t)*term3*eu1);
+gu2:=ds(1/a(t)*term3*eu2);
+gu3:=ds(1/a(t)*term3*eu3);
+
+dirac[make_gd]();
+
+# Check metric is what we intended.
+
+for ii from 0 to 3 do
+	for jj from 0 to 3 do
+		ds(gd||ii&@gd||jj)[1];
+		factor(simplify(%));
+		print(ii,jj,%);
+	od:
+od:
+
+# Fine.
+
+dirac[form_hOmj]();
+
+for ii from 0 to 3 do
+        print(`doing ii = `,ii);
+        hom||ii||p:=dppb(Om||ii);
+od:
+
+read `c:\\anl\\maple\\dirac_maple_general_h_functions_v6.map`;
+
+# Get little omegas.
+
+for ii from 0 to 3 do
+
+        tmp:=hub(ed||ii);
+        om_fromh||ii:=ds(0);
+
+        for jj from 0 to 3 do
+
+                print(`doing ii,jj = `,ii,jj);
+                tmp1:=ds(tmp&@eu||jj)[1];
+                om_fromh||ii:=ds(om_fromh||ii+tmp1*Om||jj);
+        od:
+od:
+
+# see what components we have
+
+for ii from 0 to 3 do
+
+        om_fromhp||ii:=dppb(om_fromh||ii);
+
+od;
+
+dfR():
+dfRicci():
+
+bigr:=ds(gu0&@Ric0+gu1&@Ric1+gu2&@Ric2+gu3&@Ric3)[1]:
+
+for ii from 0 to 3 do
+        Rich||ii:=ds(0);
+        for jj from 0 to 3 do
+                tmp:=ds(gu||jj&@ed||ii)[1];
+                Rich||ii:=ds(Rich||ii+tmp*Ric||jj);
+        od;
+od:
+
+# and now Einstein
+
+for ii from 0 to 3 do
+
+        Ein||ii:=ds(Rich||ii-1/2*ed||ii*bigr);
+
+od:
+
+# At this point insert some code from 
+# 'attempt_at_grav_wave_photon_geodesics_for_la_palma_lectures.map'.
+
+for ii from 0 to 3 do
+	
+	Ein||ii;
+	map(series,%,epsilon,2);
+	map(convert,%,polynom);
+	factor(simplify(%));
+#	print(ii,%);
+	Ein||ii:=%;
+od:
+
+for ii from 0 to 3 do
+
+        e||ii||p:=dppv(Ein||ii);
+
+od:
+
+# Now divide out the Einstein into zeroth and first order bits.
+
+for ii from 0 to 3 do
+
+	Ein_zeroth||ii:=factor(simplify(subs(epsilon=0,Ein||ii)));
+	Ein_first||ii:=factor(simplify(ds(Ein||ii-Ein_zeroth||ii)));
+
+od:
+
+####################
+
+Ein_zeroth0[2]-8*Pi*rho-Lambda;
+
+solve(%,rho);
+
+tmp_rho_subs:=%;
+
+tmp_adot_subs := H(t)*a(t)^2;
+
+####################
+
+# Ok, now jump straight to what we did sucessfully before as regards radiation perturbations.
+
+Ein_zeroth1[3]+8*Pi*w(t)*tmp_rho_subs-Lambda:
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%);
+
+solve(%,diff(H(t),t));
+
+tmp_Ht_from_w:=fs(%);
+
+# Make transition to k space, plus bring in r.h.s. of equations, i.e. perturbed SET.
+
+tmp_comp:=epsilon*exp(+I*(kx*x+ky*y+kz*z));
+
+tmp_non_rel_v:=(v1(t)*gam1+v2(t)*gam2+v3(t)*gam3);
+
+tmp_SET0:=ds((delta_rho(t)*gam0+(rho(t)+P(t))*tmp_non_rel_v)*tmp_comp);
+
+for ii from 1 to 3 do
+
+    tmp_SET||ii:=ds((-delta_P(t)*gam||ii+(rho(t)+P(t))
+    *ds(ed||ii&@tmp_non_rel_v)[1]*gam0)*tmp_comp);
+    
+od:
+
+# Note a general point here - by using this, and particularly by using
+# the rho substitution in tmp_rho_subs, we are effectively limiting
+# ourselves to a single fluid component.
+
+for ii from 0 to 3 do
+
+    Ein_first||ii;
+    
+    subs(Phi(t,x,y,z)=Phi(t)*exp(+I*(kx*x+ky*y+kz*z)),
+    Theta(t,x,y,z)=Theta(t)*exp(+I*(kx*x+ky*y+kz*z)),%);
+    
+    ds(%-8*Pi*tmp_SET||ii);
+    
+    subs(v1(t)=-I*kx/k*V(t),%):
+    subs(v2(t)=-I*ky/k*V(t),%):
+    subs(v3(t)=-I*kz/k*V(t),%):
+    
+    ds(%*exp(-I*(kx*x+ky*y+kz*z)));
+    
+    subs(kx^2=k^2-ky^2-kz^2,%):
+    
+    subs(Theta(t)=Phi(t),%);
+    subs(delta_rho(t)=delta(t)*rho(t),%):
+    subs(P(t)=w(t)*rho(t),delta_P(t)=w(t)*rho(t)*delta(t),%):
+    subs(rho(t)=tmp_rho_subs,%):
+    fs(%);
+    
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%):
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%);
+    
+    subs(diff(H(t),t)=tmp_Ht_from_w,%):
+    
+    tmp_SET_eqn||ii:=fs(%);
+    
+    print(ii,%);
+    
+od:
+
+# This cleans things up quite well.
+
+# Based on previous experience, we would probably regard this as
+# two constraint equations (in 0th vector) and 1 propagation
+# equation (for Phitt).
+
+# Obviously, constraints give us Phit as well, so use this in subs.
+
+# Also constraint on delta as well, to help clean things up.
+
+tmp_SET_eqn0[3]:
+
+solve(%,diff(Phi(t),t));
+
+tmp_Phit:=fs(%);
+
+tmp_SET_eqn0[2]:
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%);
+
+solve(%,delta(t));
+
+tmp_delta_from_constraint:=fs(%);
+
+tmp_SET_eqn1[3]:
+
+solve(%,diff(Phi(t),t,t));
+
+tmp_Phitt:=fs(%);
+
+tmp_SET_eqn0[2]:
+diff(%,t):
+subs(diff(Phi(t),t,t)=tmp_Phitt,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%);
+
+solve(%,diff(delta(t),t));
+
+subs(delta(t)=tmp_delta_from_constraint,%):
+fs(%):
+
+tmp_deltat:=%;
+
+tmp_SET_eqn0[3]:
+diff(%,t):
+subs(diff(Phi(t),t,t)=tmp_Phitt,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%);
+
+solve(%,diff(V(t),t));
+
+# Here not so useful to subs for delta, so leave as is.
+
+tmp_Vt:=fs(%);
+
+# Ok, so have got these.
+
+#########
+
+# Now, for Riemann^2 purposes, want to look at getting explicit equation and solution
+# for radiation-only perturbations.
+
+# Just like for matter-dominated cse, looks as though easiest variable in which
+# to get second order equation for that variable alone, is Phi.
+
+diff(Phi(t),t)-tmp_Phit:
+
+solve(%,V(t));
+
+tmp_V_from_Phi:=fs(%);
+
+tmp_delta_from_constraint:
+subs(V(t)=tmp_V_from_Phi,%):
+
+tmp_delta_from_Phi:=fs(%);
+
+diff(V(t),t)-tmp_Vt:
+subs(delta(t)=tmp_delta_from_Phi,V(t)=tmp_V_from_Phi,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+fs(%);
+
+solve(%,diff(Phi(t),t,t));
+
+tmp_Phitt_eqn_gen:=diff(Phi(t),t,t)-fs(%);
+
+# Excellent. Try out in two cases where we know the a(t)'s.
+
+###############
+
+# Will have to do this numerically now, since getting expressions for H and a
+# involves elliptic integrals.
+
+# So get series to start things off.
+
+# This is where we depart from previous, non ..._cdm_flucs version.
+
+# Here we are going to specialise to pressureless matter.
+
+tmp_w_use:=0;
+
+diff(H(t),t)-tmp_Ht_from_w:;
+
+solve(%,a(t));
+
+subs(w(t)=tmp_w_use,%):
+
+tmp_a_from_H:=%;
+
+diff(a(t),t)-tmp_adot_subs;
+subs(a(t)=tmp_a_from_H,%):
+fs(%);
+
+subs(w(t)=tmp_w_use,%):
+fs(%):
+
+tmp_H_eqn:=numer(%)/3;
+
+# Soon find that the H series starts as follows.
+
+tmp_H_ser_try:=1/t^3*(h0+h6*t^6+h7*t^7+h8*t^8);
+
+tmp_H_eqn:
+subs(H(t)=tmp_H_ser_try,%):
+fs(%):
+series(%,t,6):
+
+tmp_H_ser:=fs(%);
+
+op(1,%):
+
+solve(%,h6);
+
+tmp_h6:=%;
+
+# Have a series for Phi as well.
+
+# Soon find that the Phi series starts as follows.
+
+tmp_Phi_ser_try:=p0+p6*t^6+p7*t^7+p8*t^8;
+
+tmp_Phitt_eqn_gen:
+subs(w(t)=tmp_w_use,%):
+subs(a(t)=tmp_a_from_H,%):
+
+tmp_Phitt_eqn_use:=numer(fs(%));
+
+subs(H(t)=tmp_H_ser_try,%):
+subs(Phi(t)=tmp_Phi_ser_try,%):
+fs(%):
+series(%,t,6):
+fs(%):
+
+tmp_Phi_ser:=%;
+
+op(1,%):
+
+solve(%,p6);
+
+tmp_p6:=%;
+
+# Ok, do a solution! First prepare series.
+
+tmp_Phi_ser_try:
+subs(p6=tmp_p6,%):
+subs(p7=0,p8=0,%):
+
+tmp_Phi_ser_use:=%;
+
+tmp_H_ser_try:
+subs(h6=tmp_h6,%):
+subs(h7=0,h8=0,%):
+
+tmp_H_ser_use:=%;
+
+#####################
+
+with(plots):
+
+Digits:=40;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=1;
+
+tmp_p0_num:=1;
+
+tmp_k_num:=10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=400;
+
+t_max:=1.68140;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+####################
+
+# So this establishes what these look like, but now attempt to get analytically.
+
+# In rie2_perturbations_with_even_more_torsion_second_go.map we work with a itself
+# as the independent variable, so try this same route here.
+
+# Use same code as much as possible.
+
+# Here (in constrast to previous version) show how we get background equation in a.
+
+tmp_Ht_from_w*1/a(t)^2/H(t);
+
+subs(H(t)=H(a),a(t)=a,w(t)=0,%):
+
+tmp_background_eqn_in_Hofa:=numer(fs(diff(H(a),a)-%));
+
+tmp_Hofa_try:=sqrt(Lambda/3+C/a^3);
+
+# Check:
+
+tmp_background_eqn_in_Hofa:
+subs(H(a)=tmp_Hofa_try,%):
+fs(%);
+
+# Can do it automatically using dchange, in a way we have discovered which might
+# be useful elsewhere.
+
+with(PDEtools);
+
+tmp_background_eqn_in_Hofa;
+
+solve(%,diff(H(a),a));
+
+tmp_HA:=subs(a=A,%);
+
+tmp_HofA_try:=subs(a=A,tmp_Hofa_try);
+
+simp_proc:=proc(func) 
+
+    func; 
+    
+    subs(diff(ai(A),A)=1/A^2/H(A),%): 
+    fs(%): 
+    subs(diff(H(A),A)=tmp_HA,%); 
+    fs(%); 
+    subs(H(A)=tmp_HofA_try,%): 
+    fs(%); 
+
+end:
+
+tmp_itr:={A=a(t)};
+
+tmp_tr:={t=ai(A)};
+
+# Ok, here's where we set up the particular Phitt eqn we want to transform here.
+
+tmp_Phitt_eqn_to_transform:=fs(subs(w(t)=0,tmp_Phitt_eqn_gen));
+
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+
+tmp_Phi_eqn_in_a:=numer(%);
+
+# Fine.
+
+################
+
+# Now attempt to understand what values we should use for C, Lambda
+# beta etc., in a 'realistic' case, so that we can see how
+# Phi and other variables behave during early universe stages.
+
+# Now consult notes p28-30 for next part.
+
+# Basically looking at early universe to get value of C.
+
+H(t)^2-tmp_Hofa_try^2:
+subs(a=a(t),Lambda=0,%):
+subs(H(t)=18/A^3/t^3,a(t)=A^3/9*t^2,%):
+fs(%);
+
+solve(%,C);
+
+tmp_C_from_A:=%;
+
+# As before, we get a=1 at matter/Lambda equality if C=Lambda/3 (though
+# presumably this won't be at the mid point any more?)
+
+# Then use this to get form of equation we want to actually solve.
+
+tmp_Phi_eqn_in_a:
+subs(C=Lambda/3,%):
+#subs(GG0=0,%):
+fs(%):
+
+tmp_Phi_eqn_to_solve:=%/Lambda;
+
+# This time no k so don't need scaling we can use to reduce complexity!
+
+# In this form it can come up with something reasonably sensible as the 'solution'.
+
+dsolve(%,Phi(a));
+
+tmp_Phi_sol:=rhs(%);
+
+# Figure out what C1 and C2 need to be.
+
+series(tmp_Phi_sol,a,5):
+fs(%);
+
+expand(%);
+
+# So we'll put
+
+subs(_C1=0,_C2=1,%):
+fs(%);
+
+# Fine.
+
+tmp_Phi_sol:
+subs(_C1=0,_C2=1,%):
+
+tmp_Phi_hyper_sol_use:=%;
+
+# This is normalised to 1 at origin.
+
+# Look at series again.
+
+tmp_Phi_hyper_sol_use:
+series(%,a,10):
+fs(%):
+
+tmp_Phi_hyper_ser_use:=convert(%,polynom);
+
+# Now, would be good to get the Phi solution in terms of s=1/a.
+
+# Use following, from A&S p559, relation 15.3.7, which should work:
+
+GAMMA(c)*GAMMA(b-a)/(GAMMA(b)*GAMMA(c-a))*(-z)^(-a)*hypergeom([a,1-c+a],[1-b+a],1/z)+
+GAMMA(c)*GAMMA(a-b)/(GAMMA(a)*GAMMA(c-b))*(-z)^(-b)*hypergeom([b,1-c+b],[1-a+b],1/z);
+
+subs(a=5/6,b=3/2,c=11/6,z=-1/s^3,%);
+
+# Thus version in terms of s is (after combining with other bit and using a simplify,
+# symbolic:
+
+tmp_Phi_hyper_sol_in_s:=-5/12*s*(1+s^3)^(1/2)*(-2*2^(1/3)*GAMMA(2/3)^3*3^(1/2)+3*s^2*hypergeom([2/3, 3/2],[5/3],-s^3)*Pi)/Pi;
+
+# Form equation in s and show that this satisfies it.
+
+tmp_Phi_eqn_to_solve:
+
+dchange({a=1/s},%):
+
+tmp_Phi_eqn_in_s:=fs(s^2*%);
+
+tmp_Phi_eqn_in_s:
+subs(Phi(s)=tmp_Phi_hyper_sol_in_s,%):
+fs(%);
+
+# Fine.
+
+####################
+
+# Maybe, for this version go straight at this point to finding analytic solution
+# for a versus s, then can plot out and compare Phi stuff more easily.
+
+# So work from code which we used in non '_Lambda_cdm' version,
+# suitably modified for current case.
+
+# This started:
+
+# Now want to look properly at what's happening near conformal boundary.
+
+# What might be quite convincing is to work with s(t)=1/a(t), but start
+# solution at halfway point of 'first epoch' and let function develop from
+# there. Then should go smoothly through t=t_tot. (Remember our t here is
+# really conformal time eta.)
+
+# So first need equations in s=1/a.
+
+Ein_zeroth0[2]:
+subs(a(t)=1/s(t),%):
+fs(%):
+
+%-(8*Pi*rho(t)+Lambda):
+
+tmp_eqn1:=%;
+
+Ein_zeroth1[3]:
+subs(a(t)=1/s(t),%):
+fs(%):
+
+%-(Lambda):
+
+tmp_eqn2:=%;
+
+# Use rho subs we believe is appropriate here.
+
+tmp_eqn1:
+subs(rho(t)=3*C/(8*Pi)*s(t)^3,%):
+subs(C=Lambda/3,%):
+
+tmp_eqn1_new:=fs(%);
+
+tmp_eqn2:
+subs(rho(t)=3*C/(8*Pi)*s(t)^3,%):
+subs(C=Lambda/3,%):
+
+tmp_eqn2_new:=fs(%);
+
+# Note in both of these that there is a family of solutions where t just scales
+# with sqrt(Lambda).
+
+# So can put Lambda=1 wlog.
+
+# Note difference of these gives a nice second order eqn:
+
+tmp_eqn1_new-tmp_eqn2_new:
+fs(%);
+
+# Ok, this is where we start departing from radiation case.
+
+# This equation is solved quite nicely by a WeierstrassP function!
+
+subs(Lambda=1,%):
+
+%/s(t);
+
+dsolve(%,s(t));
+
+tmp_s_try:=rhs(%);
+
+# What conditions do we get in 1st order equation?
+
+tmp_eqn1_new:
+subs(Lambda=1,%):
+subs(s(t)=tmp_s_try,%):
+fs(%);
+
+# Interesting!
+
+solve(%,_C2);
+
+tmp_s_try_next:=subs(_C2=%,tmp_s_try);
+
+# So what does this look like?
+
+plot(subs(_C1=0,tmp_s_try_next),t=1..13.5);
+
+#!!!!!!!!!!!!!!!
+
+# Interpolated later, to get a better plot (more symmetrical and with 0 included).
+
+###*** Fig. 25
+
+tmp_plot1:=plot(subs(_C1=0,tmp_s_try_next),t=0..14):
+
+ans:=display(tmp_plot1,view=[0..14,-1..12],labels=[`eta`,`s`]);
+Export("s_weierP_cdm.csv",op([1,1],ans));
+
+
+#!!!!!!!!!!!!!!!
+
+# Interesting! So this one turns around and heads back?
+
+# Ah, haven't allowed for fact that presumably C must swap sign once 
+# s becomes negative, to keep density positive. So redo for this case.
+
+tmp_eqn1:
+subs(rho(t)=3*C/(8*Pi)*s(t)^3,%):
+subs(C=-Lambda/3,%):
+
+tmp_eqn1_alt:=fs(%);
+
+tmp_eqn2:
+subs(rho(t)=3*C/(8*Pi)*s(t)^3,%):
+subs(C=-Lambda/3,%):
+
+tmp_eqn2_alt:=fs(%);
+
+tmp_eqn1_alt-tmp_eqn2_alt:
+fs(%);
+
+subs(Lambda=1,%):
+
+%/s(t);
+
+dsolve(%,s(t));
+
+tmp_s_try_alt:=rhs(%);
+
+# What conditions do we get in 1st order equation?
+
+tmp_eqn1_alt:
+subs(Lambda=1,%):
+subs(s(t)=tmp_s_try_alt,%):
+fs(%);
+
+# Interesting!
+
+solve(%,_C2);
+
+tmp_s_try_next_alt:=subs(_C2=%,tmp_s_try_alt);
+
+# So what does this look like?
+
+plot(subs(_C1=0,tmp_s_try_next_alt),t=1..13.5);
+
+# Ok, we'd guess it's the second negative bit of this we have to
+# join onto. 
+
+################
+
+# Now, would be easier if we could get something more like the elliptic tan
+# function we had in radn case, so that this explicitly worked
+# around s=0. So work on transforming to this.
+
+# From A&S p649, we believe we want a k satisfying (with k^2=m)
+
+16*k^4-16*k^2+1;
+
+solve(%,k);
+
+# Capture order:
+
+tmp_k_roots:=[1/4*6^(1/2)-1/4*2^(1/2), -1/4*6^(1/2)+1/4*2^(1/2), 1/4*6^(1/2)+1/4*2^(1/2), -1/4*6^(1/2)-1/4*2^(1/2)];
+
+evalf(%);
+
+# So we would work with first and third.
+
+tmp_s_Jac_try:=a+b*(1+JacobiCN(c*t,k))/(1-JacobiCN(c*t,k));
+
+tmp_eqn1_new:
+subs(s(t)=tmp_s_Jac_try,%):
+subs(Lambda=1,%):
+fs(%):
+
+tmp_eqn:=numer(%);
+
+# Not obvious how to proceed with this. Look at series instead.
+
+tmp_s_Jac_try:
+series(%,t,10):
+
+tmp_ser1:=fs(%);
+
+tmp_s_try_next:
+subs(_C1=0,%):
+series(%,t,10):
+
+tmp_ser2:=fs(%);
+
+# Ok, compare coeffs.
+
+tmp_b_try:=3*c^2;
+
+tmp_ser1:
+subs(b=tmp_b_try,%):
+fs(%):
+
+tmp_hold:=%;
+
+op(3,%);
+
+solve(%,a);
+
+tmp_a_try:=fs(%);
+
+tmp_hold:
+subs(a=tmp_a_try,%):
+fs(%);
+
+solve(op(5,%)=op(3,tmp_ser2),c^6);
+
+tmp_c6_try:=fs(%);
+
+# Ok, how does this look for each of the k values?
+
+for ii from 1 to 4 do 
+
+    subs(k=tmp_k_roots[ii],tmp_c6_try): 
+    fs(%); 
+    print(ii,%); 
+    
+od:
+
+# So this singles out the 3rd root as correct value!
+
+# Assemble this solution.
+
+subs(k=tmp_k_roots[3],tmp_c6_try):
+fs(%^(1/6)):
+
+tmp_c_try:=%;
+
+tmp_s_Jac_try:
+subs(a=tmp_a_try,b=tmp_b_try,c=tmp_c_try,%):
+subs(k=tmp_k_roots[3],%):
+
+tmp_s_Jac_try_next:=%;
+
+# So does this work in equations?
+
+tmp_eqn1_new:
+subs(Lambda=1,%):
+subs(s(t)=tmp_s_Jac_try_next,%):
+fs(%);
+
+# Wow!
+
+tmp_eqn2_new:
+subs(Lambda=1,%):
+subs(s(t)=tmp_s_Jac_try_next,%):
+fs(%);
+
+# Very good! So hopefully with this form we will be able to re-centre it at s=0.
+
+# First note what first term in fact is.
+
+tmp_s_Jac_try_next:
+
+op(1,%);
+
+fs(%);
+
+# Ah ha! This goes with e2=-1/12 we think.
+
+# Now try half angle version we therefore think goes with this.
+
+tmp_s_Jac_try_next_next:=-1+sqrt(3)*(JacobiCN(tmp_c_try/2*t,tmp_k_roots[3])/
+JacobiSN(tmp_c_try/2*t,tmp_k_roots[3])/JacobiDN(tmp_c_try/2*t,tmp_k_roots[3]))^2;
+
+tmp_eqn1_new:
+subs(Lambda=1,%):
+subs(s(t)=tmp_s_Jac_try_next_next,%):
+fs(%);
+
+# Yes, works.
+
+################
+
+# Next bit relates to putting things into standard equianharmonic form (see A&S p652)
+# so that we can get proper expression for where zero (in s) occurs.
+
+tmp_omega_2:=fs(GAMMA(1/3)^3/4/Pi);
+
+tmp_s_from_equian:=-exp(-2*I*Pi/3)*(1/432)^(1/3)*12*WeierstrassP(exp(I*Pi/6)*t*(1/432)^(1/6),0,1);
+
+# Plot out:
+
+plot(tmp_s_from_equian,t=1..7);
+
+# Very good. Verify what happens at z0 and 1/2*z0.
+
+tmp_s_from_equian:
+subs(t=tmp_omega_2*2^(5/3),%):
+evalf(%);
+
+tmp_s_from_equian:
+subs(t=tmp_omega_2*2^(5/3)/2,%):
+evalf(%);
+
+# Excellent!
+
+# Now we know where zero occurs, can we use addition formula
+# to get expression where t is measured from zero instead
+# of big bang?
+
+tmp_t0:=tmp_omega_2*2^(5/3);
+
+# Find value of P' at this point.
+
+WeierstrassPPrime(tmp_t0,0,-1/432):
+evalf(%);
+
+# We believe this is
+
+-1/12/sqrt(3):
+evalf(%);
+
+# Fine. Also demonstrate we have a zero here.
+
+WeierstrassP(tmp_t0,0,-1/432):
+evalf(%);
+
+# Fine. So now get an expression valid for when t is
+# relative to t0.
+
+tmp_P_sum:=1/4*((Pd(z1)-Pd(z2))/(P(z1)-P(z2)))^2-P(z1)-P(z2);
+
+subs(P(z1)=WeierstrassP(t,0,-1/432),%):
+subs(P(z2)=0,%):
+subs(Pd(z1)=WeierstrassPPrime(t,0,-1/432),%):
+subs(Pd(z2)=-1/sqrt(3)/12,%):
+
+tmp_P_use:=fs(%);
+
+# Check:
+
+plot(12*tmp_P_use,t=-tmp_t0+1..1);
+
+plot(subs(_C1=tmp_t0,tmp_s_try_next),t=-tmp_t0+1..1);
+
+# Very good!
+
+tmp_s_expr_before_t0:=12*tmp_P_use;
+
+###################
+
+# Now do the same but for bit we think is valid *after* t0 (i.e.
+# maintaining positive density).
+
+# Think this is the bit one gets after 2*t0 in negative flipped version.
+
+# So here, have:
+
+tmp_P_sum:
+subs(P(z1)=WeierstrassP(t,0,-1/432),%):
+subs(P(z2)=0,%):
+subs(Pd(z1)=WeierstrassPPrime(t,0,-1/432),%):
+subs(Pd(z2)=1/sqrt(3)/12,%):
+
+tmp_s_expr_after_t0:=fs(-12*%);
+
+# Check:
+
+plot(tmp_s_expr_after_t0,t=0..3);
+
+plot(subs(_C1=tmp_t0,tmp_s_try_next),t=0..3);
+
+# Ok, so presumably series have to differ at t=0.
+
+tmp_s_expr_before_t0:
+series(%,t,20):
+fs(%);
+
+tmp_s_expr_after_t0:
+series(%,t,20):
+fs(%);
+
+# Indeed. So even terms are flipped.
+
+#####################
+
+# Right, should be in a position to check our analytic forms against
+# the numerical integration.
+
+# Will first redo the numerical integration using the correct
+# value of h0 to correspond to C=Lambda/3.
+
+# Find this as follows.
+
+tmp_C_from_A:
+
+solve(%=C,A^3);
+
+18/%;
+
+subs(C=Lambda/3,%);
+
+tmp_h0_for_usual_C:=%;
+
+# So use this in new integration.
+
+###########
+
+tmp_Lambda_num:=1;
+
+tmp_h0_for_usual_C:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_h0_num:=%;
+
+tmp_p0_num:=1;
+
+tmp_k_num:=10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phitt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta.
+
+tmp_V_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phi:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=400;
+
+# Integrate to just short of t0.
+
+t_max:=evalf(tmp_t0)-1e-3;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta]);
+
+display(plotH);
+
+display(plota);
+
+###*** Fig. 22
+
+ans := display(plotPhi);
+Export("Phi_cdm.csv",op([1,1],ans));
+
+###*** Fig. 23
+
+ans := display(plotV);
+Export("V_cdm.csv",op([1,1],ans));
+
+###*** Fig. 24
+
+ans:= display(plotdelta);
+Export("delta_cdm.csv",op([1,1],ans));
+
+# Fine, so now check results against each other.
+
+####################
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+    t_new:=t_tmp-evalf(tmp_t0);
+	tmptmp_s:=evalf(subs(t=t_new,tmp_s_expr_before_t0));
+    subs(s=tmptmp_s,tmp_Phi_hyper_sol_in_s);
+	pointsPhi_new||ii:=[t_tmp,evalf(%)];
+
+od:
+
+plotPhi_new:=plot([seq(pointsPhi_new||i,i=1..Ntot)],color=blue):
+
+display([plotPhi_new,plotPhi]);
+
+# Very good!
+
+##################
+
+# Ok, now want to look at continuing the Phi
+# solution through FCB, so can see whether there are any
+# conditions picked out for it in terms of what happens afterwards.
+
+# So first aim is to get solution to left of FCB as a power
+# series in conformal time coming into FCB.
+
+# The two ingredients in this are tmp_Phi_hyper_sol_in_s and
+# tmp_s_expr_before_t0.
+
+subs(s=tmp_s_expr_before_t0,tmp_Phi_hyper_sol_in_s):
+
+series(%,t,20):
+
+tmp_Phi_ser_before_t0:=fs(%);
+
+# Also get delta and V same way.
+
+tmp_V_from_Phi:
+subs(w(t)=0,%):
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+subs(C=Lambda/3,%):
+subs(k=K*sqrt(Lambda),%):
+fs(%);
+
+dchange({a=1/s},%):
+fs(%);
+
+subs(Phi(s)=tmp_Phi_hyper_sol_in_s,%):
+fs(%):
+subs(s=tmp_s_expr_before_t0,%):
+
+tmp_V_before_t0:=%;
+
+series(%,t,25):
+fs(%):
+
+tmp_V_ser_before_t0:=%;
+
+# Now delta.
+
+tmp_delta_from_Phi:
+subs(w(t)=0,%):
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+subs(C=Lambda/3,%):
+subs(k=K*sqrt(Lambda),%):
+fs(%);
+
+dchange({a=1/s},%):
+fs(%);
+
+subs(Phi(s)=tmp_Phi_hyper_sol_in_s,%):
+fs(%):
+subs(s=tmp_s_expr_before_t0,%):
+
+tmp_delta_before_t0:=%;
+
+series(%,t,25):
+fs(%):
+
+tmp_delta_ser_before_t0:=%;
+
+# See how these work versus plots we've got.
+
+tmp_delta_ser_before_t0:
+convert(%,polynom):
+subs(K=10,%):
+subs(t=t-tmp_t0,%):
+
+tmp_plot1:=plot(%,t=2..6):
+
+display([plotdelta,tmp_plot1]);
+
+# Impressive!
+
+####
+
+# Same for V.
+
+tmp_V_ser_before_t0:
+convert(%,polynom):
+subs(K=10,%):
+subs(t=t-tmp_t0,%):
+
+tmp_plot2:=plot(%,t=2..6):
+
+display([plotV,tmp_plot2]);
+
+# Again, very good!
+
+########################
+
+# Now look at things other side of t0.
+
+# For this need to redo hypergeomtric solution with C=-Lambda/3.
+
+tmp_Phi_eqn_in_a:
+subs(C=-Lambda/3,%):
+#subs(GG0=0,%):
+fs(%):
+
+tmp_Phi_eqn_to_solve_after_t0:=%/Lambda;
+
+# For this go straight to s version, since don't have requirement
+# of non-singularity at big bang as a condition we can use here
+# to find combination of solutions needed.
+
+tmp_Phi_eqn_to_solve_after_t0:
+
+dchange({a=1/s},%):
+
+tmp_Phi_eqn_in_s_after_t0:=fs(s^2*%);
+
+# Now solution is any combination of previous solutions
+# adapted to s -> -s that we wish.
+
+# Use c1 and c2 to indicate combination.
+
+tmp_Phi_hyper_sol_in_s_after_t0:=
+-5/12*s*(1-s^3)^(1/2)*(-2*c1*2^(1/3)*GAMMA(2/3)^3*3^(1/2)
++c2*3*s^2*hypergeom([2/3, 3/2],[5/3],s^3)*Pi)/Pi;
+
+# Demonstrate assertion.
+
+tmp_Phi_eqn_in_s_after_t0:
+subs(Phi(s)=tmp_Phi_hyper_sol_in_s_after_t0,%):
+fs(%);
+
+# Very good!
+
+# Now, presumably, we should pick c1 and c2 to match incoming solution
+# as far as possible.
+
+# Actually, find that if do this, then delta is discontinous.
+
+# Find out below that only way for it to be continuous is
+# to have c1=-1, c2=-1. For this choice, all 3 quantities
+# are continuous.
+
+tmp_Phi_hyper_sol_in_s_after_t0:
+series(%,s,10):
+
+tmp_ser1:=fs(%);
+
+tmp_Phi_hyper_sol_in_s:
+series(%,s,10):
+
+tmp_ser2:=fs(%);
+
+# So c1=-1 and c2=-1 is maximally bad for matching but works
+# for other reasons we've given.
+
+# Also note if plot this to large negative s then looks ok:
+
+tmp_Phi_hyper_sol_in_s_after_t0:
+subs(c1=-1,c2=-1,%):
+
+plot(%,s=-5..0);
+
+# Note goes off to infinity if consider c1 and c2 individually.
+
+tmp_Phi_hyper_sol_in_s_after_t0:
+subs(c1=1,c2=0,%):
+
+plot(%,s=-10..0);
+
+tmp_Phi_hyper_sol_in_s_after_t0:
+subs(c1=0,c2=1,%):
+
+plot(%,s=-10..0);
+
+########
+
+# So this is promising, but does it agree with what we get when bringing
+# in conformal time?
+
+subs(s=tmp_s_expr_after_t0,tmp_Phi_hyper_sol_in_s_after_t0):
+
+series(%,t,20):
+
+tmp_Phi_ser_after_t0:=fs(%);
+
+# So similar clash with 
+
+tmp_Phi_ser_before_t0;
+
+# if c1=-1 and c2=-1.
+
+# So now can plot after t0 in conformal time.
+
+subs(s=tmp_s_expr_after_t0,tmp_Phi_hyper_sol_in_s_after_t0):
+subs(c1=-1,c2=-1,%):
+
+tmp_Phi_in_terms_of_eta_after_t0:=%;
+
+plot(tmp_Phi_in_terms_of_eta_after_t0,t=0..4.5);
+
+# Very good.
+
+# In fact could argue that it's s*Phi which is genuine perturbation
+# (to h-function), so then this will be continuous, and also continuous
+# first deriv (since both zero).
+
+# Make equivalent before t0.
+
+subs(s=tmp_s_expr_before_t0,tmp_Phi_hyper_sol_in_s):
+
+tmp_Phi_in_terms_of_eta_before_t0:=%;
+
+###################
+
+# Now what about delta and V?
+
+tmp_V_from_Phi:
+subs(w(t)=0,%):
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+subs(C=-Lambda/3,%):
+subs(k=K*sqrt(Lambda),%):
+fs(%);
+
+dchange({a=1/s},%):
+fs(%);
+
+subs(Phi(s)=tmp_Phi_hyper_sol_in_s_after_t0,%):
+fs(%):
+subs(s=tmp_s_expr_after_t0,%):
+subs(c1=-1,c2=-1,%):
+
+tmp_V_after_t0:=%;
+
+series(%,t,25):
+
+fs(%):
+
+tmp_V_ser_after_t0:=%;
+
+# If compare:
+
+tmp_V_ser_before_t0;
+
+# This matches first and second derivs.
+
+# Now delta.
+
+tmp_delta_from_Phi:
+subs(w(t)=0,%):
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+subs(C=-Lambda/3,%):
+subs(k=K*sqrt(Lambda),%):
+fs(%);
+
+dchange({a=1/s},%):
+fs(%);
+
+subs(Phi(s)=tmp_Phi_hyper_sol_in_s_after_t0,%):
+fs(%):
+subs(s=tmp_s_expr_after_t0,%):
+subs(c1=-1,c2=-1,%):
+
+tmp_delta_after_t0:=%;
+
+series(%,t,25):
+fs(%):
+
+tmp_delta_ser_after_t0:=%;
+
+# Compare.
+
+tmp_delta_ser_before_t0;
+
+# So has jump in first deriv.
+
+# See how these work versus 'before'.
+
+tmp_delta_ser_before_t0:
+convert(%,polynom):
+subs(K=10,%):
+
+tmp_plot1:=plot(%,t=-2..0):
+
+tmp_delta_ser_after_t0:
+convert(%,polynom):
+subs(K=10,%):
+
+tmp_plot2:=plot(%,t=0..2,color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+tmp_V_ser_before_t0:
+convert(%,polynom):
+subs(K=10,%):
+
+tmp_plot1:=plot(%,t=-2..0):
+
+tmp_V_ser_after_t0:
+convert(%,polynom):
+subs(K=10,%):
+
+tmp_plot2:=plot(%,t=0..2,color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Look pretty good.
+
+########################
+
+# Do this with actual functions, not just series.
+
+tmp_V_before_t0:
+subs(K=10,%):
+
+tmp_plot1:=plot(%,t=-tmp_t0+1e-3..0):
+
+tmp_V_after_t0:
+subs(K=10,%):
+
+tmp_plot2:=plot(%,t=0..tmp_t0-1e-3,color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Very good!
+
+tmp_delta_before_t0:
+subs(K=10,%):
+
+tmp_plot1:=plot(%,t=-tmp_t0+1e-3..0):
+
+tmp_delta_after_t0:
+subs(K=10,%):
+
+tmp_plot2:=plot(%,t=0..tmp_t0-1e-3,color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+######################
+
+# Think there's a relation for delta and Phi derivs versus V that
+# works in this CDM case.
+
+# Useful to check that it works for both before and after functions.
+
+diff(tmp_delta_before_t0-3*tmp_Phi_in_terms_of_eta_before_t0,t)+K*tmp_V_before_t0:
+fs(%):
+
+# Can't do this, but if get series, it works:
+
+series(%,t,40):
+fs(%);
+
+# Do same for 'after'.
+
+diff(tmp_delta_after_t0-3*tmp_Phi_in_terms_of_eta_after_t0,t)+K*tmp_V_after_t0:
+fs(%):
+
+# Can't do this, but if get series, it works:
+
+series(%,t,40):
+fs(%);
+
+# So the jumps in delta and Phi derivatives must cancel out!
+
+#####################
+
+# Note following interesting thing re form of Phi solution in s.
+
+tmp_Phi_eqn_in_s;
+
+dsolve(%,Phi(s));
+
+# So can represent as combination of Legendre functions!
+
+tmp_Phi_Legendre_sol:=rhs(%);
+
+# However, not good for series solutions.
+
+# It doesn't seem to be able to expand the Q one, and it looks as though
+# we need this bit:
+
+tmp_Phi_hyper_sol_in_s_after_t0:
+series(%,s,20):
+fs(%);
+
+# So c2 bit of this looks as though it is Q bit of other:
+
+subs(_C1=1,_C2=0,tmp_Phi_Legendre_sol);
+
+series(%,s,20);
+
+######################
+
+# Restart much later (12/03/18).
+
+# Want to be see what happens at FCB for purposes of radiation from a dipole
+# passing through it, and whether there is potential for a 'future absorber' there.
+
+# Currently thinking that we want to get through with maximum analytic 'matching'
+# and so maybe we actually need our very first Weierstrass function version, in which
+# the density becomes negative for a while, before turning round and becoming
+# positive again.
+
+# The negative debsity might be ok if it is linked to a negative 'Phi' field
+# in the sense of eWGT. We know that we can have a flat lambda solution
+# parameterised in terms of Phi, so it would be interesting to see what
+# extension of this through conformal boundary is.
+
+# Independent of this, what is solution in cosmic time that the negative
+# density period corresponds to?
+
+# Another interesting question is whether the density and velocity perturbations 
+# get through with this type of s behaviour?
+
+# Call this case _ac for 'analytic continuation'.
+
+# Will express it first in terms of what we have found out about _flpp case
+# and then inserting what Phi is in this case, which will give us explicit
+# formulae for rho and H versus t (latter being conformal time here of course).
+
+# Key is that (using units with Lambda=1):
+
+tmp_s_ac:=subs(_C1=0,tmp_s_try_next);
+
+-diff(%,t):
+
+tmp_H_ac:=fs(%);
+
+# and we have
+
+1+tmp_s_ac^3-3*tmp_H_ac^2;
+
+fs(%);
+
+# Actually, now understand that probably best way is to express things in terms of H,
+# since this is clearly intrinsic and is just -ds/deta.
+
+# So take _flpp results from rie2_4d_combined_gravity_full_with_torlag_and_alpha_scale.map,
+# and solve in terms of H.
+
+tmp_H_flpp:=1/3*3^(1/2)*lambda^(1/2)*(2*Phi(t)+Phi0);
+
+tmp_rho_flpp:=1/2*Phi0*lambda*Phi(t)*(Phi(t)+Phi0)/Pi;
+
+solve({tmp_H_flpp=H(t),tmp_rho_flpp=rho(t)},{rho(t),Phi(t)});
+
+tmp_rhoPhi_from_H_flpp:=%;
+
+# So we think we can get plots of these straightaway if we put lambda=1, Phi0=1.
+
+# Note for rho we have.
+
+rho(t):
+subs(tmp_rhoPhi_from_H_flpp,%):
+subs(H(t)^2=1/3*(1+s(t)^3),%):
+subs(lambda=1,Phi0=1,%):
+
+fs(%);
+
+# Very good.
+
+subs(s(t)=tmp_s_ac,%):
+
+tmp_rho_ac:=%;
+
+# For Phi have
+
+Phi(t):
+subs(tmp_rhoPhi_from_H_flpp,%):
+subs(lambda=1,Phi0=1,%):
+
+fs(%);
+
+subs(s(t)=tmp_s_ac,%):
+subs(H(t)=tmp_H_ac,%):
+
+tmp_Phi_ac:=%;
+
+# So let's have a look at these.
+
+plot(tmp_Phi_ac,t=2.4..12);
+
+# Very interesting. So this is symmetric about the line Phi=-1/2!
+
+plot(tmp_s_ac,t=2.4..12);
+
+# Already know this one.
+
+plot(tmp_rho_ac,t=2.4..12);
+
+# Follows.
+
+plot(tmp_H_ac,t=2.4..12);
+
+# So this is an offset version of Phi one, as we now understand.
+
+##############
+
+# Now combinations of these are also potentially relevant. 
+
+# E.g., if believe what it says p9 of eWGT_symm_breaking.pdf, then redshifts are given
+# by Phi/s. So look at this.
+
+plot(tmp_Phi_ac/tmp_s_ac,t=2.4..12);
+
+# So inifnite redshift spot is in fact at *second* crossing of axis by s (around t=9.7146).
+
+# Also, if we are interested in contribution by rho to the 'energy equation'
+# (see eWGT_symm_breaking.pdf, eq. (5)), then this is Phi*rho, which looks like
+
+plot(tmp_Phi_ac*tmp_rho_ac,t=2.4..12);
+
+# So this is only negative *after* infinite redshift point.
+
+# Look at main region on better scale.
+
+plot(tmp_Phi_ac*tmp_rho_ac,t=3..10);
+
+# Very interesting. Let's look at each component of 'energy' in eq. (5) separately.
+
+# For this will need to change cosmic time derivs to conformal time.
+
+# Call cosmic time tau here.
+
+tmp_dPhidtau:=s(t)*diff(Phi(t),t);
+
+[-6*Phi(t)*H(t)*tmp_dPhidtau,Phi(t)^4,-3*H(t)^2*Phi(t)^2,-3*tmp_dPhidtau^2,8*Pi*Phi(t)*rho(t)]:
+subs(H(t)=tmp_H_ac,Phi(t)=tmp_Phi_ac,s(t)=tmp_s_ac,rho(t)=tmp_rho_ac,%):
+
+tmp:=fs(%):
+
+plot(tmp,t=3..11,color=[red,green,blue,black,cyan],view=[3..11,-1.25..1.25],thickness=2);
+
+# Quite something!
+
+# Concentrate on bit where Lambda and rho bits cross.
+
+plot(tmp,t=1.4..2,color=[red,green,blue,black,cyan],view=[1.4..2,-2000..2000],thickness=2);
+
+# Now we think crossing of Omega_Lambda and Omega_matter should in fact be at
+# eta=3.27, so how does this relate?
+
+# Another question: have we really brought all flat-Lambda matter models down to single type 
+# (in same way as we know happens for radiation dom. case). Important if so.
+
+#######
+
+# Note should verify that terms in tmp really do sum to zero.
+
+add(tmp[i],i=1..5):
+fs(%);
+
+# Impressive!
+
+######
+
+# Note we shouldn't lose sight of the question of cosmic time version of what is
+# happening in 'negative rho' region.
+
+# Come back to this. Have thought it would be good to look at 'potential'
+# to see what happens to that after s goes negative.
+
+tmp_dHdtau:=s(t)*diff(H(t),t);
+
+x^2*(1/2*tmp_dHdtau+H(t)^2)-lambda/6*x^4-4/3*Pi*rho(t)*x;
+
+subs(H(t)=tmp_H_ac,Phi(t)=tmp_Phi_ac,s(t)=tmp_s_ac,rho(t)=tmp_rho_ac,%):
+
+tmp_V_pot:=fs(%);
+
+tmp_V_pot_num:=subs(lambda=1,tmp_V_pot);
+
+# Could animate this
+
+# animate(plot,[tmp_V_pot_num,x=-3..3],t=1..13.54,view=[-3..3,-10..10],frames=200);
+
+animate(plot,[tmp_V_pot_num,x=-3..3],t=1..13.54,view=[-3..3,-10..10],frames=100);
+
+###############
+
+# Note structure of potential is quite simple in terms of s.
+
+tmp_s_ac-s(t);
+
+solve(%,WeierstrassP(t,0,-1/432));
+
+subs(WeierstrassP(t,0,-1/432)=%,tmp_V_pot_num):
+fs(%):
+simplify(%,size);
+
+# So only variable is s^3.
+
+tmp_V_pot_in_s:=%;
+
+###############
+
+# More added later. Want to look at a couple of examples of Jacobi elliptic functions
+# versus the Weierstrass ones for s, which Panagiotis would like to understand.
+
+# Set up quick local versions of the two equations these have to solve.
+
+(* with(plots);
+
+fs:=proc(func)
+
+    func;
+    factor(simplify(%));
+end:
+
+*)
+
+diff(s(eta),eta,eta)-1/2*s(eta)^2:
+
+tmp_s_eqn_second_order:=%;
+
+3*diff(s(eta),eta)^2-1-s(eta)^3:
+
+tmp_s_eqn_first_order:=%;
+
+# First check with our Weierstrass solution.
+
+tmp_P_try:=12*WeierstrassP(eta,0,-1/432);
+
+tmp_s_eqns:=[tmp_s_eqn_first_order,tmp_s_eqn_second_order]:
+
+tmp_s_eqns:
+subs(s(eta)=tmp_P_try,%):
+fs(%);
+
+# Good. Now one we sent Panagiotis.
+
+tmp_J_try1:=6*(-1/6*(6+2*I*3^(1/2))/(1+3^(1/2)*I)+JacobiSN(eta/(6+2*I*3^(1/2))^(1/2),1/2*3^(1/2)+1/2*I)^2)/(6+2*I*3^(1/2))*(1+3^(1/2)*I);
+
+tmp_s_eqns:
+subs(s(eta)=tmp_J_try1,%):
+fs(%);
+
+# Fine. Now one Panagiotis wants us to look at.
+
+tmp_J_try2:=2*3^(1/2)*(1-(1-JacobiSN(1/3*3^(3/4)*eta,1/4*6^(1/2)+1/4*2^(1/2))^2)^(1/2))/JacobiSN(1/3*3^(3/4)*eta,1/4*6^(1/2)+1/4*2^(1/2))^2-1-3^(1/2);
+
+tmp_s_eqns:
+subs(s(eta)=tmp_J_try2,%):
+fs(%);
+
+# Works! So lets plot these out.
+
+tmp_plot1:=plot(subs(eta=x-7.29,tmp_J_try1),x=2.4..12,color=red):
+
+tmp_plot2:=plot(tmp_P_try,eta=2.4..12,color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Fine.
+
+tmp_plot1:=plot(subs(eta=x-7.29,tmp_J_try2),x=2.4..12,color=red):
+
+tmp_plot2:=plot(tmp_P_try,eta=2.4..12,color=blue):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Ok, would need another solution to go with this. Try
+
+tmp_J_try3:=(2*3^(1/2))/(JacobiSN(3^(-1/4)*eta,(sqrt(2)+sqrt(6))/4)^2)*(1+sqrt(1-JacobiSN(3^(-1/4)*eta,(sqrt(2)+sqrt(6))/4)^2))-(1+sqrt(3));
+
+tmp_s_eqns:
+subs(s(eta)=tmp_J_try3,%):
+fs(%);
+
+# Fine. Following shows what is going on.
+
+tmp_plot1:=plot(subs(eta=x-7.29,tmp_J_try3),x=2.4..4.85,color=red):
+
+tmp_plot2:=plot(subs(eta=x-7.29,tmp_J_try3),x=9.80..12,color=red):
+
+tmp_plot3:=plot(tmp_P_try,eta=2.4..12,color=black):
+
+tmp_plot4:=plot(subs(eta=x-7.29,tmp_J_try2),x=2.4..12,color=blue):
+
+display([tmp_plot1,tmp_plot2,tmp_plot3,tmp_plot4]);
+
+############################################################
+
+# Resuming much later (09/12/19) since we want to continue with the
+# 'radiation perturbations' paper, and in particular continue writing up
+# the CDM fluctuations part, which we had only just started writing 
+# in 2015.
+
+# This is happening now since Deaglan and Will would like to submit 'paper 2' soon,
+# and we believe much of what it says needs looking at, and alternative
+# justifications.
+
+# So first key thing we would like to capture is what we currently believe
+# for Phi variation versus confirmal time.
+
+# Here we mean Newtonian potential, not our eWGT scalar field phi.
+
+# So we can a plot of this versus 't' (which is conformal time here), via
+
+tmp_Phi_hyper_sol_in_s;
+
+subs(s=tmp_s_try_next,%):
+subs(_C1=0,%):
+
+tmp:=%:
+
+plot(tmp,t=0..13.56);
+
+# So this just repeats first bit of course (since 's' just going over same values).
+
+# Let's take this to 'cusp'.
+
+tmp_plot1:=plot(tmp,t=0..7.28):
+
+# Now we should be able to get what we believe would be the correct Phi over the
+# full range via using the Phi equation in t:
+
+tmp_Phitt_eqn_to_transform;
+
+# and substituting what we know for the analytically continued 's' and 'H'
+# over the full period. So try this.
+
+subs(a(t)=1/tmp_s_try_next,%):
+subs(_C1=0,%):
+subs(H(t)=tmp_H_ac,%):
+subs(Lambda=1,%):
+
+tmp_Phi_newt_ac_eqn:=%;
+
+# Amazingly it seems to be able to solve it!!
+
+dsolve(%,Phi(t));
+
+# Will capture this result as it stands, since there are some problems when
+# it comes to simplify it.
+
+tmp_Phi_newt_ac_gen:=_C1*WeierstrassP(t,0,-1/432)*WeierstrassPPrime(t,0,-1/432)+_C2*WeierstrassP(t,0,-1/432)*WeierstrassPPrime(t,0,-1/432)*(96*WeierstrassP(t,0,-1/432)^2/(1+1728*WeierstrassP(t,0,-1/432)^3)*WeierstrassPPrime(t,0,-1/432)+1/9*WeierstrassZeta(t,0,-1/432));
+
+# Check this does satisfy equation.
+
+tmp_Phi_newt_ac_eqn:
+subs(Phi(t)=tmp_Phi_newt_ac_gen,%):
+fs(%);
+
+# Very good.
+
+# Now the issues we've been having with errors after simplifying may not be 
+# intrinsic to Maple but happening just in the version we were trying
+# elsewhere. So here just proceed assuming correct.
+
+tmp_Phi_newt_ac_gen:
+
+series(%,t,10);
+
+# So:
+
+tmp_Phi_newt_ac_gen:
+subs(_C1=0,_C2=-12960,%):
+fs(%):
+
+tmp_Phi_newt_ac_use:=%;
+
+# Where it went wrong before was:
+
+series(%,t,10);
+
+# Oh dear! Still wrong!
+
+# Capture what we think is right.
+
+tmp_Phi_newt_ac_use:=-1440*(2*WeierstrassP(t,0,-1/432)^2+WeierstrassPPrime(t,0,-1/432)*WeierstrassZeta(t,0,-1/432))*WeierstrassP(t,0,-1/432);
+
+series(%,t,12);
+
+# Let's do a plot of this, and compare with independent route above.
+
+tmp_plot2:=plot(tmp_Phi_newt_ac_use,t=0..12,color=red):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Excellent. Do over a smaller region so can see comparison better.
+
+tmp_plot2:=plot(tmp_Phi_newt_ac_use,t=0..8,color=red):
+
+display([tmp_plot1,tmp_plot2]);
+
+# Very impressive!
+
+# Do another one in black for paper.
+
+###*** Fig. 26
+
+ans := plot(tmp_Phi_newt_ac_use,t=0..12,labels=[`eta`,`Phi`]);
+Export("Phi_newt_full_range_cdm.csv",op([1,1],ans));
+
+##########
+
+# Have a look at V and delta as well, though have to be beware that above Maple problem
+# might affect them.
+
+tmp_V_from_Phi:
+subs(w(t)=0,%):
+subs(a(t)=1/tmp_s_try_next,%):
+subs(_C1=0,%):
+subs(H(t)=tmp_H_ac,%):
+subs(Lambda=1,%):
+subs(Phi(t)=tmp_Phi_newt_ac_use,%):
+fs(%):
+
+tmp_V_ac_use:=%;
+
+###*** Fig. 27
+
+ans:=plot(subs(k=10,tmp_V_ac_use),t=0..12,labels=[`eta`,`V`]);
+Export("V_full_range_cdm.csv",op([1,1],ans));
+
+# Very interesting! Do for delta as well.
+
+tmp_delta_from_Phi:
+subs(w(t)=0,%):
+subs(a(t)=1/tmp_s_try_next,%):
+subs(_C1=0,%):
+subs(H(t)=tmp_H_ac,%):
+subs(Lambda=1,%):
+subs(Phi(t)=tmp_Phi_newt_ac_use,%):
+fs(%):
+
+tmp_delta_ac_use:=%;
+
+###*** Fig. 28
+
+ans:=plot(subs(k=10,tmp_delta_ac_use),t=0..12,labels=[`eta`,`delta`],labeldirections=[horizontal, vertical]
+);
+Export("delta_full_range_cdm.csv",op([1,1],ans));
+
+# Looks as though it reaches a level value (i.e. zero derivative) at second
+# s crossing of 0, which again might be a nice termination point?
+
+# Actually no. If do it greater detail get
+
+plot(subs(_C1=0,tmp_s_try_next),t=9.6..10);
+
+plot(subs(k=10,tmp_delta_ac_use),t=9.6..10);
+
+# So doesn't quite happen at same point. (think it does in large k limit).
+
+# V does go to zero at same point as s though - we've checked this.
+
+#################################
+
+# Linked with this, would like to demonstrate relation  for CDM fluctuations
+# we mentioned above, which goes as follows:
+
+diff(tmp_delta_from_Phi-3*Phi(t),t)+k*tmp_V_from_Phi:
+subs(w(t)=0,%):
+fs(%):
+
+tmp_hold:=%;
+
+tmp_Phitt_eqn_use;
+
+solve(%,diff(Phi(t),t,t));
+
+subs(diff(Phi(t),t,t)=%,tmp_hold):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(w(t)=0,%):
+fs(%);
+
+# Excellent!
+
+# Note this seems to work with the solutions we have got:
+
+diff(tmp_delta_ac_use-3*tmp_Phi_newt_ac_use,t)+k*tmp_V_ac_use:
+fs(%);
+
+# which is good news.
+
+#################################
+
+# For paper, need plot of total s development under C->-C assumption.
+
+tmp_plot1:=plot(tmp_s_expr_before_t0,t=-4..0):
+
+tmp_plot2:=plot(tmp_s_expr_after_t0,t=0..4):
+
+###*** Fig. 29
+
+ans:=display([tmp_plot1,tmp_plot2],labels=[`eta'`,`s`]);
+Export("s_non_anal_1.csv",op([1,1],ans));
+Export("s_non_anal_2.csv",op([2,1],ans));
+
+#################################
+
+# Maple bug with simplify the Weierstrass functions is bad enough that we need
+# to move to Mathematica in order to verify some things.
+
+# Following sets up start of what we need. Note we need to use 'Function' notation, otherwise
+# the substitutions in the differential equation don't work.
+
+(*
+
+(* First show that the Phi function we have in mind does satisfy right equation.
+
+Mathematica doesn't know the simplification rules, so we have to help. *)
+
+tmpPhifunctry = Function[t,-1440*(2*WeierstrassP[t, {0, -1/432}]^2+WeierstrassPPrime[t, {0, -1/432}]*WeierstrassZeta[t, {0, -1/432}])*WeierstrassP[t, {0, -1/432}]]
+
+tmpPhinewtaceqn = -3/WeierstrassP[t, {0, -1/432}]*WeierstrassPPrime[t, {0, -1/432}]*D[Phi[t],t]+D[Phi[t],{t,2}]+1/144*Phi[t]/WeierstrassP[t, {0, -1/432}]^2
+
+tmpPhinewtaceqn /. Phi -> tmpPhifunctry
+      
+FullSimplify[%]
+       
+% /. WeierstrassP[t, {0, -(1/432)}]^3 -> 1/4*WeierstrassPPrime[t, {0, -(1/432)}]^2-1/1728
+
+Simplify[%]
+
+(* Fine. *)
+
+(* Now what we'd like to do in writeup, is have Phi available in WEF form centred at FCB. Don't think we've
+achieved this as yet.*)
+
+*)
+
+# Go back to Maple to sort out what we think the right Phi should be, then
+# can test it in Mathematica.
+
+# First need to use addition theorem results to move over PPrime and zeta
+# evaluations as well
+
+# Copy pattern of what we were doing above.
+
+# For moving zeta over, will need to know the value of the zeta function at 't0'.
+
+# After a lot of looking around, we found the key quantity is the eta_2 given
+# in the middle of p653 in A+S. Using this leads to
+
+tmp_zeta_at_t0:=1/4*2^(1/3)*GAMMA(2/3)^3/Pi;
+
+# Note this is 2/3 the value at the halfway point 3/2*t0.
+
+# Now use addition formula for zeta function.
+
+tmp_zeta_sum:=1/2*((zetadd(z1)-zetadd(z2))/(zetad(z1)-zetad(z2)))+zeta(z1)+zeta(z2);
+
+subs(zeta(z1)=WeierstrassZeta(t,0,-1/432),%):
+subs(zeta(z2)=tmp_zeta_at_t0,%):
+subs(zetad(z1)=-WeierstrassP(t,0,-1/432),%):
+subs(zetad(z2)=0,%):
+subs(zetadd(z1)=-WeierstrassPPrime(t,0,-1/432),%):
+subs(zetadd(z2)=-(-1/sqrt(3)/12),%):
+
+tmp_zeta_use:=fs(%);
+
+# Check:
+
+plot(tmp_zeta_use,t=-tmp_t0+1..1);
+
+plot(subs(t=t+tmp_t0,WeierstrassZeta(t,0,-1/432)),t=-tmp_t0+1..1);
+
+# Very good!
+
+# Also need to transfer PPrime. A+S p635 have a helpful formula for this (apparently not
+# in modern version!).
+
+tmp_Pp_sum:=(tmp_P_sum*(Pd(z1)-Pd(z2))+P(z1)*Pd(z2)-Pd(z1)*P(z2))/(P(z2)-P(z1));
+
+subs(P(z1)=WeierstrassP(t,0,-1/432),%):
+subs(P(z2)=0,%):
+subs(Pd(z1)=WeierstrassPPrime(t,0,-1/432),%):
+subs(Pd(z2)=-1/sqrt(3)/12,%):
+
+tmp_Pp_use:=fs(%);
+
+# Could have been a lot more complicated!
+
+# Now check these by differentiating starting at zeta level.
+
+tmp_zeta_use:
+diff(%,t):
+fs(%);
+
+%+tmp_P_use:
+fs(%);
+
+# Very good!
+
+tmp_zeta_use:
+diff(%,t,t):
+fs(%);
+
+%+tmp_Pp_use:
+fs(%);
+
+# Excellent. So this all works and can look at moving over Phi solution.
+
+tmp_Phi_newt_ac_use:
+subs(WeierstrassP(t,0,-1/432)=P_use,%):
+subs(WeierstrassPPrime(t,0,-1/432)=Pp_use,%):
+subs(WeierstrassZeta(t,0,-1/432)=zeta_use,%):
+subs(P_use=tmp_P_use,Pp_use=tmp_Pp_use,zeta_use=tmp_zeta_use,%):
+fs(%):
+
+tmp_Phi_newt_ac_use_before_t0:=%;
+
+# Check this out.
+
+plot(tmp_Phi_newt_ac_use_before_t0,t=-tmp_t0+0.1..2*tmp_t0-2.5);
+
+# Yep, looks correct.
+
+# Check in equation. Have to form new version of equation
+# first.
+
+tmp_Phitt_eqn_to_transform:
+ 
+subs(a(t)=1/tmp_s_expr_before_t0,%):
+subs(H(t)=-diff(tmp_s_expr_before_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+tmp_Phi_eqn_before_t0:=%;
+
+# Try out our solution:
+
+subs(Phi(t)=tmp_Phi_newt_ac_use_before_t0,%):
+fs(%);
+
+# Impressive.
+
+# Also could check against series we can get from previous tmp_Phi_in_terms_of_eta_before_t0
+# answer for same thing (which of course wasn't too good apart from use for series,
+# since it involves a hypergeometric function evaluated on Weierstrass functions).
+
+tmp_Phi_newt_ac_use_before_t0:
+series(%,t,12);
+
+tmp_Phi_in_terms_of_eta_before_t0:
+series(%,t,12);
+
+# Spot on. So we can be pretty confident in both.
+
+#########################
+
+# Now other side of t0.
+
+# First compare s results each side.
+
+tmp_s_expr_before_t0;
+
+# Can get from this to other side via:
+
+subs(t=-t,%):
+fs(%):
+-%;
+
+# This is same as
+
+tmp_s_expr_after_t0;
+
+# Try something similar for Phi, and check works in new equation we need to form.
+
+tmp_Phitt_eqn_to_transform:
+ 
+subs(a(t)=1/tmp_s_expr_after_t0,%):
+subs(H(t)=-diff(tmp_s_expr_after_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+tmp_Phi_eqn_after_t0:=%;
+
+tmp_Phi_newt_ac_use_before_t0:
+subs(t=-t,%):
+fs(%):
+
+tmp_Phi_newt_ac_use_after_t0:=%;
+
+# Try out this solution:
+
+tmp_Phi_eqn_after_t0:
+subs(Phi(t)=tmp_Phi_newt_ac_use_after_t0,%):
+fs(%);
+
+# Very good! This doesn't really tell us the sign of Phi though.
+
+# Also check series against what we had above.
+
+tmp_Phi_newt_ac_use_after_t0:
+series(%,t,12);
+
+tmp_Phi_in_terms_of_eta_after_t0:
+series(%,t,12);
+
+# Very good. Identical.
+
+# Note if Phi was only criterion, then would probably have minus what we've just said,
+# from looking at:
+
+-tmp_Phi_newt_ac_use_after_t0:
+series(%,t,12);
+ 
+tmp_Phi_newt_ac_use_before_t0:
+series(%,t,12);
+
+# So these match to third order.
+
+######################
+
+# Ok, now look at delta and V.
+
+tmp_delta_from_Phi:
+subs(w(t)=0,%): 
+subs(a(t)=1/tmp_s_expr_before_t0,%):
+subs(H(t)=-diff(tmp_s_expr_before_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+subs(Phi(t)=tmp_Phi_newt_ac_use_before_t0,%):
+fs(%):
+
+tmp_delta_before_t0_new:=%;
+
+# Rather complex!
+
+# Compare with series we got above.
+
+tmp_delta_before_t0_new:
+series(%,t,12):
+fs(%);
+
+tmp_delta_ser_before_t0: 
+subs(K=k,%);
+
+# Perfect! Now look at afterwards. Put a constant c in to reflect choice of sign of Phi after.
+
+tmp_delta_from_Phi:
+subs(w(t)=0,%): 
+subs(a(t)=1/tmp_s_expr_after_t0,%):
+subs(H(t)=-diff(tmp_s_expr_after_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+subs(Phi(t)=c*tmp_Phi_newt_ac_use_after_t0,%):
+fs(%):
+
+tmp_delta_after_t0_new:=%;
+
+# Rather complex!
+
+# Compare with series we got above.
+
+tmp_delta_after_t0_new:
+series(%,t,12):
+fs(%);
+
+tmp_delta_ser_after_t0: 
+subs(K=k,%);
+
+# All agrees if c=1.
+
+# Now look at before versus after for delta:
+
+tmp_delta_before_t0_new:
+series(%,t,8): 
+fs(%);
+  
+tmp_delta_after_t0_new:
+series(%,t,8): 
+fs(%);
+
+# So as we thought, need c=1 for continuity of delta, which will then have discontinuous
+# first derivative.
+
+#######################
+
+# Repeat all this for V.
+
+tmp_V_from_Phi:
+subs(w(t)=0,%): 
+subs(a(t)=1/tmp_s_expr_before_t0,%):
+subs(H(t)=-diff(tmp_s_expr_before_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+subs(Phi(t)=tmp_Phi_newt_ac_use_before_t0,%):
+fs(%):
+
+tmp_V_before_t0_new:=%;
+
+# Rather complex!
+
+# Compare with series we got above.
+
+tmp_V_before_t0_new:
+series(%,t,12):
+fs(%);
+
+tmp_V_ser_before_t0: 
+subs(K=k,%);
+
+# Perfect! Now look at afterwards. Put a constant c in to reflect choice of sign of Phi after.
+
+tmp_V_from_Phi:
+subs(w(t)=0,%): 
+subs(a(t)=1/tmp_s_expr_after_t0,%):
+subs(H(t)=-diff(tmp_s_expr_after_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+subs(Phi(t)=c*tmp_Phi_newt_ac_use_after_t0,%):
+fs(%):
+
+tmp_V_after_t0_new:=%;
+
+# Rather complex!
+
+# Compare with series we got above.
+
+tmp_V_after_t0_new:
+series(%,t,12):
+fs(%);
+
+tmp_V_ser_after_t0: 
+subs(K=k,%);
+
+# All agrees if c=1.
+
+# Now look at before versus after for V:
+
+tmp_V_before_t0_new:
+series(%,t,8): 
+fs(%);
+  
+tmp_V_after_t0_new:
+series(%,t,8): 
+fs(%);
+
+# So here disagreement is at order t^2 when c=1.
+
+#####################################
+
+# Ok, have realised that what we've been doing here is not quite enough
+# to establish that there's no other way of matching.
+
+# What we should be doing is taking *general* solution for Phi that goes with
+# the analytic solution for s up to t0, and then moving this to be centred
+# at t0.
+
+# Then can flip the 't's in this to get solutions going with the s appropriate to after t0 - this will give
+# 2 degrees of freedom here (whereas we were only working with 1 just now).
+
+# Carry this out.
+
+tmp_Phi_newt_ac_gen:
+subs(WeierstrassP(t,0,-1/432)=P_use,%):
+subs(WeierstrassPPrime(t,0,-1/432)=Pp_use,%):
+subs(WeierstrassZeta(t,0,-1/432)=zeta_use,%):
+subs(P_use=tmp_P_use,Pp_use=tmp_Pp_use,zeta_use=tmp_zeta_use,%):
+fs(%):
+
+tmp_Phi_newt_ac_gen_before_t0:=%;
+
+# Check in equation. 
+
+tmp_Phi_eqn_before_t0:
+
+# Try out our solution:
+
+subs(Phi(t)=tmp_Phi_newt_ac_gen_before_t0,%):
+fs(%);
+
+# Impressive.
+
+# Now other side of t0. Note should label constants differently.
+
+tmp_Phi_newt_ac_gen_before_t0:
+subs(t=-t,%):
+subs(_C1=c1,_C2=c2,%):
+fs(%):
+
+tmp_Phi_newt_ac_gen_after_t0:=%;
+
+# Try out this solution:
+
+tmp_Phi_eqn_after_t0:
+subs(Phi(t)=tmp_Phi_newt_ac_gen_after_t0,%):
+fs(%);
+
+# Very good! 
+
+####################
+
+# Ok, we should redo the deltas and Vs after t0 using this.
+
+tmp_delta_from_Phi:
+subs(w(t)=0,%): 
+subs(a(t)=1/tmp_s_expr_after_t0,%):
+subs(H(t)=-diff(tmp_s_expr_after_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+subs(Phi(t)=tmp_Phi_newt_ac_gen_after_t0,%):
+fs(%):
+
+tmp_delta_after_t0_new_gen:=%:
+
+# Rather complex!
+
+# Next do V, then can look at continuity of derivatives for all three.
+
+tmp_V_from_Phi:
+subs(w(t)=0,%): 
+subs(a(t)=1/tmp_s_expr_after_t0,%):
+subs(H(t)=-diff(tmp_s_expr_after_t0,t),%):
+subs(Lambda=1,%):
+fs(%):
+
+subs(Phi(t)=tmp_Phi_newt_ac_gen_after_t0,%):
+fs(%):
+
+tmp_V_after_t0_new_gen:=%:
+
+# Do these satisfy our fundamental relation?
+
+diff(tmp_delta_after_t0_new_gen-3*tmp_Phi_newt_ac_gen_after_t0,t)+k*tmp_V_after_t0_new_gen:
+fs(%);
+
+# Yes!!
+
+########################
+
+# Ok, so should be able to look at matching now.
+
+tmp_Phi_newt_ac_use_before_t0:
+series(%,t,12):
+fs(%):
+
+tmp_Phi_ser_before:=%;
+
+tmp_Phi_newt_ac_gen_after_t0:
+series(%,t,12):
+fs(%):
+
+tmp_Phi_ser_after:=%;
+
+tmp_delta_before_t0_new:
+series(%,t,12):
+fs(%):
+
+tmp_delta_ser_before:=%;
+
+tmp_delta_after_t0_new_gen:
+series(%,t,12):
+fs(%):
+
+tmp_delta_ser_after:=%;
+
+tmp_V_before_t0_new:
+series(%,t,12):
+fs(%):
+
+tmp_V_ser_before:=%;
+
+tmp_V_after_t0_new_gen:
+series(%,t,12):
+fs(%):
+
+tmp_V_ser_after:=%;
+
+#####################
+
+# delta has a constant term, so presumably we need this to match.
+
+op(1,tmp_delta_ser_before)-op(1,tmp_delta_ser_after):
+fs(%):
+
+tmp_cond1:=%;
+
+# Say we want V derivative to be continuous as well.
+
+op(1,tmp_V_ser_before)-op(1,tmp_V_ser_after):
+fs(%):
+
+tmp_cond2:=%;
+
+solve({tmp_cond1,tmp_cond2},{c1,c2});
+
+tmp_c1c2_after:=%;
+
+# Very interesting. Then for Phi have
+
+op(1,tmp_Phi_ser_before):
+fs(%);
+
+# versus
+
+op(1,tmp_Phi_ser_after):
+subs(tmp_c1c2_after,%):
+fs(%);
+
+# We think it likely that true perturbation is s*Phi, so this may be fine.
+
+###################################
+
+# Get some plots of the complete functions for this case.
+
+tmp_Phi_newt_ac_use_before_t0:
+
+tmp_plot1:=plot(%,t=-tmp_t0+0.01..0,labels=[`eta`,`Phi`]):
+
+tmp_Phi_newt_ac_gen_after_t0:
+subs(tmp_c1c2_after,%):
+fs(%):
+
+tmp_plot2:=plot(%,t=0..tmp_t0-0.01,labels=[`eta`,`Phi`]):
+
+###*** Fig. 30
+
+ans:=display([tmp_plot1,tmp_plot2]);
+Export("Phi_newt_full_range_cdm_new_1.csv",op([1,1],ans));
+Export("Phi_newt_full_range_cdm_new_2.csv",op([2,1],ans));
+
+####
+
+tmp_delta_before_t0_new:
+subs(k=10,%):
+
+tmp_plot1:=plot(%,t=-tmp_t0+0.01..0,labels=[`eta`,`delta`]):
+
+tmp_delta_after_t0_new_gen:
+subs(k=10,%):
+subs(tmp_c1c2_after,%):
+fs(%):
+
+tmp_plot2:=plot(%,t=0..tmp_t0-0.01,labels=[`eta`,`delta`]):
+
+###*** Fig. 32
+
+ans:=display([tmp_plot1,tmp_plot2]);
+Export("delta_full_range_cdm_new_1.csv",op([1,1],ans));
+Export("delta_full_range_cdm_new_2.csv",op([2,1],ans));
+
+####
+
+tmp_V_before_t0_new:
+subs(k=10,%):
+
+tmp_plot1:=plot(%,t=-tmp_t0+0.01..0,labels=[`eta`,`V`]):
+
+tmp_V_after_t0_new_gen:
+subs(k=10,%):
+subs(tmp_c1c2_after,%):
+fs(%):
+
+tmp_plot2:=plot(%,t=0..tmp_t0-0.01,labels=[`eta`,`V`]):
+
+###*** Fig. 31
+
+display([tmp_plot1,tmp_plot2]);
+####
+
+tmp_V_before_t0_new:
+subs(k=10,%):
+
+tmp_plot1:=plot(%,t=-tmp_t0+0.01..0,labels=[`eta`,`V`]):
+
+tmp_V_after_t0_new_gen:
+subs(k=10,%):
+subs(tmp_c1c2_after,%):
+fs(%):
+
+tmp_plot2:=plot(%,t=0..tmp_t0-0.01,labels=[`eta`,`V`]):
+
+###*** Fig. 31
+ans:=display([tmp_plot1,tmp_plot2]);
+Export("V_full_range_cdm_new_1.csv",op([1,1],ans));
+Export("V_full_range_cdm_new_2.csv",op([2,1],ans));
+
+
+###################################
+
+# Ok, in trying to decide on the boundary conditions at FCB for this case, have realised
+# that the delta_dot-3*Phi_dot+k*V=0 equation is very important.
+
+# Can we derive this via conservation (Bianchi identity) of SET?
+
+# Will aim to do this via dcdmu.
+
+# Note we originally copied this from somewhere else (4d_conformal_rhodes),
+# and this had Om_subs in place of Om, hence big problems!
+
+# Try to learn from this!!
+
+dcdmu:= proc(vecin,ii)
+
+    local vec,result;
+
+    vec:=vecin;
+    if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+        result:=ds(map(diff,vec,x||ii) + 1/2*(Om||ii&@vec - vec&@Om||ii));
+end:
+
+# Now need to set up zeroth and 1st order fluid SET combined.
+
+tmp_grav_SET0:=ds(rho(t)*gam0+tmp_SET0);
+
+for ii from 1 to 3 do
+
+    tmp_grav_SET||ii:=tmp_SET||ii;
+    
+od:
+
+eval_grav_SET:=proc(vec)
+
+    local ii,tmp_sum,tmp1;
+    
+    tmp_sum:=ds(0);
+    
+    for ii from 0 to 3 do
+    
+        tmp1:=ds(eu||ii&@vec)[1];
+        
+        tmp_sum:=ds(tmp_sum+tmp1*tmp_grav_SET||ii);
+        
+    od;
+    
+RETURN(tmp_sum);
+
+end:
+
+for ii from 0 to 3 do
+
+    tmp_sum:=0;
+
+    tmp1:=eval_grav_SET(ed||ii);
+    
+    tmp2:=dcd(tmp1)[1];
+
+    for jj from 0 to 3 do
+        
+        tmp3:=dcdmu(ed||ii,jj);
+        
+        tmp4:=eval_grav_SET(tmp3);
+        
+        tmp_sum:=fs(tmp_sum+ds(gu||jj&@tmp4)[1]);
+        
+    od;
+    
+    tmp_bianchi_of_SET||ii:=fs(tmp2-tmp_sum);
+    
+#    print(ii,%);
+    
+od:
+
+# Convert to k space:
+
+for ii from 0 to 3 do
+
+    tmp_bianchi_of_SET||ii;
+    series(%,epsilon,3):
+    fs(%);
+    
+    convert(%,polynom);
+
+    subs(Phi(t,x,y,z)=Phi(t)*exp(+I*(kx*x+ky*y+kz*z)),
+     Theta(t,x,y,z)=Theta(t)*exp(+I*(kx*x+ky*y+kz*z)),%):
+     subs(v1(t)=-I*kx/k*V(t),%):
+     subs(v2(t)=-I*ky/k*V(t),%):
+     subs(v3(t)=-I*kz/k*V(t),%):
+     
+     %*exp(-I*(kx*x+ky*y+kz*z)):
+     
+     subs(kx^2=k^2-ky^2-kz^2,%):
+     
+     subs(Theta(t)=Phi(t),%):
+     subs(delta_rho(t)=delta(t)*rho(t),%):
+     subs(P(t)=w(t)*rho(t),delta_P(t)=w(t)*rho(t)*delta(t),%):
+     subs(rho(t)=tmp_rho_subs,%):
+     fs(%):
+     
+     subs(diff(a(t),t)=tmp_adot_subs,%):
+     fs(%):
+     subs(diff(a(t),t)=tmp_adot_subs,%):
+     fs(%):    
+     subs(diff(H(t),t)=tmp_Ht_from_w,%): 
+     fs(%);
+     
+     series(%,epsilon,3);
+     subs(w(t)=0,%):
+     fs(%);
+     
+     tmp_bian_res_ser||ii:=%;
+     
+     print(ii,%);
+     
+od:
+
+####
+
+# So this works fine in terms of the time component, which gives us the expected
+# delta-3Phi dot constraint.
+
+# Also, have a new relation from the spatial components.
+
+# Check this out in same way as for delta relation above.
+
+tmp_other_Bianchi_rel:=-V(t)*H(t)*a(t) + Phi(t)*k - diff(V(t), t);
+
+subs(V(t)=tmp_V_from_Phi,%):
+subs(w(t)=0,%):
+fs(%):
+
+tmp_hold:=%;
+
+tmp_Phitt_eqn_use;
+
+solve(%,diff(Phi(t),t,t));
+
+subs(diff(Phi(t),t,t)=%,tmp_hold):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(w(t)=0,%):
+fs(%);
+
+# Excellent!
+
+# Note this seems to work with the solutions we have got:
+
+tmp_other_Bianchi_rel:
+subs(V(t)=tmp_V_ac_use,%):
+subs(Phi(t)=tmp_Phi_newt_ac_use,%):
+subs(a(t)=1/tmp_s_try_next,%):
+subs(H(t)=-diff(tmp_s_try_next,t),%):
+subs(_C1=0,%):
+fs(%);
+
+# Very good.
+

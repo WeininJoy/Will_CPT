@@ -1,0 +1,4288 @@
+# This is attempt to work through material in 'GR Perturbations' chapter in
+# Lyth and Liddle book (Chap. 8).
+
+# Based on closed_uni_perturbs_perfect_fluid_for_lecture.map
+
+read `dirac_maple_test_r6.map`; 
+with(dirac); 
+read `rectangular_gravity_for_r10.map`;
+
+# Use Theta as well as Phi in metric, i.e. conformal Newtonian gauge,
+# and work in conformal time (so t here is in fact eta).
+
+# Note we use Theta instead of Psi, since lattter is a special function in Maple.
+
+# Also here we explicitly include anisotropic stress, since we want to deal with radiation
+# through to the conformal boundary, and we should be able to get some of the equations
+# for this set up here (and rest in 'boltzmann' program).
+
+# In this version (started 21/03/20), generalise to include Lambda.
+
+fs:=proc(func)
+
+    func;
+    #factor(simplify(%));
+    simplify(%);
+end:
+
+term2:=1/sqrt(1+2*epsilon*Theta(t,x,y,z));
+
+term3:=1/sqrt(1-2*epsilon*Phi(t,x,y,z));
+
+gu0:=ds(1/a(t)*term2*eu0);
+gu1:=ds(1/a(t)*term3*eu1);
+gu2:=ds(1/a(t)*term3*eu2);
+gu3:=ds(1/a(t)*term3*eu3);
+
+dirac[make_gd]();
+
+# Check metric is what we intended.
+
+for ii from 0 to 3 do
+	for jj from 0 to 3 do
+		ds(gd||ii&@gd||jj)[1];
+		factor(simplify(%));
+		print(ii,jj,%);
+	od:
+od:
+
+# Fine.
+
+dirac[form_hOmj]();
+
+for ii from 0 to 3 do
+        print(`doing ii = `,ii);
+        hom||ii||p:=dppb(Om||ii);
+od:
+
+read `dirac_maple_general_h_functions_v6.map`;
+
+# Get little omegas.
+
+for ii from 0 to 3 do
+
+        tmp:=hub(ed||ii);
+        om_fromh||ii:=ds(0);
+
+        for jj from 0 to 3 do
+
+                print(`doing ii,jj = `,ii,jj);
+                tmp1:=ds(tmp&@eu||jj)[1];
+                om_fromh||ii:=ds(om_fromh||ii+tmp1*Om||jj);
+        od:
+od:
+
+# see what components we have
+
+for ii from 0 to 3 do
+
+        om_fromhp||ii:=dppb(om_fromh||ii);
+
+od;
+
+dfR():
+dfRicci():
+
+bigr:=ds(gu0&@Ric0+gu1&@Ric1+gu2&@Ric2+gu3&@Ric3)[1]:
+
+for ii from 0 to 3 do
+        Rich||ii:=ds(0);
+        for jj from 0 to 3 do
+                tmp:=ds(gu||jj&@ed||ii)[1];
+                Rich||ii:=ds(Rich||ii+tmp*Ric||jj);
+        od;
+od:
+
+# and now Einstein
+
+for ii from 0 to 3 do
+
+        Ein||ii:=ds(Rich||ii-1/2*ed||ii*bigr);
+
+od:
+
+# At this point insert some code from 
+# 'attempt_at_grav_wave_photon_geodesics_for_la_palma_lectures.map'.
+
+for ii from 0 to 3 do
+	
+	Ein||ii;
+	map(series,%,epsilon,2);
+	map(convert,%,polynom);
+	factor(simplify(%));
+#	print(ii,%);
+	Ein||ii:=%;
+od:
+
+for ii from 0 to 3 do
+
+        e||ii||p:=dppv(Ein||ii);
+
+od:
+
+# Now divide out the Einstein into zeroth and first order bits.
+
+for ii from 0 to 3 do
+
+	Ein_zeroth||ii:=factor(simplify(subs(epsilon=0,Ein||ii)));
+	Ein_first||ii:=factor(simplify(ds(Ein||ii-Ein_zeroth||ii)));
+
+od:
+
+####################
+
+# Now start on some new stuff. Depart where necessary from what we were doing in
+# previous versions, by bring in 'best practice' from each.
+
+Ein_zeroth0[2]-8*Pi*rho-Lambda;
+
+solve(%,rho);
+
+tmp_rho_subs:=%;
+
+tmp_adot_subs := H(t)*a(t)^2;
+
+####################
+
+# Ok, now jump straight to what we did sucessfully before as regards radiation perturbations.
+
+Ein_zeroth1[3]+8*Pi*w(t)*tmp_rho_subs-Lambda:
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%);
+
+solve(%,diff(H(t),t));
+
+tmp_Ht_from_w:=fs(%);
+
+####################
+
+# Make transition to k space, plus bring in r.h.s. of equations, i.e. perturbed SET.
+
+tmp_comp:=epsilon*exp(+I*(kx*x+ky*y+kz*z));
+
+tmp_non_rel_v:=(v1(t)*gam1+v2(t)*gam2+v3(t)*gam3);
+
+tmp_SET0:=ds((delta_rho(t)*gam0+(rho(t)+P(t))*tmp_non_rel_v)*tmp_comp);
+
+# For spatial components of SET we have first change from non- _with_PI version
+# since we include anisotropic stress.
+
+tmp_spatial_k:=ds(kx*gam1+ky*gam2+kz*gam3);
+
+# Also, we bring in velocity component substitutions straightaway (which we learnt to do previously
+# in later versions).
+
+# Following is using equations (8.19) and (8.23) in L&L.
+
+# We are now sure of signs of 'alpha' and 'beta' in following to use, but go through same steps
+# as before anyway.
+
+for ii from 1 to 3 do
+
+    tmp_SET||ii:=ds((-delta_P(t)*gam||ii+(rho(t)+P(t))
+    *ds(ed||ii&@tmp_non_rel_v)[1]*gam0
+    +(-alpha*1/k^2*ds(tmp_spatial_k&@gam||ii)[1]*tmp_spatial_k+beta*1/3*gam||ii)*PI(t)*P(t))*tmp_comp);
+    
+od:
+
+for ii from 0 to 3 do
+
+    Ein_first||ii;
+    
+    subs(Phi(t,x,y,z)=Phi(t)*exp(+I*(kx*x+ky*y+kz*z)),
+    Theta(t,x,y,z)=Theta(t)*exp(+I*(kx*x+ky*y+kz*z)),%);
+    
+    ds(%-8*Pi*tmp_SET||ii);
+    
+    subs(v1(t)=-I*kx/k*V(t),%):
+    subs(v2(t)=-I*ky/k*V(t),%):
+    subs(v3(t)=-I*kz/k*V(t),%):
+    
+    ds(%*exp(-I*(kx*x+ky*y+kz*z)));
+    
+    subs(kx^2=k^2-ky^2-kz^2,%):
+    
+    tmp_eqn||ii:=fs(%);
+    
+    print(ii,%);
+    
+od:
+
+tmp_eqn1[4];
+
+solve(%,PI(t));
+
+tmptmp_PI:=%;
+
+# Now want to see how this equates to (8.36) in L&L.
+
+# Then can say:
+
+tmptmp_PI:
+subs(P(t)=w(t)*tmp_rho_subs,%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%);
+
+# So looks as though (8.36) assumes w=1/3, and our alpha must be -1.
+
+# But in fact later on, this choice ends up that we can't get -k*Pi/6 
+# as contribution to Vdot with either beta=-1 or +1, and it has to be one
+# of these.
+
+# Believe sign on this due to seperate derivation for Boltzmann equation.
+
+# So we seem to need PI to have opposite definition to (8.36), i.e.
+# we are going to take 
+
+subs(alpha=1,%):
+
+tmptmp_PI_next:=%;
+
+# Put this back in and show it cleans up the equations where individual k components
+# are still appearing.
+
+for ii from 0 to 3 do
+
+    tmp_eqn||ii:
+    
+    subs(PI(t)=tmptmp_PI_next,%):
+    subs(alpha=1,%):
+    subs(P(t)=w(t)*tmp_rho_subs,%):
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%);
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%);
+    
+    tmp_eqn_next||ii:=%;
+    
+    print(ii,%);
+    
+od:
+
+# Yes, looks as though everything has separated successfully.
+
+# Carry on with sort of treatment we were doing in later programs.
+
+for ii from 0 to 3 do
+
+    tmp_eqn_next||ii:
+    
+    subs(delta_rho(t)=delta(t)*rho(t),%):
+    subs(P(t)=w(t)*rho(t),delta_P(t)=w(t)*rho(t)*delta(t),%):
+    subs(rho(t)=tmp_rho_subs,%):
+    fs(%);
+    
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%):
+    subs(diff(a(t),t)=tmp_adot_subs,%):
+    fs(%);
+    
+    subs(diff(H(t),t)=tmp_Ht_from_w,%):
+    
+    tmp_eqn_nn||ii:=%;
+    
+    print(ii,%);
+    
+od:
+
+# Ok, think see how these work.
+
+tmp_eqn_nn1[3];
+
+solve(%,diff(Phi(t),t,t));
+
+tmptmp_Phitt:=%;
+
+[tmp_eqn_nn0[2],tmp_eqn_nn0[3]];
+
+tmp:=%:
+
+map(diff,%,t):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+fs(%);
+
+subs(diff(Phi(t),t,t)=tmptmp_Phitt,%):
+fs(%);
+
+solve(%,{diff(delta(t),t),diff(V(t),t)});
+
+tmp_sol:=%:
+
+##########
+
+# Now this time instead of seeking to match the 'book equations',
+# we will find out what comes from the SET conservation.
+
+dcdmu:= proc(vecin,ii)
+
+    local vec,result;
+
+    vec:=vecin;
+    if not dirac[ismulti](vec) then vec:= dirac[simp](vec); fi;
+        result:=ds(map(diff,vec,x||ii) + 1/2*(Om||ii&@vec - vec&@Om||ii));
+end:
+
+# Now need to set up zeroth and 1st order fluid SET combined.
+
+# Here must include pressure in zeroth order one.
+
+for ii from 0 to 3 do
+
+    ds((rho(t)+P(t))*ds(ed||ii&@gam0)[1]*gam0-P(t)*ed||ii);
+    
+    tmp_SET_zeroth||ii:=%;
+    
+    print(ii,%);
+    
+od:
+
+for ii from 0 to 3 do
+
+    tmp_grav_SET||ii:=ds(tmp_SET_zeroth||ii+tmp_SET||ii);
+    
+    print(ii,%);
+    
+od:
+
+eval_grav_SET:=proc(vec)
+
+    local ii,tmp_sum,tmp1;
+    
+    tmp_sum:=ds(0);
+    
+    for ii from 0 to 3 do
+    
+        tmp1:=ds(eu||ii&@vec)[1];
+        
+        tmp_sum:=ds(tmp_sum+tmp1*tmp_grav_SET||ii);
+        
+    od;
+    
+RETURN(tmp_sum);
+
+end:
+
+for ii from 0 to 3 do
+
+    tmp_sum:=0;
+
+    tmp1:=eval_grav_SET(ed||ii);
+    
+    tmp2:=dcd(tmp1)[1];
+
+    for jj from 0 to 3 do
+        
+        tmp3:=dcdmu(ed||ii,jj);
+        
+        tmp4:=eval_grav_SET(tmp3);
+        
+        tmp_sum:=fs(tmp_sum+ds(gu||jj&@tmp4)[1]);
+        
+    od;
+    
+    tmp_bianchi_of_SET||ii:=fs(tmp2-tmp_sum);
+    
+#    print(ii,%);
+    
+od:
+
+# Convert to k space:
+
+for ii from 0 to 3 do
+
+    tmp_bianchi_of_SET||ii;
+    series(%,epsilon,2):
+    fs(%);
+    
+    convert(%,polynom);
+
+    subs(Phi(t,x,y,z)=Phi(t)*exp(+I*(kx*x+ky*y+kz*z)),
+     Theta(t,x,y,z)=Theta(t)*exp(+I*(kx*x+ky*y+kz*z)),%):
+     subs(v1(t)=-I*kx/k*V(t),%):
+     subs(v2(t)=-I*ky/k*V(t),%):
+     subs(v3(t)=-I*kz/k*V(t),%):
+     
+     %*exp(-I*(kx*x+ky*y+kz*z)):
+     
+     subs(kx^2=k^2-ky^2-kz^2,%):
+     
+     subs(delta_rho(t)=delta(t)*rho(t),%):
+     subs(P(t)=w(t)*rho(t),delta_P(t)=w(t)*rho(t)*delta(t),%):
+     subs(rho(t)=tmp_rho_subs,%):
+     fs(%):
+     
+     subs(diff(a(t),t)=tmp_adot_subs,%):
+     fs(%):
+     subs(diff(a(t),t)=tmp_adot_subs,%):
+     fs(%):    
+     subs(diff(H(t),t)=tmp_Ht_from_w,%): 
+     fs(%);
+     
+     series(%,epsilon,2);
+     fs(%);
+     
+     subs(alpha=1,beta=-1,%);
+     fs(%);
+     
+     subs(kx^2=k^2-ky^2-kz^2,%):
+     fs(%);
+     
+     tmp_bian_res_ser||ii:=%;
+     
+     print(ii,%);
+     
+od:
+
+# Ok, is this compatible with what we found above?
+
+tmp_eqn_nn0[3];
+
+solve(%,diff(Phi(t),t));
+
+tmptmp_Phidot_from_V:=%;
+
+for ii from 0 to 3 do
+     
+     tmp_bian_res_ser||ii:
+     
+     subs(tmp_sol,%);
+     fs(%);
+     subs(diff(Phi(t),t)=tmptmp_Phidot_from_V,%):
+     fs(%);
+     subs(alpha=1,beta=-1,%);
+     subs(PI(t)=tmptmp_PI_next,%):
+     fs(%);
+     
+     tmp_bian_res_ser_next||ii:=%;
+     
+     print(ii,%);
+     
+od:
+
+# Looks good!
+
+# Save first relation, which is analogue, with Lambda,
+# of (8.35) in L&L.
+
+tmp_non_deriv_constraint:=fs(numer(op(1,tmp_bian_res_ser_next0))/3/H(t));
+
+# Would be good to show directly that the derivatives we know about conserve this.
+
+tmp_non_deriv_constraint:
+diff(%,t):
+subs(tmp_sol,%):
+fs(%):
+subs(diff(Phi(t),t)=tmptmp_Phidot_from_V,%):
+fs(%):
+subs(alpha=1,beta=-1,%):
+subs(PI(t)=tmptmp_PI_next,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%): 
+fs(%);
+
+# Very impressive! (get constraint back again).
+
+######################
+
+# Ok, let's get results in a better form. Perhaps the best way to think
+# about the equations is that we have 3 first order equations for
+# Phi, delta and V, and that these are compatible with the constraint.
+
+# Let's get these three in a slightly better form, using the constraint, and then
+# check that second order relation is compatible.
+
+tmp_non_deriv_constraint:
+
+solve(%,a(t)^3);
+
+tmptmp_a3:=%;
+
+tmp_sol:
+subs(diff(Phi(t),t)=tmptmp_Phidot_from_V,%):
+fs(%):
+subs(alpha=1,beta=-1,%):
+fs(%):
+
+subs(a(t)^3=tmptmp_a3,%):
+fs(%):
+
+tmp:=%;
+
+# This has cleaned things up quite a bit.
+
+diff(V(t),t):
+subs(tmp,%):
+
+tmp_Vt:=%;
+
+diff(delta(t),t):
+subs(tmp,%):
+
+tmp_deltat:=%;
+
+tmptmp_Phidot_from_V:
+
+# This doesn't have a(t)^3 in it anyway.
+
+tmp_Phit:=%;
+
+# Show that these work.
+
+tmp_non_deriv_constraint:
+diff(%,t):
+subs(diff(delta(t),t)=tmp_deltat,%):
+subs(diff(V(t),t)=tmp_Vt,%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%): 
+fs(%);
+
+# Very good! Also look at 2nd order relation.
+
+tmp_eqn_nn1[3];
+
+subs(diff(Phi(t),t)=tmp_Phit,%):
+fs(%):
+subs(diff(delta(t),t)=tmp_deltat,%):
+subs(diff(V(t),t)=tmp_Vt,%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(alpha=1,beta=-1,%): 
+fs(%);
+
+# Good. So all works.
+
+##################
+
+# Now show Vt is what we expect from Boltzmann equation in radiation case.
+
+tmp_PI:=tmptmp_PI_next;
+
+solve(tmp_PI=PI(t),Theta(t));
+
+tmp_Theta_from_PI:=%;
+
+solve(tmp_PI=PI(t),Phi(t));
+
+tmp_Phi_from_PI:=%;
+
+# Now import what we believe.
+
+tmp_Vt_boltz:=k*(delta(t)/4-PI(t)/6+Theta(t));
+
+%-tmp_Vt:
+subs(PI(t)=tmp_PI,%):
+subs(w(t)=1/3,%):
+fs(%);
+
+# Very good. Also delta result.
+
+tmp_deltat_boltz:=-4/3*k*V(t)+4*diff(Phi(t),t);
+
+%-tmp_deltat:
+subs(diff(Phi(t),t)=tmp_Phit,%):
+subs(w(t)=1/3,%):
+fs(%);
+
+# This needs the constraint equation.
+
+subs(a(t)^3=tmptmp_a3,%):
+subs(w(t)=1/3,%):
+fs(%);
+
+# Good.
+
+#################################
+
+# Now want to (a) add in Boltzmann version of evolution equation for PI, and
+# (b) Look at getting second order equation for Phi - can this still be in terms
+# of Phi alone?
+
+# Re (b), let's see how to eliminate V and delta where required.
+
+tmp_eqn_nn0[2]:
+
+solve(%,delta(t));
+
+tmp_delta_from_Phidot:=fs(%);
+
+tmp_eqn_nn0[3]:
+
+solve(%,V(t));
+
+tmp_V_from_Phidot:=fs(%);
+
+# These are the expressions we used as the starting point last time of course.
+
+tmp_eqn_nn1[3]:
+subs(V(t)=tmp_V_from_Phidot,%):
+subs(delta(t)=tmp_delta_from_Phidot,%):
+subs(alpha=1,beta=-1,%): 
+fs(%);
+
+tmp_hold:=%;
+
+# This is a second order equation in Phi and Theta alone, but of course we don't know
+# Theta.
+
+# Let's assume that the Boltzmann hierarchy truncates immediately, i.e.
+# (Boltzmann) Theta[3]=0.
+
+# Then believe following is zero:
+
+# Note we put a general factor f in, so that can simultaneously do the case where f=0,
+# i.e. non-anisotropic stress.
+
+diff(PI(t),t)-f*8*k*V(t)/5;
+
+subs(PI(t)=tmp_PI,%):
+fs(%):
+subs(diff(Phi(t),t)=tmp_Phit,%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(alpha=1,beta=-1,%): 
+fs(%);
+
+solve(%,diff(Theta(t),t));
+
+tmptmp_Thetat:=%;
+
+tmp_hold:
+subs(diff(Theta(t),t)=tmptmp_Thetat,%):
+subs(V(t)=tmp_V_from_Phidot,%):
+subs(delta(t)=tmp_delta_from_Phidot,%):
+subs(alpha=1,beta=-1,%): 
+fs(%);
+
+solve(%,diff(Phi(t),t,t));
+
+tmp_Phitt_bht_gen:=fs(%);
+
+# _bht means Boltzmann hierarchy truncated.
+
+# Looks a mess, but hopefully improves in radiation case.
+
+tmp_Phitt_bht_gen:
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_Phitt_bht_rad:=%;
+
+# Yes, much better.
+
+# Note the Thetadot expression which goes along with this is
+
+tmptmp_Thetat:
+subs(V(t)=tmp_V_from_Phidot,%):
+subs(delta(t)=tmp_delta_from_Phidot,%):
+subs(alpha=1,beta=-1,%): 
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_Thetat_bht_rad:=%;
+
+# This is quite nice.
+
+############
+
+# We can get an equation in Phi alone by going to third order.
+
+solve(diff(Phi(t),t,t)=tmp_Phitt_bht_rad,Theta(t));
+
+tmp_Theta_from_Phitt:=%;
+
+subs(Theta(t)=%,diff(Theta(t),t)-tmp_Thetat_bht_rad):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(alpha=1,beta=-1,%): 
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_3rd_order_Phi_eqn_bht_rad:=numer(%);
+
+###################
+
+# Interpolated later (07/07/20).
+
+# Want to get out this equation with f=1, for write up. 
+
+# Do this via:
+
+tmp_3rd_order_Phi_eqn_bht_rad:
+subs(f=1,%):
+
+tmp:=fs(%);
+
+tmp:
+subs(diff(Phi(t),t,t,t)=X^4,diff(Phi(t),t,t)=X^3,diff(Phi(t),t)=X^2,Phi(t)=X,%):
+series(%,X,10):
+fs(%):
+subs(a(t)=a,H(t)=H,%);
+
+latex(%);
+
+# End of interpolation.
+
+###################
+
+# Note the _gen case we were using above doesn't mean much since this already
+# uses Boltzmann hierarchy equations for radiation case.
+
+# Going the other way, what would everything look like as first order?
+
+tmp_Thetat_bht_rad:
+subs(diff(Phi(t),t)=tmp_Phit,%): 
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_Thetat_for:=%;
+
+# _for = first order radiation.
+
+tmp_Phit:
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_Phit_for:=%;
+
+tmp_Vt:
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_Vt_for:=%;
+
+tmp_deltat:
+subs(w(t)=1/3,%):
+fs(%):
+
+tmp_deltat_for:=%;
+
+# These will certainly be compatible with constraint, since this didn't involve
+# Theta.
+
+# So just need to check compatible with 2nd order relation and intended
+# PI derivative.
+
+tmp_eqn_nn1[3]:
+
+subs(diff(Phi(t),t)=tmp_Phit_for,%):
+fs(%):
+subs(diff(delta(t),t)=tmp_deltat_for,%):
+subs(diff(V(t),t)=tmp_Vt_for,%):
+subs(diff(Phi(t),t)=tmp_Phit_for,%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(alpha=1,beta=-1,%): 
+subs(w(t)=1/3,%):
+fs(%);
+
+# Fine.
+
+diff(tmp_PI,t):
+subs(diff(Phi(t),t)=tmp_Phit_for,%):
+subs(diff(Theta(t),t)=tmp_Thetat_for,%):
+fs(%):
+subs(diff(a(t),t)=tmp_adot_subs,%):
+fs(%):    
+subs(diff(H(t),t)=tmp_Ht_from_w,%):
+subs(alpha=1,beta=-1,%): 
+subs(w(t)=1/3,%):
+fs(%);
+
+# Also fine.
+
+######################
+
+# Ok, as next step, let's look at what the functions look like
+# when we do a numerical integration.
+
+# So will adapt code from the version before cdm was brought in.
+
+# So get series to start things off.
+
+# Do for w=1/3.
+
+tmp_w_use:=1/3;
+
+diff(H(t),t)-tmp_Ht_from_w:;
+
+solve(%,a(t));
+
+subs(w(t)=tmp_w_use,%):
+
+tmp_a_from_H:=%;
+
+diff(a(t),t)-tmp_adot_subs;
+subs(a(t)=tmp_a_from_H,%):
+fs(%);
+
+subs(w(t)=tmp_w_use,%):
+fs(%):
+
+tmp_H_eqn:=numer(%)/3;
+
+tmp_H_ser_try:=1/t^2*sum('h||i'*t^i,i=0..8);
+
+tmp_H_eqn:
+subs(H(t)=tmp_H_ser_try,%):
+fs(%):
+series(%,t,6):
+
+tmp_H_ser:=fs(%);
+
+subs(h1=0,h2=0,h3=0,%):
+fs(%);
+
+op(1,%):
+
+solve(%,h4);
+
+tmp_h4:=%;
+
+# Have a series for Phi as well.
+
+# This time it's 3rd order.
+
+tmp_Phi_ser_try:=sum('p||i'*t^i,i=0..8);
+
+tmp_3rd_order_Phi_eqn_bht_rad:
+subs(w(t)=tmp_w_use,%):
+subs(a(t)=tmp_a_from_H,%):
+
+tmp_Phittt_eqn_use:=numer(fs(%));
+
+subs(H(t)=tmp_H_ser_try,%):
+subs(Phi(t)=tmp_Phi_ser_try,%):
+#fs(%):                                         # Have to supress this this time.
+series(%,t,6):
+fs(%);
+
+subs(h1=0,h2=0,h3=0,%):
+subs(h4=tmp_h4,%):
+
+fs(%);
+
+subs(p1=0,%):
+fs(%);
+
+tmp:=%:
+
+solve({op(1,tmp),op(3,tmp),op(5,tmp)},{p2,p3,p4});
+
+tmp_p2p3p4_sol:=fs(%);
+
+# What are the implications for Theta?
+
+tmp_Theta_from_Phitt:
+subs(w(t)=tmp_w_use,%):
+subs(a(t)=tmp_a_from_H,%):
+fs(%):
+
+tmp_Theta_from_Phitt_rad:=%;
+
+tmp_Theta_from_Phitt_rad:
+subs(H(t)=tmp_H_ser_try,%):
+subs(Phi(t)=tmp_Phi_ser_try,%):
+series(%,t,5):
+fs(%):
+
+subs(h1=0,h2=0,h3=0,%):
+subs(h4=tmp_h4,%):
+subs(p1=0,%):
+subs(tmp_p2p3p4_sol,%):
+fs(%);
+
+# So if f neq 0 we can't avoid things starting with non-zero PI.
+
+tmp_Theta_ser_use:=convert(%,polynom);
+
+# Also set up other series.
+
+tmp_Phi_ser_try:
+subs(p1=0,%):
+subs(tmp_p2p3p4_sol,%):
+subs(p5=0,p6=0,p7=0,p8=0,%):
+
+tmp_Phi_ser_use:=%;
+
+tmp_H_ser_try:
+subs(h1=0,h2=0,h3=0,%):
+subs(h4=tmp_h4,%):
+subs(h5=0,h6=0,h7=0,h8=0,%):
+
+tmp_H_ser_use:=%;
+
+#####################
+
+# Interpolation here (07/07/20) in order to bring in
+# the h0 we determine below, and write these series
+# in better fashion.
+
+tmp_Phi_ser_use:
+subs(f=1,%):
+subs(h0=1/sqrt(Lambda/3),%):
+subs(k=K*sqrt(Lambda),%):
+fs(%):
+series(%,t,10):
+fs(%);
+
+tmp_Theta_ser_use:
+subs(f=1,%):
+subs(h0=1/sqrt(Lambda/3),%):
+subs(k=K*sqrt(Lambda),%):
+fs(%):
+series(%,t,10):
+fs(%);
+
+# Fine.
+
+# End of interpolation.
+
+#####################
+
+with(plots):
+
+Digits:=40;
+
+# Take code and numbers for a numerical case from a bit later in 
+# attempt_at_gr_perturbs_for_la_palma_lectures_with_Lambda.map
+# where we have understood how to relate C to h0 etc.
+
+# Note in rough notes (p32), have shown h0 we want in order to
+# tie in with the C appearing in the density is
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_f_num:=1;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phittt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phitt_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta and Theta.
+
+tmp_Theta_from_Phitt_rad:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_Theta_num:=evalf(%);
+
+tmp_V_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+(D@@2)(Phi)(t_start)=tmp_Phitt_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=200;
+
+t_max:=3.165;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,tmp_a_num^2*Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[t,tmp_a_num^2*tmp_Theta_num]);
+	pointsTheta||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+# Looks interesting!
+
+#########################
+
+# Possible that Phi, and Theta as well, are 'inversion symmetric'.
+
+# Let's attempt to test this out, using same route as in
+# attempt_at_gr_perturbs_for_la_palma_lectures_with_Lambda.map.
+
+tmp_background_eqn_in_Hofa:=diff(H(a),a)*a*H(a)-2*Lambda/3+2*H(a)^2;
+
+tmp_Hofa_try:=sqrt(3*a^4*Lambda+9*C)/(3*a^2);
+
+# Check:
+
+tmp_background_eqn_in_Hofa:
+subs(H(a)=tmp_Hofa_try,%):
+fs(%);
+
+# Can do it automatically using dchange, in a way we have discovered which might
+# be useful elsewhere.
+
+with(PDEtools);
+
+tmp_background_eqn_in_Hofa;
+
+solve(%,diff(H(a),a));
+
+tmp_HA:=subs(a=A,%);
+
+tmp_HofA_try:=subs(a=A,tmp_Hofa_try);
+
+simp_proc:=proc(func) 
+
+    func; 
+    
+    subs(diff(ai(A),A)=1/A^2/H(A),%): 
+    fs(%): 
+    subs(diff(H(A),A)=tmp_HA,%); 
+    fs(%); 
+    subs(H(A)=tmp_HofA_try,%): 
+    fs(%); 
+
+end:
+
+tmp_itr:={A=a(t)};
+
+tmp_tr:={t=ai(A)};
+
+# Ok, here's where we set up the particular Phitt eqn we want to transform here.
+
+tmp_Phittt_eqn_use:
+
+dchange(tmp_tr,%,tmp_itr,simp_proc):
+subs(A=a,%): 
+fs(%):
+
+tmp_Phi_eqn_in_a:=numer(%);
+
+########
+
+tmp_Phi_eqn_in_a:
+subs(C=Lambda/3,%):
+#subs(GG0=0,%):
+fs(%):
+
+tmp_Phi_eqn_to_solve:=%;
+
+# There's a scaling we can use to reduce complexity.
+
+tmp_Phi_eqn_to_solve:
+subs(k=K*sqrt(Lambda),%):
+fs(%):
+
+tmp_Phi_eqn_in_a_next:=%;
+
+##############
+
+# Ok, so is it inversion symmetric?
+
+tmp_Phi_eqn_in_a_next:
+subs(Phi(a)=psi(a)/a^2,%):
+
+tmp_hold1:=fs(%);
+
+dchange({a=1/s},%):
+fs(%):
+subs(s=a,%): 
+fs(%):
+
+tmp_hold2:=%;
+
+solve(tmp_hold1,diff(psi(a),a,a,a));
+
+subs(diff(psi(a),a,a,a)=%,tmp_hold2):
+fs(%);
+
+# If get psiaa from this and then subs in e.g. tmp_hold1, then doesn't
+# work unless f=0.
+
+# So looks as though it's not inversion symmetric unless f=0 (original case).
+
+# However, we now have an equation which we can try out at the FCB.
+
+tmp_Phi_eqn_in_a_next:
+dchange({a=1/s},%):
+fs(%):
+
+solve(%,diff(Phi(s),s,s,s));
+
+diff(Phi(s),s,s,s)-%:
+fs(%):
+
+tmp_Phi_eqn_in_s:=numer(%);
+
+tmp_Phi_ser_in_s_try:=s^nu*(c0+c1*s+c2*s^2+c3*s^3+c4*s^4+c5*s^5+c6*s^6);
+
+subs(Phi(s)=tmp_Phi_ser_in_s_try,tmp_Phi_eqn_in_s):
+fs(%/s^nu):
+series(%,s):
+fs(%);
+
+# So now possible indicial indices are 1, 2 and 4, and f doesn't alter these.
+
+tmp_ser_hold:=%:
+
+# Won't go through these yet. Important aspect is that they are all non-singular.
+
+# Maybe a better approach is to gor to joint 1st order equations, and get these into
+# same form, i.e. s.t. we can work at the FCB.
+
+# Then can make sure everything is non-singular there.
+
+##############################
+
+go_s:=proc(func)
+
+    func;
+    subs(a(t)=tmp_a_from_H,%): 
+    dchange(tmp_tr,%,tmp_itr,simp_proc):
+    subs(A=a,%): 
+    fs(%):
+    subs(C=Lambda/3,%):
+    fs(%):
+    subs(k=K*sqrt(Lambda),%):
+    fs(%):
+    dchange({a=1/s},%):
+    fs(%);
+    simplify(%) assuming(s^2>0,Lambda>0);
+    fs(%);
+    
+end:
+
+diff(Phi(t),t)-tmp_Phit_for:
+go_s(%);
+
+solve(%,diff(Phi(s),s));
+
+simplify(%) assuming(s^2>0,Lambda>0):
+fs(%):
+
+tmp_Phis:=%;
+
+diff(Theta(t),t)-tmp_Thetat_for:
+go_s(%);
+
+solve(%,diff(Theta(s),s));
+
+simplify(%) assuming(s^2>0,Lambda>0):
+fs(%):
+
+tmp_Thetas:=%;
+
+diff(delta(t),t)-tmp_deltat_for:
+go_s(%);
+
+solve(%,diff(delta(s),s));
+
+simplify(%) assuming(s^2>0,Lambda>0):
+fs(%):
+
+tmp_deltas:=%;
+
+diff(V(t),t)-tmp_Vt_for:
+go_s(%);
+
+solve(%,diff(V(s),s));
+
+simplify(%) assuming(s^2>0,Lambda>0):
+fs(%):
+
+tmp_Vs:=%;
+
+############
+
+# Would be worth checking constraint still satisfied.
+
+tmp_non_deriv_constraint:
+subs(w(t)=1/3,%):
+go_s(%);
+
+tmp_constraint_in_s:=%;
+
+diff(%,s):
+subs(diff(Phi(s),s)=tmp_Phis,%):
+subs(diff(delta(s),s)=tmp_deltas,%):
+subs(diff(V(s),s)=tmp_Vs,%):
+fs(%);
+
+tmp_hold:=%;
+
+solve(tmp_constraint_in_s,V(s));
+
+subs(V(s)=%,tmp_hold):
+fs(%);
+
+# Excellent!
+
+##################
+
+# Also check that PI derivative works out to what it should be.
+
+tmptmp_PI_next:
+subs(w(t)=1/3,%):
+go_s(%);
+
+diff(%,s):
+subs(diff(Phi(s),s)=tmp_Phis,%):
+subs(diff(delta(s),s)=tmp_deltas,%):
+subs(diff(V(s),s)=tmp_Vs,%):
+subs(diff(Theta(s),s)=tmp_Thetas,%):
+fs(%);
+
+# Meanwhile:
+
+diff(PI(t),t)-f*8*k*V(t)/5:
+
+go_s(%);
+
+solve(%,diff(PI(s),s));
+
+# Fine.
+
+################
+
+# So look at series at FCB.
+
+tmp_Phis_eqn:=numer(fs(diff(Phi(s),s)-tmp_Phis));
+
+tmp_Thetas_eqn:=numer(fs(diff(Theta(s),s)-tmp_Thetas));
+
+tmp_deltas_eqn:=numer(fs(diff(delta(s),s)-tmp_deltas));
+
+tmp_Vs_eqn:=numer(fs(diff(V(s),s)-tmp_Vs));
+
+tmp_Phi_ser_in_s_try:=s^nu*(c0+c1*s+c2*s^2+c3*s^3+c4*s^4+c5*s^5+c6*s^6);
+
+# Use this to find out how the other should go.
+
+tmp_Theta_from_Phitt_rad:
+
+go_s(%):
+
+# Interesting what happens to the denominator.
+
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+fs(%/s^nu):
+series(%,s):
+fs(%);
+
+op(1,%):
+
+tmp_Theta_ser_first_term:=%;
+
+solve(%,nu);
+
+# Anyway, point is that for nu = either 1,2 or 4 then for f=0 or 1 we have a leading
+# term with the same power as Phi, since 't0' has to be non-zero.
+
+# So we say:
+
+tmp_Theta_ser_in_s_try:=s^nu*(t0+t1*s+t2*s^2+t3*s^3+t4*s^4+t5*s^5+t6*s^6);
+
+# What about V?
+
+tmp_V_from_Phidot:
+subs(w(t)=1/3,%):
+go_s(%);
+
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+fs(%/s^nu):
+series(%,s):
+tmp:=fs(%);
+
+# We're presuming V is non-singular, so:
+
+op(1,%);
+
+solve(%,t0);
+
+# Actually, no, the actual V is multiplied by s^nu, so have to be careful.
+
+# If nu=1, then first two terms of series just found have to go,
+# if nu=2, then first term, and if nu=4, then none of the terms are obliged
+# to vanish.
+
+# This ties in with following:
+
+tmp:
+subs(t0=tmp_Theta_ser_first_term,%):
+fs(%);
+
+# So indeed this vanishes for nu=1,2.
+
+# Very good! So we know nu=1 or 2 now. Look at delta as well.
+
+tmp_delta_from_Phidot:
+subs(w(t)=1/3,%):
+go_s(%);
+
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+fs(%/s^nu):
+series(%,s):
+tmp:=fs(%);
+
+# So now:
+# nu=1 implies first three terms have to vanish
+# nu=2 implies first two terms
+# nu=4 don't need any to vanish.
+
+# Check re t0:
+
+tmp:
+subs(t0=tmp_Theta_ser_first_term,%):
+fs(%);
+
+# Fine.
+
+# Same result here.
+
+# Ok, there are several other singular terms one would need to go through as well, but
+# will suppose this all works.
+
+# However, we don't know which nu works, though it has to be 1 or 2 or 4.
+# whilst we still need an s^nu present or 'series' won't be able to work.
+
+# So say:
+
+tmp_Phi_ser_in_s_try:=s*(c0+c1*s+c2*s^2+c3*s^3+c4*s^4+c5*s^5+c6*s^6+c7*s^7);
+
+tmp_Theta_ser_in_s_try:=s*(t0+t1*s+t2*s^2+t3*s^3+t4*s^4+t5*s^5+t6*s^6+t7*s^7);
+
+tmp_delta_ser_in_s_try:=(d0+d1*s+d2*s^2+d3*s^3+d4*s^4+d5*s^5+d6*s^6+d7*s^7);
+
+tmp_V_ser_in_s_try:=(v0+v1*s+v2*s^2+v3*s^3+v4*s^4+v5*s^5+v6*s^6+v7*s^7);
+
+tmp_Phis_eqn:
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+subs(delta(s)=tmp_delta_ser_in_s_try,V(s)=tmp_V_ser_in_s_try,%):
+fs(%):
+series(%,s):
+fs(%);
+
+# Ok, makes sense. If nu=1 then starts with c0 and t0, if nu=2 starts with c1 and t1
+# and they are in the different ratios implied.
+
+# If nu=4, then should start with t3 and c3.
+
+tmp_Phi_eqn_ser:=%;
+
+tmp_Thetas_eqn:
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+subs(delta(s)=tmp_delta_ser_in_s_try,V(s)=tmp_V_ser_in_s_try,%):
+fs(%):
+series(%,s):
+fs(%):
+
+tmp_Theta_eqn_ser:=%;
+
+tmp_Vs_eqn:
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+subs(delta(s)=tmp_delta_ser_in_s_try,V(s)=tmp_V_ser_in_s_try,%):
+fs(%):
+series(%,s):
+fs(%):
+
+tmp_V_eqn_ser:=%;
+
+tmp_deltas_eqn:
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+subs(delta(s)=tmp_delta_ser_in_s_try,V(s)=tmp_V_ser_in_s_try,%):
+fs(%):
+series(%,s):
+fs(%):
+
+tmp_delta_eqn_ser:=%;
+
+# There is also the constraint equation.
+
+tmp_constraint_in_s:
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+subs(delta(s)=tmp_delta_ser_in_s_try,V(s)=tmp_V_ser_in_s_try,%):
+fs(%):
+series(%,s):
+fs(%):
+
+tmp_cond_eqn_ser:=%;
+
+# Ok, get going. Think can choose c0, c1 and c3
+# as the variables that fix the rest, in line with expectations about nu.
+
+{op(1,tmp_Phi_eqn_ser),op(1,tmp_Theta_eqn_ser),op(1,tmp_delta_eqn_ser),
+op(1,tmp_V_eqn_ser),op(1,tmp_cond_eqn_ser)};
+
+solve(%,{t0,v0,d1});
+
+tmp_sol1:=fs(%);
+
+{op(3,tmp_Phi_eqn_ser),op(3,tmp_Theta_eqn_ser),op(3,tmp_delta_eqn_ser),
+op(3,tmp_V_eqn_ser),op(3,tmp_cond_eqn_ser)};
+
+subs(tmp_sol1,%):
+fs(%);
+
+solve(%,{t1,v1,d2});
+
+tmp_sol2:=fs(%);
+
+{op(5,tmp_Phi_eqn_ser),op(5,tmp_Theta_eqn_ser),op(5,tmp_delta_eqn_ser),
+op(5,tmp_V_eqn_ser),op(5,tmp_cond_eqn_ser)};
+
+subs(tmp_sol1,tmp_sol2,%):
+fs(%);
+
+solve(%,{c2,t2,v2,d3});
+
+tmp_sol3:=fs(%);
+
+{op(7,tmp_Phi_eqn_ser),op(7,tmp_Theta_eqn_ser),op(7,tmp_delta_eqn_ser),
+op(7,tmp_V_eqn_ser),op(7,tmp_cond_eqn_ser)}:
+
+subs(tmp_sol1,tmp_sol2,tmp_sol3,%):
+fs(%);
+
+solve(%,{d0,t3,v3,d4});
+
+tmp_sol4:=fs(%);
+
+# So this seems to be working and has 3 d.o.f.
+
+# This seems right in that we have 4 first order equations and 1 constraint.
+
+# Do one more, just to make sure no 'obstructions' come in.
+
+{op(9,tmp_Phi_eqn_ser),op(9,tmp_Theta_eqn_ser),op(9,tmp_delta_eqn_ser),
+op(9,tmp_V_eqn_ser),op(9,tmp_cond_eqn_ser)}:
+
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,%):
+fs(%);
+
+solve(%,{c4,t4,v4,d5});
+
+tmp_sol5:=fs(%);
+
+# Fine, so stop at this point.
+
+###################
+
+# So we can understand about nu=1 not being allowed in Phi=Theta case (i.e. PI=0)
+# since the series can't start this way (t1 is forced to be 2*c1).
+
+# OK, what happens to the anisotropic stress at the FCB?
+
+tmptmp_PI_next:
+subs(w(t)=1/3,%):
+go_s(%):
+
+tmp_PI_in_s:=%;
+
+subs(Phi(s)=tmp_Phi_ser_in_s_try,Theta(s)=tmp_Theta_ser_in_s_try,%):
+subs(delta(s)=tmp_delta_ser_in_s_try,V(s)=tmp_V_ser_in_s_try,%):
+fs(%):
+series(%,s):
+fs(%):
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%);
+
+# So in all cases this doesn't diverge, which is good.
+
+# Thus we think all quantities just pass straight through FCB, and there is
+# no constraint.
+
+#########################################
+
+# Let's check this via explicit integration.
+
+# To get a case we are interested in, could integrate in conformal time
+# (as above) with f=0 until a specific point which is meant to correspond to
+# recombination, then pick up with the values at that point and
+# integrate with s, which might be able to get through the FCB since
+# things are non-singular there.
+
+# But equations in s have s or evn s^2 in denominator in places, so this is unlikely to work?
+
+# Have a go anyway. Start by using above code to 
+# integrate to some intermediate point with f=0.
+
+# (Don't multiply by a^2 in this version.)
+
+Digits:=40;
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_f_num:=0;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=10;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phittt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phitt_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta and Theta.
+
+tmp_Theta_from_Phitt_rad:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_Theta_num:=evalf(%);
+
+tmp_V_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+(D@@2)(Phi)(t_start)=tmp_Phitt_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+t_max:=1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[t,tmp_Theta_num]);
+	pointsTheta||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+#######################
+
+# Ok, save where things have got to.
+
+tmptmp_save:=tmptmp;
+
+tmp_Phi_save:=pointsPhi||Ntot[2];
+
+tmp_Theta_save:=pointsTheta||Ntot[2];
+
+tmp_V_save:=pointsV||Ntot[2];
+
+tmp_delta_save:=pointsdelta||Ntot[2];
+
+# So have a go at conitnuing integration in s.
+
+# Will assume Lambda=1, so don't have to think about this
+# and K is just k.
+
+tmp_a_from_H:
+subs(tmptmp_save,%):
+subs(Lambda=1,%):
+1/%:
+
+s_start:=%;
+
+tmp_f_num:=1;
+
+{tmp_Phis_eqn,tmp_Thetas_eqn,tmp_deltas_eqn,tmp_Vs_eqn}:
+subs(K=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_start_num:=tmp_Phi_save;
+
+tmp_Theta_start_num:=tmp_Theta_save;
+
+tmp_delta_start_num:=tmp_delta_save;
+
+tmp_V_start_num:=tmp_V_save;
+
+# Monitor a and H and PI as well.
+
+tmp_a_num:=1/s;
+
+tmp_H_num:=1/sqrt(3)*sqrt(1+s^4);
+
+tmp_PI_num:=subs(K=tmp_k_num,tmp_PI_in_s);
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+s_max:=1e-3;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+display(plotPI);
+
+# This seems to be working!
+
+# Have checked that if we do a run of 't' based integration with f=1 all the way
+# through to the FCB (or as close as we were able to get above), then 
+# this is the same as doing what we've just done with f=1 in first section 
+# as well as second.
+
+###########
+
+# Ok, let's seek to fit the c0, c1 and c3 that corresponds to where we've got to,
+# and use this to move other side of FCB.
+
+# Following way of doing this seems numerically stable.
+
+[tmp_V_ser_in_s_try-subs(tmptmp,V(s)),tmp_delta_ser_in_s_try-subs(tmptmp,delta(s)),tmp_Theta_ser_in_s_try-subs(tmptmp,Theta(s))]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+
+# Remove the coefficients we don't know.
+
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+solve(%,{c0,c1,c3});
+
+tmp_cs_sol:=%;
+
+# So does this give right Phi?
+
+tmp_Phi_ser_in_s_try:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+subs(tmp_cs_sol,%);
+
+# Compare with:
+
+subs(tmptmp,Phi(s));
+
+# Very good!!
+
+s_start_for_next_time:=-s_max;
+
+#####################
+
+# So now, poke out the other side and continue integration.
+
+s_start:=s_start_for_next_time;
+
+[tmp_Phi_ser_in_s_try,tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_start,%):
+evalf(%):
+subs(tmp_cs_sol,%);
+
+tmp:=%:
+
+tmp_Phi_start_num:=tmp[1];
+
+tmp_Theta_start_num:=tmp[4];
+
+tmp_delta_start_num:=tmp[3];
+
+tmp_V_start_num:=tmp[2];
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=200;
+
+s_max:=-4;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(-tmp_a_num)]);  # Notice change here for flip of sign of a.
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi_after:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV_after:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta_after:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta_after:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH_after:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota_after:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI_after:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+###*** Fig. 13
+
+ans := display([plotV,plotdelta,plotV_after,plotdelta_after]);
+Export("delta_and_V_plot_cropped_1.csv",op([1,1],ans));
+Export("delta_and_V_plot_cropped_2.csv",op([2,1],ans));
+Export("delta_and_V_plot_cropped_3.csv",op([3,1],ans));
+Export("delta_and_V_plot_cropped_4.csv",op([4,1],ans));
+
+display(plotH,plotH_after);
+
+display(plota,plota_after);
+
+###*** Fig. 14
+
+ans:=display([plotTheta,plotPhi,plotTheta_after,plotPhi_after]);
+Export("potentials_plot_cropped_1.csv",op([1,1],ans));
+Export("potentials_plot_cropped_2.csv",op([2,1],ans));
+Export("potentials_plot_cropped_3.csv",op([3,1],ans));
+Export("potentials_plot_cropped_4.csv",op([4,1],ans));
+
+###*** Fig. 15
+
+ans:=display([plotPI,plotPI_after]);
+Export("PI_plot_cropped_1.csv",op([1,1],ans));
+Export("PI_plot_cropped_2.csv",op([2,1],ans));
+
+################################
+
+# Ok, so presumably what we want to do now is find out K values
+# which don't lead to runaway Phi etc. on other side of FCB.
+
+# Note following which brings an analytic answer a little closer.
+
+solve(tmp_constraint_in_s,V(s));
+
+subs(V(s)=%,{tmp_Phis_eqn,tmp_Thetas_eqn,tmp_deltas_eqn,tmp_Vs_eqn});
+
+solve(%,{diff(Phi(s),s),diff(Theta(s),s),diff(delta(s),s)});
+
+tmp_derivs_sol:=fs(%);
+
+dsolve(%,{Phi(s),Theta(s),delta(s)});
+
+# This gives a 2nd order equation for Phi!
+
+# Extra degree of freedom comes in via an adjustable constant in this.
+
+# Interesting.
+
+# Check really does work.
+
+# First capture it in case it can't do it again.
+
+tmp_sol:={Phi(s) = DESol({diff(_Y(s),`$`(s,2))-2*(5*K^2*s^6+10*K^2*s^2+8*f*s^8+12*f*s^4+4*f)/(4*f+5*K^2*s^2+4*f*s^4)/s/(1+s^4)*diff(_Y(s),s)+1/5*(25*K^4*s^4+20*f*K^4*s^4+100*f*K^2*s^6+16*f^2*K^2*s^6+16*f^2*K^2*s^2+100*K^2*s^2-20*f*K^2*s^2+120*f*s^8+32*s^8*f^2+32*f^2*s^4+40*f)/(4*f+5*K^2*s^2+4*f*s^4)/s^2/(1+s^4)*_Y(s)-_C1*s^2*(10*s^4+4*f*s^4+5*K^2*s^2-10+4*f)/(1+s^4)/(4*f+5*K^2*s^2+4*f*s^4)},{_Y(s)}), Theta(s) = (5*s^6*diff(Phi(s),`$`(s,2))+4*diff(Phi(s),s)*f*s^5-10*diff(Phi(s),s)*s^5+10*Phi(s)*s^4+10*Phi(s)*K^2*s^2+5*s^2*diff(Phi(s),`$`(s,2))+4*s*diff(Phi(s),s)*f-20*s*diff(Phi(s),s)+10*Phi(s))/(10*s^4+4*f*s^4+5*K^2*s^2-10+4*f), delta(s) = (-20*Phi(s)-40*Phi(s)*K^2*s^6-10*s^10*diff(Phi(s),`$`(s,2))+10*diff(Phi(s),s)*K^2*s^3+10*diff(Phi(s),s)*K^2*s^7+40*s^9*diff(Phi(s),s)+20*s*diff(Phi(s),s)-10*Phi(s)*K^4*s^4+60*diff(Phi(s),s)*s^5-10*s^2*diff(Phi(s),`$`(s,2))-40*Phi(s)*s^4-20*Phi(s)*s^8-8*Phi(s)*f*K^2*s^6-20*s^6*diff(Phi(s),`$`(s,2))-8*Phi(s)*f*K^2*s^2)/(-10*s^4+10*s^8+4*f*s^4+5*K^2*s^6+4*f*s^8)};
+
+subs(tmp_sol,Phi(s)):
+
+op(1,op(1,%));
+
+subs(_Y(s)=Phi(s),%):
+
+solve(%,diff(Phi(s),s,s));
+
+tmptmp_Phiss:=%;
+
+# Try out in 3rd order eqn.
+
+tmp_Phi_eqn_in_s:
+subs(diff(Phi(s),s,s)=tmptmp_Phiss,%):
+fs(%):
+subs(diff(Phi(s),s,s)=tmptmp_Phiss,%):
+fs(%);
+
+# Impressive! (though not sure how to use it as yet).
+
+######################
+
+# Ok, let's try playing around with some values of K to see if we can
+# make Phi and Theta symmetrical about FCB.
+
+# Following does quite well for a K near 2, and may be the first allowed value.
+
+Digits:=40;
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_f_num:=0;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=2.605;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phittt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phitt_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta and Theta.
+
+tmp_Theta_from_Phitt_rad:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_Theta_num:=evalf(%);
+
+tmp_V_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+(D@@2)(Phi)(t_start)=tmp_Phitt_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+t_max:=1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[t,tmp_Theta_num]);
+	pointsTheta||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+#######################
+
+# Ok, save where things have got to.
+
+tmptmp_save:=tmptmp;
+
+tmp_Phi_save:=pointsPhi||Ntot[2];
+
+tmp_Theta_save:=pointsTheta||Ntot[2];
+
+tmp_V_save:=pointsV||Ntot[2];
+
+tmp_delta_save:=pointsdelta||Ntot[2];
+
+# So have a go at conitnuing integration in s.
+
+# Will assume Lambda=1, so don't have to think about this
+# and K is just k.
+
+tmp_a_from_H:
+subs(tmptmp_save,%):
+subs(Lambda=1,%):
+1/%:
+
+s_start:=%;
+
+tmp_s_start_save:=%;
+
+tmp_f_num:=1;
+
+{tmp_Phis_eqn,tmp_Thetas_eqn,tmp_deltas_eqn,tmp_Vs_eqn}:
+subs(K=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_start_num:=tmp_Phi_save;
+
+tmp_Theta_start_num:=tmp_Theta_save;
+
+tmp_delta_start_num:=tmp_delta_save;
+
+tmp_V_start_num:=tmp_V_save;
+
+# Monitor a and H and PI as well.
+
+tmp_a_num:=1/s;
+
+tmp_H_num:=1/sqrt(3)*sqrt(1+s^4);
+
+tmp_PI_num:=subs(K=tmp_k_num,tmp_PI_in_s);
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+s_max:=1e-3;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+display(plotPI);
+
+# This seems to be working!
+
+# Have checked that if we do a run of 't' based integration with f=1 all the way
+# through to the FCB (or as close as we were able to get above), then 
+# this is the same as doing what we've just done with f=1 in first section 
+# as well as second.
+
+###########
+
+# Ok, let's seek to fit the c0, c1 and c3 that corresponds to where we've got to,
+# and use this to move other side of FCB.
+
+# Following way of doing this seems numerically stable.
+
+[tmp_V_ser_in_s_try-subs(tmptmp,V(s)),tmp_delta_ser_in_s_try-subs(tmptmp,delta(s)),tmp_Theta_ser_in_s_try-subs(tmptmp,Theta(s))]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+
+# Remove the coefficients we don't know.
+
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+solve(%,{c0,c1,c3});
+
+tmp_cs_sol:=%;
+
+# So does this give right Phi?
+
+tmp_Phi_ser_in_s_try:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+subs(tmp_cs_sol,%);
+
+# Compare with:
+
+subs(tmptmp,Phi(s));
+
+# Very good!!
+
+s_start_for_next_time:=-s_max;
+
+#####################
+
+# So now, poke out the other side and continue integration.
+
+s_start:=s_start_for_next_time;
+
+[tmp_Phi_ser_in_s_try,tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_start,%):
+evalf(%):
+subs(tmp_cs_sol,%);
+
+tmp:=%:
+
+tmp_Phi_start_num:=tmp[1];
+
+tmp_Theta_start_num:=tmp[4];
+
+tmp_delta_start_num:=tmp[3];
+
+tmp_V_start_num:=tmp[2];
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=200;
+
+s_max:=-tmp_s_start_save;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(-tmp_a_num)]);  # Notice change here for flip of sign of a.
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi_after:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV_after:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta_after:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta_after:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH_after:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota_after:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI_after:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+###*** Fig. 16
+
+ans:=display([plotV,plotdelta,plotV_after,plotdelta_after]);
+Export("delta_and_V_plot_1st_mode_cropped_1.csv",op([1,1],ans));
+Export("delta_and_V_plot_1st_mode_cropped_2.csv",op([2,1],ans));
+Export("delta_and_V_plot_1st_mode_cropped_3.csv",op([3,1],ans));
+Export("delta_and_V_plot_1st_mode_cropped_4.csv",op([4,1],ans));
+
+display(plotH,plotH_after);
+
+display(plota,plota_after);
+
+###*** Fig. 17
+
+ans:=display([plotTheta,plotPhi,plotTheta_after,plotPhi_after]);
+Export("potentials_plot_1st_mode_cropped_1.csv",op([1,1],ans));
+Export("potentials_plot_1st_mode_cropped_2.csv",op([2,1],ans));
+Export("potentials_plot_1st_mode_cropped_3.csv",op([3,1],ans));
+Export("potentials_plot_1st_mode_cropped_4.csv",op([4,1],ans));
+
+###*** Fig. 18
+
+ans:=display([plotPI,plotPI_after]);
+Export("PI_plot_1st_mode_cropped_1.csv",op([1,1],ans));
+Export("PI_plot_1st_mode_cropped_2.csv",op([2,1],ans));
+
+###########################
+
+# From the structure of this we believe it may be the second mode rather
+# than first, so attempt to get the first mode now.
+
+# We had a go at this, trying values around 1.7 but didn't seem to be getting anywhere,
+# so will try again here by
+
+# (i) Integrating out of big bang to some predetermined conformal time,
+# as above.
+
+# (ii) Then integrating *back* from the FCB with c1=c3=0 which should have the
+# symmetry we are after for the first mode to where (i) stopped and attempt to pick 
+# a K such that it matches there.
+
+# To start with, let's establish what we have just said about the symmetry.
+
+[tmp_Phi_ser_in_s_try,tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+fs(%):
+map(series,%,s,6):
+fs(%):
+convert(%,polynom):
+
+tmp_sers_use:=%;
+
+# First of all, let's see what c0=0 will do.
+
+tmp_sers_use:
+subs(c0=0,%):
+fs(%);
+
+# So this, for any c1, c3 and f, leads to series which are odd (for V) and
+# even (for rest).
+
+# Also, it leaves us 2 d.o.f. (c1 and c3) so think we will be able to adjust these
+# so that we can have all of the quantities going to right thing at f=0/1
+# transition (since K adjustable as well, so really have 3).
+
+# If we use c1=0 then:
+
+tmp_sers_use:
+subs(c1=0,%):
+fs(%);
+
+# Now we only get the expected symmetry if c3=0 as well:
+
+subs(c3=0,%):
+fs(%);
+
+# This now leaves only 1 d.o.f. so suspect we won't be able to match
+# in this case, unless f=0, when we should only need 1.
+
+#############
+
+# Ok, to try things out without having to repeat code each time,
+# set up two routines.
+
+# First will do what we just said, i.e. integrate to f=0/1 transition, then
+# come back to attempt to match this from the FCB with desired symmetry.
+
+# Second will be integration all the way through, including going past the
+# FCB in way we have been doing so far, which can independently check things out.
+
+# So now, first of these two routines.
+
+go_forward_and_back:=proc(K_use,f_mid)
+
+global plotPhi,plotV,plotdelta,plotTheta,plotPI;
+
+Digits:=40;
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_f_num:=0;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=K_use;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phittt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phitt_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta and Theta.
+
+tmp_Theta_from_Phitt_rad:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_Theta_num:=evalf(%);
+
+tmp_V_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+(D@@2)(Phi)(t_start)=tmp_Phitt_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+t_max:=1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[t,tmp_Theta_num]);
+	pointsTheta||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+#######################
+
+# Ok, save where things have got to.
+
+tmptmp_save:=tmptmp;
+
+tmp_Phi_save:=pointsPhi||Ntot[2];
+
+tmp_Theta_save:=pointsTheta||Ntot[2];
+
+tmp_V_save:=pointsV||Ntot[2];
+
+tmp_delta_save:=pointsdelta||Ntot[2];
+
+# So this time want to start at FCB and integrate back in s to match what we've
+# just found.
+
+# By setting c1=c3=0, this should give symmetry properties that are what we
+# think we want for 1st mode (or subsequent odd ones).
+
+# Think c0 just provides a scaling, so important thing we are looking for is
+# that PI vanishes when we get back to f=0/1 boundary.
+
+# Go through usual stuff first.
+
+# Will assume Lambda=1, so don't have to think about this
+# and K is just k.
+
+tmp_a_from_H:
+subs(tmptmp_save,%):
+subs(Lambda=1,%):
+1/%:
+
+tmp_s_end:=%;
+
+tmp_f_num:=f_mid;
+
+{tmp_Phis_eqn,tmp_Thetas_eqn,tmp_deltas_eqn,tmp_Vs_eqn}:
+subs(K=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+s_start:=1e-3;
+
+[tmp_Phi_ser_in_s_try,tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_start,%):
+evalf(%):
+subs(c0=1,c1=0,c3=0,%);
+
+tmp:=%:
+
+tmp_Phi_start_num:=tmp[1];
+
+tmp_Theta_start_num:=tmp[4];
+
+tmp_delta_start_num:=tmp[3];
+
+tmp_V_start_num:=tmp[2];
+
+# Monitor a and H and PI as well.
+
+tmp_a_num:=1/s;
+
+tmp_H_num:=1/sqrt(3)*sqrt(1+s^4);
+
+tmp_PI_num:=subs(K=tmp_k_num,tmp_PI_in_s);
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+s_max:=tmp_s_end;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+end:
+
+#################
+
+# Now have routine which integrates straight through, to check.
+
+go_straight_through:=proc(k_use,f_mid)
+
+global plotPhi,plotV,plotdelta,plotTheta,plotPI;
+
+global plotPhi_after,plotV_after,plotdelta_after,plotTheta_after,plotPI_after;
+
+Digits:=40;
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_f_num:=0;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=k_use;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phittt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phitt_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta and Theta.
+
+tmp_Theta_from_Phitt_rad:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_Theta_num:=evalf(%);
+
+tmp_V_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+(D@@2)(Phi)(t_start)=tmp_Phitt_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+t_max:=1;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[t,tmp_Theta_num]);
+	pointsTheta||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+#######################
+
+# Ok, save where things have got to.
+
+tmptmp_save:=tmptmp;
+
+tmp_Phi_save:=pointsPhi||Ntot[2];
+
+tmp_Theta_save:=pointsTheta||Ntot[2];
+
+tmp_V_save:=pointsV||Ntot[2];
+
+tmp_delta_save:=pointsdelta||Ntot[2];
+
+# So have a go at conitnuing integration in s.
+
+# Will assume Lambda=1, so don't have to think about this
+# and K is just k.
+
+tmp_a_from_H:
+subs(tmptmp_save,%):
+subs(Lambda=1,%):
+1/%:
+
+s_start:=%;
+
+tmp_s_start_save:=%;
+
+tmp_f_num:=f_mid;
+
+{tmp_Phis_eqn,tmp_Thetas_eqn,tmp_deltas_eqn,tmp_Vs_eqn}:
+subs(K=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_start_num:=tmp_Phi_save;
+
+tmp_Theta_start_num:=tmp_Theta_save;
+
+tmp_delta_start_num:=tmp_delta_save;
+
+tmp_V_start_num:=tmp_V_save;
+
+# Monitor a and H and PI as well.
+
+tmp_a_num:=1/s;
+
+tmp_H_num:=1/sqrt(3)*sqrt(1+s^4);
+
+tmp_PI_num:=subs(K=tmp_k_num,tmp_PI_in_s);
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+s_max:=1e-3;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+display(plotPI);
+
+# This seems to be working!
+
+# Have checked that if we do a run of 't' based integration with f=1 all the way
+# through to the FCB (or as close as we were able to get above), then 
+# this is the same as doing what we've just done with f=1 in first section 
+# as well as second.
+
+###########
+
+# Ok, let's seek to fit the c0, c1 and c3 that corresponds to where we've got to,
+# and use this to move other side of FCB.
+
+# Following way of doing this seems numerically stable.
+
+[tmp_V_ser_in_s_try-subs(tmptmp,V(s)),tmp_delta_ser_in_s_try-subs(tmptmp,delta(s)),tmp_Theta_ser_in_s_try-subs(tmptmp,Theta(s))]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+
+# Remove the coefficients we don't know.
+
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+solve(%,{c0,c1,c3});
+
+tmp_cs_sol:=%;
+
+# So does this give right Phi?
+
+tmp_Phi_ser_in_s_try:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+subs(tmp_cs_sol,%);
+
+# Compare with:
+
+subs(tmptmp,Phi(s));
+
+# Very good!!
+
+s_start_for_next_time:=-s_max;
+
+#####################
+
+# So now, poke out the other side and continue integration.
+
+s_start:=s_start_for_next_time;
+
+[tmp_Phi_ser_in_s_try,tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_start,%):
+evalf(%):
+subs(tmp_cs_sol,%);
+
+tmp:=%:
+
+tmp_Phi_start_num:=tmp[1];
+
+tmp_Theta_start_num:=tmp[4];
+
+tmp_delta_start_num:=tmp[3];
+
+tmp_V_start_num:=tmp[2];
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=200;
+
+s_max:=-tmp_s_start_save;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(-tmp_a_num)]);  # Notice change here for flip of sign of a.
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi_after:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV_after:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta_after:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta_after:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH_after:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota_after:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI_after:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+end:
+
+################################
+
+# Ok, let's test these out.
+
+# Following does quite well in terms of giving a PI that goes to zero
+# at right point.
+
+go_forward_and_back(1.854,1):
+
+display([plotV,plotdelta]);
+
+display([plotTheta,plotPhi]);
+
+display(plotPI);
+
+# However, following shows it doesn't in fact work.
+
+go_straight_through(1.854,1):
+
+display([plotV,plotdelta,plotV_after,plotdelta_after]);
+
+display([plotTheta,plotPhi,plotTheta_after,plotPhi_after]);
+
+display([plotPI,plotPI_after]);
+
+# Note following is possibly next state after 2.605:
+
+go_straight_through(3.89,1):
+
+display([plotV,plotdelta,plotV_after,plotdelta_after]);
+
+display([plotTheta,plotPhi,plotTheta_after,plotPhi_after]);
+
+###*** Fig. 19
+
+ans:=display([plotPI,plotPI_after]);
+Export("PI_2nd_mode_1.csv",op([1,1],ans));
+Export("PI_2nd_mode_2.csv",op([2,1],ans));
+
+# Note can't immediately do this in 'forward and back' since this is setup
+# to put c1 and c3 to 0
+
+##########################
+
+# Following is what we used to write down third order Phi equation in s.
+
+tmp_Phi_eqn_in_s: subs(f=1,%): 
+fs(%);
+
+tmp_hold:=%:
+
+coeff(tmp_hold,diff(Phi(s),s,s,s)): fs(%);
+
+tmp1:=fs(tmp_hold-diff(Phi(s),s,s,s)*%):
+
+coeff(tmp1,diff(Phi(s),s,s)): fs(%);
+
+tmp2:=fs(tmp1-diff(Phi(s),s,s)*%):
+
+coeff(tmp2,diff(Phi(s),s)): fs(%);
+
+tmp3:=fs(tmp2-diff(Phi(s),s)*%):
+
+coeff(tmp3,Phi(s)): fs(%);
+
+###########################
+
+# Also in write up, want to be clear about values of PI at boundary. 
+
+tmp_Theta_from_Phitt_rad:
+go_s(%): subs(f=1,%): 
+fs(%):
+subs(Theta(s)=%,tmp_PI_in_s): 
+tmp:=%:
+
+tmp_nu_vals:=[1,2,4];
+
+for ii from 1 to 3 do 
+
+    tmp: 
+    subs(Phi(s)=s^tmp_nu_vals[ii]*(c0+c1*s+c2*s^2+c3*s^3),%): 
+    fs(%): 
+    series(%,s): 
+    fs(%);
+    print(ii,%): 
+    
+od:
+
+# So this should answer question.
+
+##########################
+
+# Do same for Theta itself.
+
+tmp_Theta_from_Phitt_rad:
+go_s(%): subs(f=1,%): 
+fs(%):
+tmp:=%:
+
+tmp_nu_vals:=[1,2,4];
+
+for ii from 1 to 3 do 
+
+    tmp: 
+    subs(Phi(s)=s^tmp_nu_vals[ii]*(c0+c1*s+c2*s^2+c3*s^3),%): 
+    fs(%): 
+    series(%,s): 
+    fs(%);
+    print(ii,%): 
+    
+od:
+
+##########################
+
+# Now have a look at each series in terms of c0, c1, c3 in a form suitable for
+# writing down.
+
+[tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try,tmp_Phi_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+
+# Remove the coefficients we don't know.
+
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+
+fs(%):
+
+map(series,%,s):
+
+tmp_sers:=fs(%);
+
+tmp_sers_f1:=fs(subs(f=1,%));
+
+##########################
+
+# Would like to sort out some K values that are more 'realistic', in the sense
+# of the conformal time of the period in which f=0 is more what we'd expect.
+
+# Could seek to get an expression for temperature of the CMB in terms of
+# 's=1/a', and then see when T=4000K occurs.
+
+# We had a go at linking to the CMB temperature in 
+# tmp_rie2_restart_further_cosmology_investigations_using_R_and_Rbar_and_Ric_and_Ricbar_and_Vic_next_with_eta_and_sigma3.map.
+
+# First set up usual numbers.
+
+# Before continuing here better get some usual numbers set up (note will work with
+# Mpc scale instead of kpc) (though see later).
+
+# Get usual numbers set up.
+
+parsec_in_m:=3.087e16;
+
+year_in_sec:=evalf(3600*24*365.25);
+
+bigG:=6.6732e-11;
+
+lightc:=2.998e8;
+
+hbar:=1.0546e-34;
+
+# Going to use units in which hbar=c=1.
+
+bigGd:=hbar*bigG/lightc^3;
+
+# First, what is Lambda in natural units, if Oml=0.7 and H0=72?
+
+H0_in_sm1:=72e3/parsec_in_m/1e6;
+
+Lambda_in_sm2:=3*H0_in_sm1^2*0.7;
+
+Lambda_in_mm2:=Lambda_in_sm2/lightc^2;
+
+Lambda_in_plm2:=Lambda_in_mm2/(1/sqrt(bigGd))^2;
+
+# Departing a bit from what we've had before at this point.
+
+# How big is 1kpc, in natural units?
+
+1e3*parsec_in_m/sqrt(bigGd);
+
+tmp_1kpc_nat:=%;
+
+# Also get one solar mass in natural units.
+
+2e30*bigG/lightc^2;
+
+%/sqrt(bigGd);
+
+tmp_Msun_nat:=%;
+
+# Would be useful to have something the scale of the Solar System as well.
+
+# Use Pluto orbit semi major axis.
+
+tmp_Pluto_semi_major:=5906376272e3;
+
+tmp_Pluto_sm_nat:=%/sqrt(bigGd);
+
+########################
+
+# So what is lambda if we use 1 kpc as unit of length?
+
+Lambda_in_mm2*(1e3*parsec_in_m)^2;
+
+tmp_lambda_for_1kpc:=%;
+
+# Let's in fact get various things set up for 1Mpc units, which we'll do cosmology in.
+
+# Following should give H0 in correct units.
+
+H0_in_sm1/lightc:
+3*%^2/8/Pi:
+%*(parsec_in_m*1e6)^2:
+evalf(%):
+
+tmp_rho0_crit_1Mpc:=%;
+
+3*H0^2/(8*Pi)=%;
+
+solve(%,H0);
+
+tmp_H0_1Mpc:=%[1];
+
+# (Bit of a convoluted route! - note following is easier:)
+
+72/lightc;
+
+# Also get Lambda in right units.
+
+lambda/3/tmp_H0_1Mpc^2=0.7:
+
+solve(%,lambda);
+
+tmp_Lambda_1Mpc:=%;
+
+# Check it's what we'd get if done directly:
+
+Lambda_in_mm2*(parsec_in_m*1e6)^2;
+
+# Fine.
+
+###################
+
+# Each time unit (if using tmp_Lambda_1Mpc) is 
+
+parsec_in_m/lightc/year_in_sec;
+
+# in Myr, so record this:
+
+tmp_t_unit_in_Myr:=%;
+
+###################
+
+# Ok, here's what we did in 
+# tmp_rie2_restart_further_cosmology_investigations_using_R_and_Rbar_and_Ric_and_Ricbar_and_Vic_next_with_eta_and_sigma3.map.
+# in order to go from temperature of CMB to Omega_rad.
+
+#######
+
+# Also look at radiation energy density. Figure out what Omrad should be.
+
+7.56e-16*2.725^4:
+
+%/(3*H0_in_sm1^2/8/Pi/bigG*lightc^2):
+
+tmp_current_Omrad_should_be:=evalf(%);
+
+#######
+
+# Secondly, here's manipulation which gives Omega_rad in terms of s.
+
+# Use expression from paper for rho_rad.
+
+3*C/8/Pi/a^4;
+
+# Form Omega:
+
+%/(3*H^2/8/Pi);
+
+# Use favoured value of C.
+
+subs(C=Lambda/3,%);
+
+# Use expression for H in terms of s (note discovered had been getting thgis wrong (without
+# second square root) in tmp_H_num expressions above - don't think this affected
+# anything else.
+
+subs(H=sqrt(Lambda/3)*sqrt(1+s^4),%);
+
+subs(a=1/s,%);
+
+# Very nice!
+
+tmp_Om_rad_in_s:=%;
+
+#############
+
+# Ok, so put things together. Try to do symbolically as far as possible.
+
+a_SB*T^4:
+
+%/(3*H^2/8/Pi/G*c^2):
+
+tmp_Om_rad_conv_units:=%;
+
+subs(H=sqrt(Lambda/3/Oml),%);
+
+tmp_Om_rad_in_s-%:
+subs(Oml=1-tmp_Om_rad_in_s,%):
+fs(%);
+
+solve(%,T^4);
+
+tmp_T4_in_K:=%;
+
+# Now, if this is correct, should be able to tie in with standard calculation of
+# temperature in an EdS radiation dominated universe, such as we do in last
+# lecture.
+
+tmp_T4_lect:=(3*c^2/(32*Pi*G*a_SB))*t^(-2);
+
+tmp_T4_in_K-%:
+fs(%);
+
+solve(%,t^2);
+
+sqrt(%):
+simplify(%,symbolic);
+
+# Fine, this agrees with small a expansion of relation between t and a in paper:
+
+1/2/sqrt(Lambda/3)/s^2;
+
+# Very good. So what does it look like numerically?
+
+tmp_T4_in_K:
+subs(Lambda=Lambda_in_mm2*c^2,c=lightc,G=bigG,%):
+subs(a_SB=7.56e-16,%):
+evalf(%);
+
+%^(1/4): 
+simplify(%,symbolic);
+
+tmp_T_in_K_num:=%;
+
+# So about 30*s, which is quite interesting!
+
+# (Note we convert the Lambda_in_mm2 to units of time^-2, since this
+# is what we're using in relation to H subs. etc.
+
+# So let's do a plot of temperature in K versus conformal time.
+
+# Use following imported solution for s as a function of eta.
+
+tmp_s_sol_at_FCB_alt:=-JacobiSN(1/sqrt(3)*t,1/sqrt(2))*JacobiDN(1/sqrt(3)*t,1/sqrt(2))/JacobiCN(1/sqrt(3)*t,1/sqrt(2));
+
+sqrt(3)*GAMMA(1/4)*GAMMA(5/4)/GAMMA(1/2):
+
+tmp_eta_tot:=evalf(%);
+
+subs(s=tmp_s_sol_at_FCB_alt,tmp_T_in_K_num):
+
+subs(t=-tmp_eta_tot+eta,%):
+
+plot(%,eta=1e-3..tmp_eta_tot);
+
+# Looks plausible. So what conformal time gives 4000K?
+
+subs(s=tmp_s_sol_at_FCB_alt,tmp_T_in_K_num):
+ 
+tmp:=subs(t=-tmp_eta_tot+eta,%):
+ 
+plot(%,eta=1e-2..2e-2);
+
+# This delimits it nicely.
+
+fsolve(tmp=4000,eta,1e-2..2e-2);
+
+tmp_eta_for_4000K:=%;
+
+# Fine.
+
+#######################
+
+# Ok, have a new version of go_straight_through which has this
+# as eta we integrate to to start with.
+
+# Note we need to increase Ntot to 800 on two main sections, since
+# things change pretty rapidly near origin.
+
+go_straight_through_new:=proc(k_use,f_mid)
+
+global plotPhi,plotV,plotdelta,plotTheta,plotPI;
+
+global plotPhi_after,plotV_after,plotdelta_after,plotTheta_after,plotPI_after;
+
+Digits:=40;
+
+tmp_h0_from_C:=1/sqrt(C);
+
+# So following should reproduce values just done.
+
+tmp_f_num:=0;
+
+tmp_Lambda_num:=1;
+
+tmp_h0_num:=subs(C=tmp_Lambda_num/3,tmp_h0_from_C);
+
+tmp_p0_num:=1;
+
+tmp_k_num:=k_use;
+
+t_start:=0.001;
+
+{tmp_H_eqn,tmp_Phittt_eqn_use}:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phi_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phit_start_num:=%;
+
+tmp_Phi_ser_use:
+diff(%,t,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Phitt_start_num:=%;
+
+tmp_H_ser_use:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_H_start_num:=%;
+
+tmp_H_ser_use:
+diff(%,t):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(p0=tmp_p0_num,%):
+subs(h0=tmp_h0_num,%):
+subs(f=tmp_f_num,%):
+
+subs(t=t_start,%):
+evalf(%):
+
+tmp_Ht_start_num:=%;
+
+# Monitor a as well.
+
+tmp_a_from_H:
+subs(Lambda=tmp_Lambda_num,%):
+
+tmp_a_num:=evalf(%);
+
+# Also V and delta and Theta.
+
+tmp_Theta_from_Phitt_rad:
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_Theta_num:=evalf(%);
+
+tmp_V_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_V_num:=evalf(%);
+
+tmp_delta_from_Phidot:
+subs(w(t)=tmp_w_use,%):
+subs(Lambda=tmp_Lambda_num,%):
+subs(k=tmp_k_num,%):
+subs(a(t)=tmp_a_num,%):
+subs(Theta(t)=tmp_Theta_num,%):
+
+tmp_delta_num:=evalf(%);
+
+tmp_ics:={Phi(t_start)=tmp_Phi_start_num,D(Phi)(t_start)=tmp_Phit_start_num,
+(D@@2)(Phi)(t_start)=tmp_Phitt_start_num,
+H(t_start)=tmp_H_start_num,D(H)(t_start)=tmp_Ht_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(t),H(t)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=100;
+
+t_max:=tmp_eta_for_4000K;
+
+t_min:=t_start;
+
+for ii from 1 to Ntot do
+
+	t_tmp:=(ii-1)*(t_max-t_min)/(Ntot-1)+t_min;
+	tmptmp:=ff1(t_tmp);
+	subs(tmptmp,[t,Phi(t)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[t,tmp_V_num]);
+	pointsV||ii:=%;
+	subs(tmptmp,[t,tmp_delta_num]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[t,log10(H(t))]);
+	pointsH||ii:=%;
+	subs(tmptmp,[t,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[t,tmp_Theta_num]);
+	pointsTheta||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+#######################
+
+# Ok, save where things have got to.
+
+tmptmp_save:=tmptmp;
+
+tmp_Phi_save:=pointsPhi||Ntot[2];
+
+tmp_Theta_save:=pointsTheta||Ntot[2];
+
+tmp_V_save:=pointsV||Ntot[2];
+
+tmp_delta_save:=pointsdelta||Ntot[2];
+
+# So have a go at conitnuing integration in s.
+
+# Will assume Lambda=1, so don't have to think about this
+# and K is just k.
+
+tmp_a_from_H:
+subs(tmptmp_save,%):
+subs(Lambda=1,%):
+1/%:
+
+s_start:=%;
+
+tmp_s_start_save:=%;
+
+tmp_f_num:=f_mid;
+
+{tmp_Phis_eqn,tmp_Thetas_eqn,tmp_deltas_eqn,tmp_Vs_eqn}:
+subs(K=tmp_k_num,%):
+subs(f=tmp_f_num,%):
+
+tmp_eqns_num:=evalf(%);
+
+tmp_Phi_start_num:=tmp_Phi_save;
+
+tmp_Theta_start_num:=tmp_Theta_save;
+
+tmp_delta_start_num:=tmp_delta_save;
+
+tmp_V_start_num:=tmp_V_save;
+
+# Monitor a and H and PI as well.
+
+tmp_a_num:=1/s;
+
+tmp_H_num:=1/sqrt(3)*sqrt(1+s^4);
+
+tmp_PI_num:=subs(K=tmp_k_num,tmp_PI_in_s);
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+s_max:=1e-3;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(tmp_a_num)]);
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+display([plotPhi,plotV,plotdelta,plotTheta]);
+
+display(plotH);
+
+display(plota);
+
+display([plotTheta,plotPhi]);
+
+display(plotPI);
+
+# This seems to be working!
+
+# Have checked that if we do a run of 't' based integration with f=1 all the way
+# through to the FCB (or as close as we were able to get above), then 
+# this is the same as doing what we've just done with f=1 in first section 
+# as well as second.
+
+###########
+
+# Ok, let's seek to fit the c0, c1 and c3 that corresponds to where we've got to,
+# and use this to move other side of FCB.
+
+# Following way of doing this seems numerically stable.
+
+[tmp_V_ser_in_s_try-subs(tmptmp,V(s)),tmp_delta_ser_in_s_try-subs(tmptmp,delta(s)),tmp_Theta_ser_in_s_try-subs(tmptmp,Theta(s))]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+
+# Remove the coefficients we don't know.
+
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+solve(%,{c0,c1,c3});
+
+tmp_cs_sol:=%;
+
+print(`tmp_cs_sol=`,tmp_cs_sol);
+
+# So does this give right Phi?
+
+tmp_Phi_ser_in_s_try:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_max,%):
+evalf(%);
+
+subs(tmp_cs_sol,%);
+
+# Compare with:
+
+subs(tmptmp,Phi(s));
+
+# Very good!!
+
+s_start_for_next_time:=-s_max;
+
+#####################
+
+# So now, poke out the other side and continue integration.
+
+s_start:=s_start_for_next_time;
+
+[tmp_Phi_ser_in_s_try,tmp_V_ser_in_s_try,tmp_delta_ser_in_s_try,tmp_Theta_ser_in_s_try]:
+subs(tmp_sol1,tmp_sol2,tmp_sol3,tmp_sol4,tmp_sol5,%):
+fs(%):
+subs(v6=0,v5=0,d6=0,d7=0,v7=0,c5=0,c6=0,c7=0,t5=0,t6=0,t7=0,%):
+subs(K=tmp_k_num,f=1,s=s_start,%):
+evalf(%):
+subs(tmp_cs_sol,%);
+
+tmp:=%:
+
+tmp_Phi_start_num:=tmp[1];
+
+tmp_Theta_start_num:=tmp[4];
+
+tmp_delta_start_num:=tmp[3];
+
+tmp_V_start_num:=tmp[2];
+
+tmp_ics:={Phi(s_start)=tmp_Phi_start_num,Theta(s_start)=tmp_Theta_start_num,
+delta(s_start)=tmp_delta_start_num,V(s_start)=tmp_V_start_num};
+
+tmp_acc:=1e-14;
+  
+ff1:=dsolve(tmp_eqns_num union tmp_ics,
+{Phi(s),Theta(s),delta(s),V(s)},numeric,abserr=tmp_acc,relerr=tmp_acc,method=lsode);
+
+Ntot:=800;
+
+s_max:=-tmp_s_start_save;
+
+s_min:=s_start;
+
+for ii from 1 to Ntot do
+
+	s_tmp:=(ii-1)*(s_max-s_min)/(Ntot-1)+s_min;
+	tmptmp:=ff1(s_tmp);
+	subs(tmptmp,[s,Phi(s)]);
+	pointsPhi||ii:=%;
+	subs(tmptmp,[s,V(s)]);
+	pointsV||ii:=%;
+	subs(tmptmp,[s,delta(s)]);
+	pointsdelta||ii:=%;
+	subs(tmptmp,[s,log10(tmp_H_num)]);
+	pointsH||ii:=%;
+	subs(tmptmp,[s,log10(-tmp_a_num)]);  # Notice change here for flip of sign of a.
+	pointsa||ii:=%;
+	subs(tmptmp,[s,Theta(s)]);
+	pointsTheta||ii:=%;
+	subs(tmptmp,[s,tmp_PI_num]);
+	pointsPI||ii:=%;
+
+od:
+
+plotPhi_after:=plot([seq(pointsPhi||i,i=1..Ntot)],color=red,title=`Phi`):
+
+plotV_after:=plot([seq(pointsV||i,i=1..Ntot)],color=blue,title=`V`):
+
+plotdelta_after:=plot([seq(pointsdelta||i,i=1..Ntot)],color=black,title=`delta`):
+
+plotTheta_after:=plot([seq(pointsTheta||i,i=1..Ntot)],color=green,title=`Theta`):
+
+plotH_after:=plot([seq(pointsH||i,i=1..Ntot)],color=red,title=`H`):
+
+plota_after:=plot([seq(pointsa||i,i=1..Ntot)],color=red,title=`a`):
+
+plotPI_after:=plot([seq(pointsPI||i,i=1..Ntot)],color=red,title=`PI`):
+
+end:
+
+# Following is getting to close to being of interest.
+
+go_straight_through_new(2.476845,1):
+
+display([plotV,plotdelta,plotV_after,plotdelta_after]);
+
+###*** Fig. 20
+
+ans:=display([plotTheta,plotPhi,plotTheta_after,plotPhi_after]);
+Export("Theta_and_Phi_first_mode_proper_eta_1.csv",op([1,1],ans));
+Export("Theta_and_Phi_first_mode_proper_eta_2.csv",op([2,1],ans));
+Export("Theta_and_Phi_first_mode_proper_eta_3.csv",op([3,1],ans));
+Export("Theta_and_Phi_first_mode_proper_eta_4.csv",op([4,1],ans));
+
+display([plotPI,plotPI_after]);
+
+# Look in more detail.
+
+display([plotTheta,plotPhi,plotTheta_after,plotPhi_after],view=[-10..10,-0.01..1.1]);
+
+display([plotdelta,plotdelta_after],view=[-10..10,-6..0]);
+
+display([plotV,plotV_after],view=[-10..10,-1.8..1.8]);
+
+display([plotPI,plotPI_after],view=[-10..10,-8..2]);
+
+###########
+
+# Very good. Following captures what we did to get next state up (and explore whether
+# there were some lower ones).
+
+(*
+
+0.75 -> 1.45
+
+1 -> 1.19
+
+1.25 -> 0.916
+
+1.5 -> 0.647
+
+2.0 -> 0.216
+
+2.5 -> -0.0057
+
+3.0 -> -0.0513
+
+3.5 -> -0.017
+
+3.7195 -> -0.0000117
+
+3.7196727 -> -0.5e-9
+
+3.71967 -> -0.18e-6
+
+3.71968 -> 0.49e-6
+
+3.71970 -> 0.18e-5
+
+3.720 -> 0.00002
+
+3.721 -> 0.00009
+
+3.722 -> 0.000157
+
+3.723 -> 0.000225
+
+3.75 -> 0.002
+
+4.0 -> 0.014
+
+*)
+
+##############
+
+# So here's that result.
+
+go_straight_through_new(3.7196727,1):
+
+display([plotV,plotdelta,plotV_after,plotdelta_after]);
+
+display([plotTheta,plotPhi,plotTheta_after,plotPhi_after]);
+
+display([plotPI,plotPI_after]);
+
+# Look in more detail.
+
+display([plotTheta,plotPhi,plotTheta_after,plotPhi_after],view=[-10..10,-0.01..1.1]);
+
+display([plotdelta,plotdelta_after],view=[-10..10,-6..0]);
+
+display([plotV,plotV_after],view=[-10..10,-1.8..1.8]);
+
+display([plotPI,plotPI_after],view=[-10..10,-8..2]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
