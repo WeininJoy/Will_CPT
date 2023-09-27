@@ -1,139 +1,298 @@
 import numpy as np
+import math
 from scipy.integrate import quad
 import matplotlib.pyplot as plt
 from wolframclient.evaluation import WolframLanguageSession
 from wolframclient.language import wl, wlexpr
 from scipy import interpolate
 from scipy.optimize import root_scalar
+from scipy import optimize
+import pandas as pd
+import corner
 
 plt.rcParams['text.usetex'] = True
 
 ###############
-# Flat universe
+# Important cosmmological parameters
 ###############
-
-def psi_flat(a, k):
-    return k * (k**4-4)**0.5 * a**2/(a**4+1)**0.5 / (1+a**2*k**2+a**4)
-
-def psi_int_flat(k):
-    result, err = quad(psi_flat, 0, float('inf'), args=(k))
-    return result
-
-###############
-# Curved universe
-###############
+from astropy import units as u
+from astropy.constants import c
+from scipy.constants import physical_constants
+import numpy as np
 
 
-def psi_curved(a, k, kc):
-    return (k**2+8*kc)**0.5 * ((k**2+6*kc)**2-4)**0.5 * a**2 / (1+a**4-2*kc*a**2)**0.5 / (a**4 + (k**2+6*kc)*a**2 +1)
-
-def psi_int_curved(k, kc):
-    result, err = quad(psi_curved, 0, float('inf'), args=(k, kc))
-    return result
-
-def psi_int_anal(a, k, kc): 
-    wolfSession = WolframLanguageSession()
-    wolfSession.evaluate(wl.Needs("targetFunctions`"))
-    
-    result = wolfSession.evaluate(wl.targetFunctions.PsiIntCurved((a, k, kc)))
-    wolfSession.terminate()
-    return result
-
-###############
-# plot K-theta(K)
-###############
-
-k_list = np.linspace(0, 6, 50)
-# kc_list = np.linspace(1.4, -1.4, 5)
-kc_list = [0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1]
-a = 1
-
-# plt.plot(k_list, [psi_int_flat(k) for k in k_list], label='num, kc=0')
-for kc in kc_list:
-    if kc < 1:
-        plt.plot(k_list, [psi_int_curved(k, kc) for k in k_list], label='num, kc='+str(kc))
-    else:
-        plt.plot(k_list, [psi_int_curved(k, kc) for k in k_list], '-.',label='num, kc='+str(kc))
-    # plt.plot(k_list, [psi_int_anal(a, k, kc) for k in k_list], label='anal, kc='+str(kc))
-
-plt.xlabel(r"$K$")
-plt.ylabel(r"$\theta(K)$")
-plt.legend()
-plt.savefig("psi_diffK_close.pdf")
-
-
-
-################################
-# Find discrete k (kc is known)
-################################
-
-# kc = 1.9210779397786009
-
-# # Use interpolator to find an approximated function (for root finder)
-# k_list = np.linspace(0, 20, 50)
-# y_list = [psi_int_curved(k, kc) for k in k_list]
-# func_interpolate = interpolate.interp1d(k_list,y_list,kind='cubic') 
-
-# # Use root finder to find discrete k 
-# discrete_theta_list = [(n+5)*np.pi/2 for n in range(5)]
-# discrete_k_list = []
-# for theta in discrete_theta_list:
-#     sol_k = root_scalar(lambda k: func_interpolate(k) - theta, bracket=[0, 20], method='brentq') 
-#     discrete_k_list.append(sol_k.root)
-
-# print(discrete_k_list)
-
-################################
-# Find the kc which theta(k) has slope = 1 
-################################
-
-# def slope_func(kc):
-#     k_list = np.linspace(0, 10, 30)
-#     y_list = [psi_int_curved(k, kc) for k in k_list]
-#     func_interpolate = interpolate.interp1d(k_list,y_list,kind='cubic') 
-#     slope = 2./ np.pi * (func_interpolate(10) - func_interpolate(9)) / 1.
-#     return slope - 1. 
-
-# try: 
-#     sol_slope = root_scalar(slope_func, bracket=[1.2, 2.2], method='brentq')
-#     print('kc='+str(sol_slope.root))
-# except:
-#     print('Cannot find kc in the range.')
-
-################################
-# Find the kc which has integer discrete k 
-################################
-
-# achieve this goal by changing dark energy (Lambda_DE)
-
-n_k = 10
-
-def find_Lambda(Lambda_DE):
-
-    def slope_func(kc):
-        k_list = np.linspace(0, 20, 30)
-        y_list = [psi_int_curved(k, kc) for k in k_list]
-        func_interpolate = interpolate.interp1d(k_list,y_list,kind='cubic') 
-        slope = 2./ np.pi / Lambda_DE**0.5 * (func_interpolate(10) - func_interpolate(9)) / 1.
-        return slope - 1. 
-
-    try: 
-        sol_slope = root_scalar(slope_func, bracket=[0, 3], method='brentq')
-        print('kc='+str(sol_slope.root))
-        kc = sol_slope.root
-
-        k_list = np.linspace(0, 20, 30)
-        y_list = [psi_int_curved(k, kc) for k in k_list]
-        func_interpolate = interpolate.interp1d(k_list,y_list,kind='cubic') 
-        theta = n_k * np.pi/2
-        sol_k = root_scalar(lambda k: func_interpolate(k) - theta, bracket=[0, 20], method='brentq') 
-        return sol_k.root * Lambda_DE**0.5 - n_k
-
-    except:
-        print('Cannot find kc in the range.')
+class Universe:
+    def __init__(self, H0, Omega_lambda, Omega_r_h2): 
         
-try: 
-    sol_Lambda = root_scalar(find_Lambda, bracket=[0.5, 1.], method='brentq')
-    print('Lambda_DE='+str(sol_Lambda.root)) 
-except:
-    print('Cannot find Lambda_DE in the range.')
+        ### cosmological constants
+        self.H0 = H0   # Hubble constant
+        self.h = H0.value / 100.
+        self.Omega_lambda = Omega_lambda  # dark energy
+        self.Omega_r = Omega_r_h2 / self.h**2
+        self.Lambda = self.Omega_lambda * 3 * self.H0**2 / c**2  # suppose a = 1 when the energy density of radiation and the DE are equal.
+        self.a0 = (self.Omega_lambda/ self.Omega_r)**0.25  
+
+    ###############
+    # Flat universe
+    ###############
+
+    def psi_int_flat(self, k):
+
+        def psi_flat(a, k):
+            return k * (k**4-4)**0.5 * a**2/(a**4+1)**0.5 / (1+a**2*k**2+a**4)
+        
+        result, err = quad(psi_flat, 0, float('inf'), args=(k))
+        return result
+
+    ###############
+    # Curved universe
+    ###############
+
+    def psi_int_curved(self, k, kc):
+
+        def psi_curved(a, k, kc):
+            return (k**2+8*kc)**0.5 * ((k**2+6*kc)**2-4)**0.5 * a**2 / (1+a**4-2*kc*a**2)**0.5 / (a**4 + (k**2+6*kc)*a**2 +1)
+        
+        result, err = quad(psi_curved, 0, float('inf'), args=(k, kc))
+        return result
+
+    def psi_int_anal(self, a, k, kc): 
+        wolfSession = WolframLanguageSession()
+        wolfSession.evaluate(wl.Needs("targetFunctions`"))
+        
+        result = wolfSession.evaluate(wl.targetFunctions.PsiIntCurved((a, k, kc)))
+        wolfSession.terminate()
+        return result
+
+    def a_tot(self, kc): # when kc > 1 -> a_tot is finite 
+        if kc > 1:
+            K = kc * 1. / 3. * 2 * self.Lambda  
+            R = self.Lambda 
+            a_tot_small = math.sqrt( (3* K - math.sqrt(9* K**2 - 4*R*self.Lambda)) / (2* self.Lambda) )
+            a_tot_large = math.sqrt( (3* K + math.sqrt(9* K**2 - 4*R*self.Lambda)) / (2* self.Lambda) )
+            return a_tot_small
+        else: 
+            print("For kc < 1, a_tot is infinite.")
+            return float('inf')
+
+    ###############
+    # plot K-theta(K) curves with different kc
+    ###############
+    
+    def plot_k_theta(self, k_list, kc_list):
+
+        for kc in kc_list:
+            if kc < 1:
+                a = 1
+                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list], label='num, kc='+str(kc))
+                plt.plot(k_list, [self.psi_int_anal(a, k, kc) for k in k_list], label='anal, kc='+str(kc))
+            else:
+                a = self.a_tot(kc)
+                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],label='num, kc='+str(kc))
+                plt.plot(k_list, [self.psi_int_anal(a, k, kc) for k in k_list], label='anal, kc='+str(kc))
+
+        plt.xlabel(r"$K$")
+        plt.ylabel(r"$\theta(K)$")
+        plt.legend()
+        plt.savefig("psi_diffK_num_anal.pdf")
+
+
+    ########################
+    # Find K (curvature) with known Lambda (DE) by making slope of theta = pi/2 (Lambda is known)
+    # Note: (1) k_int: integer wave vectors, _bar: in K=1 unit
+    #       (2) k_com_bar = sqrt( k_int*(k_int+2) - 3*K_bar ) , K_bar = 1
+    #       (3) k_com = k* sqrt(Lambda)
+    #       (4) k_com_bar/a_bar = k_phys = k_com/a -> k = a_bar/a/sqrt(Lambda)*k_com_bar
+    ########################
+
+    def Find_kc(self, n_k, n_range): # n_k > n_range/2
+        # note: n_k is the number of wave vector we used for calculating slope (choose larger one, with theta approaching to a straight line))
+        # return: kc, K, Omega_K
+        
+        if n_k > n_range/2 :
+            k_int_list = np.linspace(n_k - n_range/2, n_k + n_range/2, 30)
+
+            ##### Calculate slope
+            def theta_slope(kc):
+                
+                K = 2.* self.Lambda / 3. * kc
+                Omega_K = - K * c**2 / self.a0**2 / self.H0**2
+
+                if kc > 0: K_bar = 1
+                elif kc < 0: K_bar = -1
+                else: K_bar = 0
+
+                a0_bar = c * np.sqrt(-K_bar/Omega_K)/self.H0
+
+                if kc > 0:  # close universe 
+                    k_com_bar_list = np.real([math.sqrt( k_int*(k_int+2) - 3*K_bar ) for k_int in k_int_list])
+                else:       # open or flat universe
+                    k_com_bar_list = np.real([math.sqrt( k_int**2 - 3*K_bar ) for k_int in k_int_list])
+
+                k_list = np.real([self.a0/a0_bar.si.value/math.sqrt(self.Lambda.si.value)*k_com_bar for k_com_bar in k_com_bar_list])
+
+                theta_list = [self.psi_int_curved(k, kc) for k in k_list]
+                func_interpolate = interpolate.interp1d(k_int_list, theta_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
+                slope = 2./ np.pi * (func_interpolate(n_k) - func_interpolate(n_k-1)) / 1.     # calculate the slope at n_k
+
+                return slope
+
+            ##### Calculate kc by root finder
+            sol = root_scalar(lambda kc: theta_slope(kc) - 1., bracket=[0.1 , 3.], method='brentq') 
+            kc = sol.root 
+            K = 2.* self.Lambda / 3. * kc
+            Omega_K = - K * c**2 / self.a0**2 / self.H0**2
+
+            print("Omega_K=", Omega_K)
+
+            return kc, K, Omega_K
+
+        else:
+            raise ValueError("n_k should be larger than n_range/2.")
+
+
+    ########################
+    # Find K (curvature) and Lambda (DE) by making discrete comoving dimensional wave vectors (k_dim) to be integers
+    # 1. dimensionless curvature (k_c) = 3./2./Lambda * K
+    # 2. dimensionless wave vector (k) = k_dim / sqrt(Lambda) 
+    # 3. Constraint1: The slope of theta(k_dim) = np.pi/2 -> 2/np.pi * theta'(k_dim) = 1
+    # 4. Constraint2: Discrete k_dim should be integers
+    ########################
+
+    # n_k = 110  # the number of wave vector we used for calculating slope and k_dim (choose larger one, with theta approaching to a straight line))
+
+    # def Find_K_Lambda(x):
+        
+    #     K = x[0]
+    #     Lambda = x[1]
+        
+    #     ##### Calculate slope
+    #     kc = 3./2./Lambda * K  ## dimensionless kc
+    #     k_dim_list = np.linspace(100, 120, 30)
+    #     k_list = [k_dim/(Lambda)**(0.5) for k_dim in k_dim_list]
+    #     theta_list = [psi_int_curved(k, kc) for k in k_list]
+    #     func_interpolate = interpolate.interp1d(k_dim_list, theta_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
+    #     slope = 2./ np.pi * (func_interpolate(n_k) - func_interpolate(n_k-1)) / 1.     # calculate the slope at n_k
+    #     print("slope="+str(slope))
+
+    #     ##### Calculate k_dim by root finder
+    #     theta = n_k * np.pi / 2.
+    #     sol = root_scalar(lambda k_dim: func_interpolate(k_dim) - theta, bracket=[100, 120], method='brentq') 
+    #     sol_k_dim = sol.root   # find the k_dim value corresponding to the theta value we want
+    #     print ("sol_k_dim="+str(sol_k_dim))
+
+    #     return [slope - 1., sol_k_dim - int(sol_k_dim)]  # want the slope = 1, and sol_k_dim to be an integer
+
+    # res = optimize.root(Find_K_Lambda, [0.75, 2.], method='hybr') # Use root finder to find the K and Lambda satisfying the two constraints
+    # K = res.x[0]
+    # Lambda = res.x[1]
+    # print('K, Lambda = '+str(K)+', '+str(Lambda))
+
+
+    ###############################
+    # Plot the discrete comoving wave vectors according to the kc value we found
+    ###############################
+
+
+    def find_discrete_k(self, n_k, n_range):
+
+        kc, K, Omega_K = self.Find_kc(n_k, n_range)
+        k_int_list = np.linspace(n_k - n_range/2, n_k + n_range/2, 30)
+
+        if kc > 0: K_bar = 1
+        elif kc < 0: K_bar = -1
+        else: K_bar = 0
+
+        a0_bar = c * np.sqrt(-K_bar/Omega_K)/self.H0
+
+        if kc > 0:  # close universe 
+            k_com_bar_list = np.real([math.sqrt( k_int*(k_int+2) - 3*K_bar ) for k_int in k_int_list])
+        else:       # open universe
+            k_com_bar_list = np.real([math.sqrt( k_int**2 - 3*K_bar ) for k_int in k_int_list])
+
+        k_list = np.real([self.a0/a0_bar.si.value/math.sqrt(self.Lambda.si.value)*k_com_bar for k_com_bar in k_com_bar_list])
+
+        theta_curved_list = [self.psi_int_curved(k, kc) for k in k_list]
+        func_interpolate = interpolate.interp1d(k_int_list, theta_curved_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
+
+        ##### Use root finder to find discrete k 
+        discrete_theta_list = [(n+101)* np.pi/ 2. for n in range(13)]
+        discrete_k_int_list = []
+        for theta in discrete_theta_list:
+            sol_k_int = root_scalar(lambda k_int: func_interpolate(k_int) - theta, bracket=[100, 120], method='brentq') 
+            discrete_k_int_list.append(sol_k_int.root)
+
+        print(discrete_k_int_list)
+
+        return k_int_list, theta_curved_list, discrete_k_int_list, discrete_theta_list
+    
+
+
+    ##### Make the k-theta plot
+
+    def plot_k_theta_discrete(self, n_k, n_range): 
+        
+        k_int_list, theta_curved_list, discrete_k_int_list, discrete_theta_list = self.find_discrete_k(n_k, n_range)
+
+        ## plot curved case
+        plt.plot(k_int_list, theta_curved_list, label = r"curved, $\Omega_{\kappa,0}=$"+str(round(Omega_K.si.value,3)))
+        plt.plot(discrete_k_int_list, discrete_theta_list, 'k.')
+
+        plt.xlim([100, 115])
+        plt.ylim([100*np.pi/2., 114*np.pi/2.])
+        plt.vlines(discrete_k_int_list, 0, discrete_theta_list, colors='k', linestyles='dotted')
+        plt.hlines(discrete_theta_list, 0, discrete_k_int_list, colors='k', linestyles='dotted')
+        plt.xticks([(n+101) for n in range(15)], [str(n+101) for n in range(15)], fontsize=13)
+        plt.yticks(discrete_theta_list, [str(n+101)+r"$\frac{\pi}{2}$"  for n in range(13)], fontsize=13)
+        plt.xlabel(r"$k$ (integer wave vector)", fontsize=15)
+        plt.ylabel(r"$\theta(k)$", fontsize=15)
+        plt.legend(fontsize=14)
+        plt.savefig("theta_k_discrete.pdf")
+
+
+###############################
+# Plot the allowed curves in the Omega_K, Omega_Lambda plane
+###############################
+
+def plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k, n_range):
+
+    ### Plot Planck data 2018
+
+    # MCMC chain samples
+    samples = np.loadtxt('/home/wnd22/Documents/Research/PlanckData_2018/base_omegak/plikHM_TTTEEE_lowl_lowE/base_omegak_plikHM_TTTEEE_lowl_lowE_4.txt')
+
+    # load the column names for the samples
+    column_names_raw = np.loadtxt('/home/wnd22/Documents/Research/PlanckData_2018/base_omegak/plikHM_TTTEEE_lowl_lowE/base_omegak_plikHM_TTTEEE_lowl_lowE.paramnames', dtype=str, usecols=[0])
+    column_names = [x.replace("b'",'').replace("'",'') for x in column_names_raw]
+
+    # make a data frame with column names and samples
+    samples1 = pd.DataFrame(samples[:,2:], columns=column_names) # first two columns are not important
+
+    # define which parameters to use
+    use_params = ['H0*', 'omegak']
+    ndim = len(use_params)
+    # Make the base corner plot
+    #figure = corner.corner(samples1[use_params], range=[(00.6, 0.72), (-0.02, 0.0)], bins=20, color='r')
+    figure = corner.corner(samples1[use_params],  bins=20, color='r')
+    # Extract the axes
+    axes = np.array(figure.axes).reshape((ndim, ndim))
+
+    ### plot my result
+    universe_list = [Universe(H0, Omega_lambda, Omega_r_h2) for H0 in H0_list]
+    Omega_K_list = [universe.Find_kc(n_k, n_range)[2] for universe in universe_list]
+
+    ax = axes[1, 0]
+    ax.plot(H0_list, Omega_K_list, label = r"$\Omega_{\lambda,0}="+str(Omega_lambda)+", \Omega_{r,0}h^2=$"+'{:.2e}'.format(Omega_r_h2))
+    ax.set_xlabel(r"$H_0$", fontsize=10)
+    ax.set_ylabel(r"$\Omega_{\kappa,0}$", fontsize=10)
+    ax.legend(fontsize=8)
+    plt.savefig("H0-OmegaK-withPlanck2018.pdf")
+
+
+### Set parameters
+
+H0_list = np.linspace(45, 65, 5) * u.km/u.s/u.Mpc
+Omega_r_h2 = 2.46e-5
+Omega_lambda = 0.56 # np.linspace(0.6, 0.72, 5)
+
+plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k=110, n_range=20)
