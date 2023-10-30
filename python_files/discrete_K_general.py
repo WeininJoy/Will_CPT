@@ -282,7 +282,7 @@ def plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k, n_rang
     Omega_K_list = [universe.Find_kc(n_k, n_range)[2] for universe in universe_list]
 
     ax = axes[1, 0]
-    ax.plot(H0_list, Omega_K_list, label = r"$\Omega_{\lambda,0}="+str(Omega_lambda)+", \Omega_{r,0}h^2=$"+'{:.2e}'.format(Omega_r_h2))
+    ax.plot(H0_list, Omega_K_list, label = r"$\Omega_{\lambda,0}="+str(Omega_lambda)+r", \Omega_{r,0}h^2=$"+'{:.2e}'.format(Omega_r_h2))
     ax.set_xlabel(r"$H_0$", fontsize=10)
     ax.set_ylabel(r"$\Omega_{\kappa,0}$", fontsize=10)
     ax.legend(fontsize=8)

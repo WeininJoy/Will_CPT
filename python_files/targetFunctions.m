@@ -27,4 +27,38 @@ Begin["Private`"]
 PsiIntCurved[{a_, ks_, kc_}] := N[ Re [2 * (ks^2+8*kc)^0.5 * (kc- (kc^2-1)^0.5)^0.5 * ( EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) - ((ks^2+6*kc)^2 - 4)^0.5), ArcSin[a/ (kc- (kc^2-1)^0.5 )^0.5] , ((kc^2-1)^0.5 -kc)^2 ] - EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) + ((ks^2+6*kc)^2 - 4)^0.5), ArcSin [a/ (kc- (kc^2-1)^0.5)^0.5] , ((kc^2-1)^0.5 -kc)^2 ] ) ]];
 End[]
 
+PhiIntCurved::usage = "PhiIntCurved[{a, ks, kc}]";
+Begin["Private`"]
+PhiIntCurved[{a_, ks_, kc_}] :=
+ Block[{f, psi, Phi}, 
+  f = 3* (a^4 + (ks^2+6*kc)*a^2 +1)^0.5 / (ks^2 + 8*kc)^0.5 / ((ks^2 + 6*kc)^2 - 4)^0.5 / a^3;
+  psi = (kc- (kc^2-1)^0.5)^0.5 * ( EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) - ((ks^2+6*kc)^2 - 4)^0.5), ArcSin[a/ (kc- (kc^2-1)^0.5 )^0.5] , ((kc^2-1)^0.5 -kc)^2 ] - EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) + ((ks^2+6*kc)^2 - 4)^0.5), ArcSin [a/ (kc- (kc^2-1)^0.5)^0.5] , ((kc^2-1)^0.5 -kc)^2 ] );
+  Phi = N[ Re[ f * Sin[(ks^2 + 8*kc)^0.5 * psi] ]];
+  Return[Phi]]
+End[]
+
+dPhidkCurved::usage = "dPhidkCurved[{a, ks, kc}]";
+Begin["Private`"]
+dPhidkCurved[{a_, ks_, kc_}] :=
+ Block[{dPhidkR},
+  f[k_] := 3* (a^4 + (k^2+6*kc)*a^2 +1)^0.5 / (k^2 + 8*kc)^0.5 / ((k^2 + 6*kc)^2 - 4)^0.5 / a^3;
+  psi[k_] := (kc- (kc^2-1)^0.5)^0.5 * ( EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (k^2+6*kc) - ((k^2+6*kc)^2 - 4)^0.5), ArcSin[a/ (kc- (kc^2-1)^0.5 )^0.5] , ((kc^2-1)^0.5 -kc)^2 ] - EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (k^2+6*kc) + ((k^2+6*kc)^2 - 4)^0.5), ArcSin [a/ (kc- (kc^2-1)^0.5)^0.5] , ((kc^2-1)^0.5 -kc)^2 ] );
+  Phi[k_] := f[k] * Sin[(k^2 + 8*kc)^0.5 * psi[k]];
+  dPhidk[k_] := Evaluate@D[Phi[k], {k, 1}];
+  dPhidkR = N[Re[ dPhidk[ks]]];
+  Return[dPhidkR]]
+End[]
+
+d2PhidkCurved::usage = "d2PhidkCurved[{a, ks, kc}]";
+Begin["Private`"]
+d2PhidkCurved[{a_, ks_, kc_}] :=
+ Block[{d2PhidkR},
+  f[k_] := 3* (a^4 + (k^2+6*kc)*a^2 +1)^0.5 / (k^2 + 8*kc)^0.5 / ((k^2 + 6*kc)^2 - 4)^0.5 / a^3;
+  psi[k_] := (kc- (kc^2-1)^0.5)^0.5 * ( EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (k^2+6*kc) - ((k^2+6*kc)^2 - 4)^0.5), ArcSin[a/ (kc- (kc^2-1)^0.5 )^0.5] , ((kc^2-1)^0.5 -kc)^2 ] - EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (k^2+6*kc) + ((k^2+6*kc)^2 - 4)^0.5), ArcSin [a/ (kc- (kc^2-1)^0.5)^0.5] , ((kc^2-1)^0.5 -kc)^2 ] );
+  Phi[k_] := f[k] * Sin[(k^2 + 8*kc)^0.5 * psi[k]];
+  d2Phidk[k_] := Evaluate@D[Phi[k], {k, 2}];
+  d2PhidkR = N[Re[ d2Phidk[ks]]];
+  Return[d2PhidkR]]
+End[]
+
 EndPackage[]
