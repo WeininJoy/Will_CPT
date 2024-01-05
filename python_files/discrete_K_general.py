@@ -22,6 +22,7 @@ import numpy as np
 
 
 class Universe:
+
     def __init__(self, H0, Omega_lambda, Omega_r_h2): 
         
         ### cosmological constants
@@ -29,8 +30,8 @@ class Universe:
         self.h = H0.value / 100.
         self.Omega_lambda = Omega_lambda  # dark energy
         self.Omega_r = Omega_r_h2 / self.h**2
-        self.Lambda = self.Omega_lambda * 3 * self.H0**2 / c**2  # suppose a = 1 when the energy density of radiation and the DE are equal.
-        self.a0 = (self.Omega_lambda/ self.Omega_r)**0.25  
+        self.Lambda = self.Omega_lambda * 3 * self.H0**2 / c**2 
+        self.a0 = (self.Omega_lambda/ self.Omega_r)**0.25   # suppose a = 1 when the energy density of radiation and the DE are equal.
 
     ###############
     # Flat universe
@@ -53,7 +54,10 @@ class Universe:
         def psi_curved(a, k, kc):
             return (k**2+8*kc)**0.5 * ((k**2+6*kc)**2-4)**0.5 * a**2 / (1+a**4-2*kc*a**2)**0.5 / (a**4 + (k**2+6*kc)*a**2 +1)
         
-        result, err = quad(psi_curved, 0, float('inf'), args=(k, kc))
+        if kc > 1:
+            result, err = quad(psi_curved, 0, self.a_tot(kc), args=(k, kc))
+        else:
+            result, err = quad(psi_curved, 0, float('inf'), args=(k, kc))
         return result
 
     def psi_int_anal(self, a, k, kc): 
@@ -66,30 +70,47 @@ class Universe:
 
     def a_tot(self, kc): # when kc > 1 -> a_tot is finite 
         if kc > 1:
-            K = kc * 1. / 3. * 2 * self.Lambda  
-            R = self.Lambda 
-            a_tot_small = math.sqrt( (3* K - math.sqrt(9* K**2 - 4*R*self.Lambda)) / (2* self.Lambda) )
-            a_tot_large = math.sqrt( (3* K + math.sqrt(9* K**2 - 4*R*self.Lambda)) / (2* self.Lambda) )
+            Lambda = self.Lambda.si.value
+            K = kc * 1. / 3. * 2 * Lambda
+            R = Lambda
+            a_tot_small = math.sqrt( (3* K - math.sqrt(9* K**2 - 4*R*Lambda)) / (2* Lambda) )
+            a_tot_large = math.sqrt( (3* K + math.sqrt(9* K**2 - 4*R*Lambda)) / (2* Lambda) )
             return a_tot_small
         else: 
             print("For kc < 1, a_tot is infinite.")
             return float('inf')
+    
+    def eta_tot(self, kc):
+
+        Lambda = 1
+        R = Lambda
+        K = kc * 1. / 3. * 2 * Lambda  
+
+        def a_dot(a):
+            return math.sqrt( 1./3. * ( R - 3*K* a**2 + Lambda* a**4 ) )
+
+        if kc < 1:
+            result = quad(lambda a: 1./a_dot(a), 0, np.inf)
+            return result[0]
+        else: 
+            result = quad(lambda a: 1./a_dot(a), 0, self.a_tot(kc))
+            return 2* result[0]
 
     ###############
     # plot K-theta(K) curves with different kc
     ###############
     
     def plot_k_theta(self, k_list, kc_list):
-
+      
         for kc in kc_list:
-            if kc < 1:
+            if kc < 1: # Note: for kc<1, a->infinity -> theta=2*psi(a=1)
                 a = 1
-                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list], label='num, kc='+str(kc))
-                plt.plot(k_list, [self.psi_int_anal(a, k, kc) for k in k_list], label='anal, kc='+str(kc))
+                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list], label='num, kc='+str(round(kc,1)))
+                plt.plot(k_list, [2 * self.psi_int_anal(a, k, kc) for k in k_list], '--',label='anal, kc='+str(round(kc,1)))
             else:
                 a = self.a_tot(kc)
-                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],label='num, kc='+str(kc))
-                plt.plot(k_list, [self.psi_int_anal(a, k, kc) for k in k_list], label='anal, kc='+str(kc))
+                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],'-.', label='num, kc='+str(round(kc,1)))
+                plt.plot(k_list, [self.psi_int_anal(a, k, kc) for k in k_list], '--',label='anal, kc='+str(round(kc,1)))
 
         plt.xlabel(r"$K$")
         plt.ylabel(r"$\theta(K)$")
@@ -126,6 +147,7 @@ class Universe:
 
                 if kc > 0:  # close universe 
                     k_com_bar_list = np.real([math.sqrt( k_int*(k_int+2) - 3*K_bar ) for k_int in k_int_list])
+                    # k_com_bar_list = np.real([math.sqrt( k_int**2 - K_bar ) for k_int in k_int_list])
                 else:       # open or flat universe
                     k_com_bar_list = np.real([math.sqrt( k_int**2 - 3*K_bar ) for k_int in k_int_list])
 
@@ -138,7 +160,7 @@ class Universe:
                 return slope
 
             ##### Calculate kc by root finder
-            sol = root_scalar(lambda kc: theta_slope(kc) - 1., bracket=[0.1 , 3.], method='brentq') 
+            sol = root_scalar(lambda kc: theta_slope(kc) - 1., bracket=[0.1 , 0.99], method='brentq') 
             kc = sol.root 
             K = 2.* self.Lambda / 3. * kc
             Omega_K = - K * c**2 / self.a0**2 / self.H0**2
@@ -196,7 +218,7 @@ class Universe:
 
     def find_discrete_k(self, n_k, n_range):
 
-        kc, K, Omega_K = self.Find_kc(n_k, n_range)
+        kc, K, Omega_K = self.Find_kc(110, 20)
         k_int_list = np.linspace(n_k - n_range/2, n_k + n_range/2, 30)
 
         if kc > 0: K_bar = 1
@@ -216,10 +238,10 @@ class Universe:
         func_interpolate = interpolate.interp1d(k_int_list, theta_curved_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
 
         ##### Use root finder to find discrete k 
-        discrete_theta_list = [(n+101)* np.pi/ 2. for n in range(13)]
+        discrete_theta_list = [(n + n_k - n_range/2)* np.pi/ 2. for n in range(n_range)]
         discrete_k_int_list = []
         for theta in discrete_theta_list:
-            sol_k_int = root_scalar(lambda k_int: func_interpolate(k_int) - theta, bracket=[100, 120], method='brentq') 
+            sol_k_int = root_scalar(lambda k_int: func_interpolate(k_int) - theta, bracket=[n_k - n_range/2 -5, n_k + n_range/2+5], method='brentq') 
             discrete_k_int_list.append(sol_k_int.root)
 
         print(discrete_k_int_list)
@@ -227,28 +249,69 @@ class Universe:
         return k_int_list, theta_curved_list, discrete_k_int_list, discrete_theta_list
     
 
+    def k_FCB_closed(self, n_k, n_range):
+        
+        kc, K, Omega_K = self.Find_kc(110, 20)
+        k_int_list = np.linspace(n_k - n_range/2, n_k + n_range/2, n_range+1)
+
+        if kc > 0: K_bar = 1
+        elif kc < 0: K_bar = -1
+        else: K_bar = 0
+
+        a0_bar = c * np.sqrt(-K_bar/Omega_K)/self.H0
+
+        if kc > 0:  # close universe 
+            k_com_bar_list = np.real([math.sqrt( k_int*(k_int+2) - 3*K_bar ) for k_int in k_int_list])
+            # k_com_bar_list = np.real([math.sqrt( k_int**2 - K_bar ) for k_int in k_int_list])
+        else:       # open universe
+            k_com_bar_list = np.real([math.sqrt( k_int**2 - 3*K_bar ) for k_int in k_int_list])
+
+        k_list = np.real([self.a0/a0_bar.si.value/math.sqrt(self.Lambda.si.value)*k_com_bar for k_com_bar in k_com_bar_list])
+
+        theta_curved_list = [self.psi_int_curved(k, kc) for k in k_list]
+        func_interpolate = interpolate.interp1d(theta_curved_list, k_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
+
+        discrete_theta_list = [(n + n_k - n_range/2 -1)* np.pi/ 2. for n in range(n_range+1)]
+        discrete_k_list_FCB = [func_interpolate(theta) for theta in discrete_theta_list]
+
+        plt.plot(k_int_list, discrete_k_list_FCB,'.-', label = "k_FCB")
+        plt.plot(k_int_list, k_list,'.-', label = "k_closed")
+        plt.xlabel(r"$\nu$ (integers)", fontsize=15)
+        plt.ylabel(r"$\tilde{k}=k/\sqrt{\lambda}$", fontsize=15)
+        plt.legend(fontsize=15)
+        plt.savefig("k_discrete_FCB-closed.pdf")
+
 
     ##### Make the k-theta plot
 
     def plot_k_theta_discrete(self, n_k, n_range): 
         
+        kc, K, Omega_K = self.Find_kc(110, 20)
         k_int_list, theta_curved_list, discrete_k_int_list, discrete_theta_list = self.find_discrete_k(n_k, n_range)
 
         ## plot curved case
         plt.plot(k_int_list, theta_curved_list, label = r"curved, $\Omega_{\kappa,0}=$"+str(round(Omega_K.si.value,3)))
         plt.plot(discrete_k_int_list, discrete_theta_list, 'k.')
 
-        plt.xlim([100, 115])
-        plt.ylim([100*np.pi/2., 114*np.pi/2.])
+        # plt.xlim([100, 115])
+        # plt.ylim([100*np.pi/2., 114*np.pi/2.])
         plt.vlines(discrete_k_int_list, 0, discrete_theta_list, colors='k', linestyles='dotted')
         plt.hlines(discrete_theta_list, 0, discrete_k_int_list, colors='k', linestyles='dotted')
-        plt.xticks([(n+101) for n in range(15)], [str(n+101) for n in range(15)], fontsize=13)
-        plt.yticks(discrete_theta_list, [str(n+101)+r"$\frac{\pi}{2}$"  for n in range(13)], fontsize=13)
+        # plt.xticks([(n+101) for n in range(15)], [str(n+101) for n in range(15)], fontsize=13)
+        # plt.yticks(discrete_theta_list, [str(n+101)+r"$\frac{\pi}{2}$"  for n in range(13)], fontsize=13)
         plt.xlabel(r"$k$ (integer wave vector)", fontsize=15)
         plt.ylabel(r"$\theta(k)$", fontsize=15)
         plt.legend(fontsize=14)
         plt.savefig("theta_k_discrete.pdf")
 
+
+H0 = 70 * u.km/u.s/u.Mpc
+Omega_lambda = 0.73 
+Omega_r_h2 = 2.47e-5
+
+universe = Universe(H0, Omega_lambda, Omega_r_h2)
+kc, K, Omega_K = universe.Find_kc(n_k=110, n_range=20)
+print('kc='+str(kc))
 
 ###############################
 # Plot the allowed curves in the Omega_K, Omega_Lambda plane
@@ -291,8 +354,8 @@ def plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k, n_rang
 
 ### Set parameters
 
-H0_list = np.linspace(45, 65, 5) * u.km/u.s/u.Mpc
-Omega_r_h2 = 2.46e-5
-Omega_lambda = 0.56 # np.linspace(0.6, 0.72, 5)
+# H0_list = np.linspace(45, 65, 5) * u.km/u.s/u.Mpc
+# Omega_r_h2 = 2.46e-5
+# Omega_lambda = 0.56 # np.linspace(0.6, 0.72, 5)
 
-plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k=110, n_range=20)
+# plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k=110, n_range=20)

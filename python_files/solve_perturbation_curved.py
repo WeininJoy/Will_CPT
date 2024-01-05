@@ -61,27 +61,20 @@ class Universe:
         u = beta * eta
         a_eta = alpha * ellipfun('sn', u, m)
         
-        # choose a(eta) positive while eta > 0 
-        if eta * a_eta.real > 0: 
-            return a_eta
-        else:
-            return - a_eta
+        return a_eta.real
+
     
     def plot_a(self):
 
         eta_tot = self.eta_tot()
-        
-        ##### make plot in complex plane 
-        # plt = cplot.plot(
-        #     a,
-        #     (-eta_tot, eta_tot, 400),
-        #     (-eta_tot, eta_tot, 400)
-        # )
-        # plt.show()
-
-        ##### make plot in real axis
         eta_list = np.linspace(0, eta_tot, 100)
-        plt.plot(eta_list, [self.a(eta).real for eta in eta_list], color=color_list[self.n], label = 'kc='+str(round(self.k_curved, 2)))
+
+        # choose a(eta) positive while eta[0] > 0 
+        if eta_list[0] * self.a(eta_list[0]).real > 0:
+            a_list = [self.a(eta).real for eta in eta_list]
+        else: 
+            a_list = [-self.a(eta).real for eta in eta_list]
+        plt.plot(eta_list, a_list, color=color_list[self.n], label = 'kc='+str(round(self.k_curved, 2)))
         plt.axvline(x=eta_tot/2., color=color_list[self.n], ls='--')
     
 
@@ -92,9 +85,10 @@ class Universe:
     
     def solve_Phi(self, Phi_i, Phi_dot_i, k_scale):
         def Phi_ode(a, y):
-            Phi, Phi_dot = y
+            Phi, Phi_dot, eta = y
             Phi_2dot = - ( (2*(3*a**4 + 2) - 15*a**2*self.K/ self.Lambda) * Phi_dot + a* (4*a**2 + k_scale**2) * Phi ) / (a *(1+a**4) - 3*a**3*self.K/self.Lambda)
-            return [Phi_dot, Phi_2dot]
+            eta_dot = 1./self.a_dot(a)
+            return [Phi_dot, Phi_2dot, eta_dot]
         
         if self.k_curved > 1:
             a_tot = self.a_tot()
@@ -103,6 +97,7 @@ class Universe:
 
         y0 = [Phi_i, Phi_dot_i]
         return solve_ivp(Phi_ode, [1.e-5, a_tot], y0, rtol=1e-10, atol=1e-10)
+    
 
     def plot_Phi(self, Phi_i, Phi_dot_i, k_scale):
         
@@ -123,11 +118,10 @@ class Universe:
             # result = Phi_i * wolfSession.evaluate(wl.targetFunctions.PhiCurved((a, k_scale, self.k_curved))) # Heun function form
             wolfSession.terminate()
             
-            print(result)
             return result
         
-        def plot_Phi_anal():
-            # plot analytic solution of Phi
+        def plot_a_Phi_anal():
+            # plot analytic solution of Phi(a)
 
             if self.k_curved > 1:
                 a_list = np.linspace(1.e-5, self.a_tot(), 30)
@@ -147,8 +141,8 @@ class Universe:
             Phi_list = [Phi / Phi_list[0] for Phi in Phi_list] 
             plt.plot(a_list, Phi_list, label="anal, kc="+str(round(self.k_curved, 2))+ ", n="+str(self.n))
 
-        def plot_Phi_num():
-            # plot numerical solution of Phi
+        def plot_a_Phi_num():
+            # plot numerical solution of Phi(a)
             Phi_sol = self.solve_Phi(Phi_i, Phi_dot_i, k_scale)
             a_list = Phi_sol.t
             # Phi_list = [Phi / Phi_list[0] for Phi in Phi_sol.y[0]] 
@@ -156,8 +150,41 @@ class Universe:
 
             plt.plot(a_list, Phi_list, label="num, kc="+str(round(self.k_curved, 2)))
 
-        plot_Phi_num()
-        plot_Phi_anal()
+        def plot_eta_Phi_anal():
+            # plot analytic solution of Phi(eta)
+
+            eta_tot = self.eta_tot()
+            eta_list = np.linspace(1.e-5, 2*eta_tot*(1.-1.e-5), 60)
+                # choose a(eta) positive while eta[0] > 0 
+            if eta_list[0] * self.a(eta_list[0]).real > 0:
+                a_list = [round(float(self.a(eta).real), 5) for eta in eta_list]
+            else: 
+                a_list = [-round(float(self.a(eta).real), 5) for eta in eta_list]
+
+            Phi_list = []
+            for i in range(len(a_list)):
+                try:                      
+                    if self.k_curved == 0:
+                        Phi_list.append(Phi_flat(a_list[i]))
+                    else:
+                        Phi_list.append(Phi_curved(a_list[i]))
+                except:                   
+                    Phi_list.append(-1)
+            
+            Phi_list = [Phi / Phi_list[0] for Phi in Phi_list] 
+            plt.plot(eta_list, Phi_list, color=color_list[self.n], label="anal, kc="+str(round(self.k_curved, 2)))
+            plt.axvline(x=eta_tot, color=color_list[self.n], ls='--')
+
+        def plot_eta_Phi_num():
+            # plot numerical solution of Phi(eta)
+            Phi_sol = self.solve_Phi(Phi_i, Phi_dot_i, k_scale)
+            eta_list = Phi_sol.y[2]
+            # Phi_list = [Phi / Phi_list[0] for Phi in Phi_sol.y[0]] 
+            Phi_list = Phi_sol.y[0]
+
+            plt.plot(eta_list, Phi_list, label="num, kc="+str(round(self.k_curved, 2)))
+
+        plot_eta_Phi_anal()
         
         ######################
         # plot solution of Phi
@@ -258,19 +285,18 @@ class Universe:
 # plot V(a) or delta(a)
 ######################
 
-k_curved_list = [-0.5, -0.01, 0, 0.01, 0.5] 
-Phi_i, Phi_dot_i, k_scale = 1., 0., 10
+# k_curved_list = [-0.5, -0.01, 0, 0.01, 0.5] 
+# Phi_i, Phi_dot_i, k_scale = 1., 0., 10
 
-for n in range(len(k_curved_list)):
-    universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
-    universe.plot_delta(Phi_i, Phi_dot_i, k_scale)
-
-plt.xlabel(r"$a$", fontsize=30)
-plt.ylabel(r"$\delta(a)$", fontsize=30)
-plt.xticks(fontsize=28)
-plt.yticks(fontsize=28)
-plt.legend(fontsize=28)
-plt.savefig("a-delta.pdf")
+# for n in range(len(k_curved_list)):
+#     universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
+#     universe.plot_delta(Phi_i, Phi_dot_i, k_scale)
+# plt.xlabel(r"$a$", fontsize=30)
+# plt.ylabel(r"$\delta(a)$", fontsize=30)
+# plt.xticks(fontsize=28)
+# plt.yticks(fontsize=28)
+# plt.legend(fontsize=28)
+# plt.savefig("a-delta.pdf")
 
 ######################
 # plot solution of a 
@@ -294,7 +320,7 @@ plt.savefig("a-delta.pdf")
 
 
 ######################
-# plot solution of Phi
+# plot solution of Phi(a)
 ######################
 
 # k_curved_list = [-1.2, -0.6, 0.001, 0.6, 1.2]        
@@ -312,3 +338,22 @@ plt.savefig("a-delta.pdf")
 # plt.legend(fontsize=28)
 # plt.savefig("PhiHeun.pdf")
 
+######################
+# plot solution of Phi(eta)
+######################
+
+k_curved_list = [-1.2, -0.6, 0.001, 0.6, 1.2] 
+color_list = ['tab:blue', 'tab:orange','tab:green','tab:red','tab:purple']
+
+for n in range(len(k_curved_list)):
+    universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
+    Phi_i, Phi_dot_i, k_scale = 1., 0., 10
+    universe.plot_Phi(Phi_i, Phi_dot_i, k_scale)
+
+plt.xlabel(r"$\eta$", fontsize=30)
+plt.ylabel(r"$\Phi(\eta)$", fontsize=30)
+plt.xticks(fontsize=28)
+plt.yticks(fontsize=28)
+# plt.ylim([-5., 5.])
+plt.legend(fontsize=28)
+plt.savefig("eta-Phi.pdf")

@@ -24,7 +24,7 @@ End[]
 
 PsiIntCurved::usage = "PsiIntCurved[{a, ks, kc}]";
 Begin["Private`"]
-PsiIntCurved[{a_, ks_, kc_}] := N[ Re [2 * (ks^2+8*kc)^0.5 * (kc- (kc^2-1)^0.5)^0.5 * ( EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) - ((ks^2+6*kc)^2 - 4)^0.5), ArcSin[a/ (kc- (kc^2-1)^0.5 )^0.5] , ((kc^2-1)^0.5 -kc)^2 ] - EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) + ((ks^2+6*kc)^2 - 4)^0.5), ArcSin [a/ (kc- (kc^2-1)^0.5)^0.5] , ((kc^2-1)^0.5 -kc)^2 ] ) ]];
+PsiIntCurved[{a_, ks_, kc_}] := N[ Re [(ks^2+8*kc)^0.5 * (kc- (kc^2-1)^0.5)^0.5 * ( EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) - ((ks^2+6*kc)^2 - 4)^0.5), ArcSin[a/ (kc- (kc^2-1)^0.5 )^0.5] , ((kc^2-1)^0.5 -kc)^2 ] - EllipticPi[ - 1/2* (kc- (kc^2-1)^0.5) *( (ks^2+6*kc) + ((ks^2+6*kc)^2 - 4)^0.5), ArcSin [a/ (kc- (kc^2-1)^0.5)^0.5] , ((kc^2-1)^0.5 -kc)^2 ] ) ]];
 End[]
 
 PhiIntCurved::usage = "PhiIntCurved[{a, ks, kc}]";
