@@ -250,6 +250,7 @@ class Universe:
     
 
     def k_FCB_closed(self, n_k, n_range):
+        # Suppose the non-integer behavior comes from k^2 = k_int^2-3K
         
         kc, K, Omega_K = self.Find_kc(110, 20)
         k_int_list = np.linspace(n_k - n_range/2, n_k + n_range/2, n_range+1)
