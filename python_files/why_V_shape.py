@@ -31,6 +31,8 @@ amplitude = [ 1.28665642e-02+0.j, -3.97038545e-02+0.j,  8.44426750e-02+0.j,\
   9.52383345e-09+0.j, -1.01868436e-09+0.j,  1.67020324e-08+0.j,\
  -1.17667053e-09+0.j]
 
+
+
 phi = np.zeros_like(basis_1[0], dtype=complex)
 for i in range(len(basis_1)):
     phi += amplitude[i]* basis_1[i]

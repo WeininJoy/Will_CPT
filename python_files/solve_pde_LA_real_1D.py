@@ -47,11 +47,11 @@ if __name__=="__main__":
 
     # Parameters
     N = 15
-    N_t = 500
+    N_t = 300
     kappa = 1.5
     T = np.pi
     eigenvalues_threshold = 1.e-1
-    N_plot = 6
+    N_plot = 7
 
     t = np.linspace(0, T, N_t)
 
@@ -65,7 +65,8 @@ if __name__=="__main__":
    
     # Comute coefficient matrix A and its eigenvalues and eigenvectors
     eigenvalues_1, eigenvectors_1, eigenvalues_2, eigenvectors_2 = compute_A_matrix(orthonormal_functions_1, orthonormal_functions_2)
-
+    print(eigenvectors_1)
+    
     # Choose the egienvectors with eigenvalues close to 1
     eigenvalues_valid_1, eigenvectors_valid_1 = choose_eigenvalues(eigenvalues_1, eigenvectors_1, eigenvalues_threshold)
     eigenvalues_valid_2, eigenvectors_valid_2 = choose_eigenvalues(eigenvalues_2, eigenvectors_2, eigenvalues_threshold)
@@ -77,6 +78,8 @@ if __name__=="__main__":
     # Plot the solution
     if N_plot > len(eigenvalues_valid_1):
         N_plot = len(eigenvalues_valid_1)
+    fig, axs = plt.subplots(N_plot, figsize=(6,0.8*N_plot))
+    fig.suptitle(r"$\Phi(t)$")
     for i in range(N_plot):
         plt.subplot(N_plot, 1, i+1)
         solution_1 = np.zeros_like(t, dtype=complex)
@@ -88,13 +91,12 @@ if __name__=="__main__":
             solution_1 = -solution_1
         if solution_2.real[0] < 0:
             solution_2 = -solution_2
-        plt.plot(t, solution_1.real, 'b--', label="basis k")
-        plt.plot(t, solution_2.real, 'r:', label="basis n")
-        plt.ylabel(r"$\Phi(t)$")
+        axs[i].plot(t, solution_1.real, color='r', label=r"basis: $\phi$")
+        axs[i].plot(t, solution_2.real, color='g', linestyle='dashed', label=r"basis: $\tilde\phi$")
         
     plt.legend()
     plt.xlabel(r"$t$")
-    plt.savefig(f"eigenvalue_1d_N{N:d}_Nt{N_t:d}_test.pdf")
+    plt.savefig(f"eigenvalue_1d_N{N:d}_Nt{N_t:d}.pdf")
 
     def all():
         qr_decomposition(np.array(basis_1).T)

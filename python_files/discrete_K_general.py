@@ -32,7 +32,7 @@ class Universe:
         self.Omega_r = Omega_r_h2 / self.h**2
         self.Lambda = self.Omega_lambda * 3 * self.H0**2 / c**2 
         self.a0 = (self.Omega_lambda/ self.Omega_r)**0.25   # suppose a = 1 when the energy density of radiation and the DE are equal.
-
+        
     ###############
     # Flat universe
     ###############
@@ -57,8 +57,8 @@ class Universe:
         if kc > 1:
             result, err = quad(psi_curved, 0, self.a_tot(kc), args=(k, kc))
         else:
-            result, err = quad(psi_curved, 0, float('inf'), args=(k, kc))
-        return result
+            result, err = quad(psi_curved, 0, 1, args=(k, kc))
+        return 2*result
 
     def psi_int_anal(self, a, k, kc): 
         wolfSession = WolframLanguageSession()
@@ -66,7 +66,7 @@ class Universe:
         
         result = wolfSession.evaluate(wl.targetFunctions.PsiIntCurved((a, k, kc)))
         wolfSession.terminate()
-        return result
+        return 2* result
 
     def a_tot(self, kc): # when kc > 1 -> a_tot is finite 
         if kc > 1:
@@ -95,6 +95,47 @@ class Universe:
         else: 
             result = quad(lambda a: 1./a_dot(a), 0, self.a_tot(kc))
             return 2* result[0]
+        
+    def slope_kc_eta_tot(self, kc_list):
+        # for kc < 1 case
+        slope_list_with_matter = []
+        slope_list_without_matter = []
+        for kc in kc_list:
+            K = 2.* self.Lambda / 3. * kc
+            Omega_K = - K * c**2 / self.a0**2 / self.H0**2
+            a0_bar = c * np.sqrt(-1/Omega_K)/self.H0
+            k_trans_const = np.real(self.a0 / a0_bar.si.value / math.sqrt(self.Lambda.si.value))
+
+            # without matter
+            if kc < 1:
+                eta_tot = self.eta_tot(kc)
+                trans_slope = 2./np.pi* eta_tot/np.sqrt(3.)* k_trans_const
+                slope_list_without_matter.append(trans_slope)
+
+            # with matter
+            try:
+                Omega_m = 1 - Omega_K - self.Omega_lambda - self.Omega_r
+                m = Omega_m / self.Omega_lambda  # if Lambda=1 -> H0=1/sqrt(3 Omega_lambda) -> m = 3* H0^2 Omega_m=Omega_m/Omega_lambda 
+                def a_dot(a): return math.sqrt( 1./3. * ( 1 + m*a- 2*kc* a**2 + a**4 ) )
+                eta_tot = quad(lambda a: 1./a_dot(a), 0, np.inf)[0]
+                trans_slope = 2./np.pi* eta_tot/np.sqrt(3.)* k_trans_const
+                slope_list_with_matter.append(trans_slope)
+            except:
+                max_kc = kc
+                print("max kc=", kc)
+                break
+
+        plt.plot(kc_list[:len(slope_list_without_matter)], slope_list_without_matter, color='b', label = r"without matter")
+        plt.axvline(x = 1, color = 'b', linestyle='--')
+        plt.plot(kc_list[:len(slope_list_with_matter)], slope_list_with_matter, color='orange', label = r"with matter")
+        plt.axvline(x = max_kc, color = 'orange', linestyle='--')
+        plt.xlabel(r"$k_c$", fontsize=17)
+        plt.ylabel(r"Slope, should be $N$ or $1/N$", fontsize=17)
+        plt.ylim([0, 2.25])
+        plt.legend(fontsize=16)
+        plt.savefig("slope_kc_eta_tot.pdf")
+        
+
 
     ###############
     # plot K-theta(K) curves with different kc
@@ -102,20 +143,33 @@ class Universe:
     
     def plot_k_theta(self, k_list, kc_list):
       
+        plt.figure(figsize=(6.5,5))
+        plt.rcParams.update({'text.usetex': True, 'text.latex.preamble': r'\usepackage{amsfonts}'})
+        n = 0
         for kc in kc_list:
-            if kc < 1: # Note: for kc<1, a->infinity -> theta=2*psi(a=1)
-                a = 1
-                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list], label='num, kc='+str(round(kc,1)))
-                plt.plot(k_list, [2 * self.psi_int_anal(a, k, kc) for k in k_list], '--',label='anal, kc='+str(round(kc,1)))
+            K = 2.* self.Lambda / 3. * kc
+            Omega_K = - K * c**2 / self.a0**2 / self.H0**2
+            if kc < 1:
+                plt.plot(k_list, [2/np.pi*self.psi_int_curved(k, kc) for k in k_list],color=color_list[n] ,label=r'$\Omega_{K,0}=$'+str(round(Omega_K.si.value,3)))
+                # plt.plot(k_list, [2/np.pi*self.psi_int_anal(a, k, kc) for k in k_list], '--',label=r'anal, $k_c=$'+str(round(kc,1)))
             else:
-                a = self.a_tot(kc)
-                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],'-.', label='num, kc='+str(round(kc,1)))
-                plt.plot(k_list, [self.psi_int_anal(a, k, kc) for k in k_list], '--',label='anal, kc='+str(round(kc,1)))
+                plt.plot(k_list, [2/np.pi*self.psi_int_curved(k, kc) for k in k_list], '-.', color=color_list[n], label=r'$\Omega_{K,0}=$'+str(round(Omega_K.si.value,3)))
+                # plt.plot(k_list, [2/np.pi*self.psi_int_anal(a, k, kc) for k in k_list], '--',label=r'anal, $k_c=$'+str(round(kc,1)))
+            n += 1
 
-        plt.xlabel(r"$K$")
-        plt.ylabel(r"$\theta(K)$")
-        plt.legend()
-        plt.savefig("psi_diffK_num_anal.pdf")
+        plt.plot([4.3, 5.8], [7.2, 9.7],'--', color='r')
+        plt.text(5.2, 8.7, 'Slope', fontsize=15, color='r', ha='right', va='bottom')
+        # plt.xlabel(r"$\tilde{k}$", fontsize=15)
+        # plt.ylabel(r"$\frac{2}{\pi}\theta(\tilde{k})$", fontsize=15)
+        plt.xlabel(r"$k$, should be $n\in \mathbb{N}$", fontsize=17)
+        plt.ylabel(r"$\frac{2}{\pi}\theta$, should be $m\in \mathbb{N}$", fontsize=17)
+        plt.xlim([0, 6])
+        plt.ylim([0, 20])
+        plt.xticks([int(ele) for ele in np.linspace(0, 6, 7)], fontsize=16)
+        plt.yticks([int(ele) for ele in np.linspace(0, 19, 20)], fontsize=16)
+        plt.legend(fontsize=16)
+        plt.savefig("theta_diffK_closed.pdf")
+        # plt.savefig("theta_diffK_num_anal.pdf")
 
 
     ########################
@@ -156,7 +210,7 @@ class Universe:
                 theta_list = [self.psi_int_curved(k, kc) for k in k_list]
                 func_interpolate = interpolate.interp1d(k_int_list, theta_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
                 slope = 2./ np.pi * (func_interpolate(n_k) - func_interpolate(n_k-1)) / 1.     # calculate the slope at n_k
-
+                print("slope="+str(slope))
                 return slope
 
             ##### Calculate kc by root finder
@@ -306,13 +360,23 @@ class Universe:
         plt.savefig("theta_k_discrete.pdf")
 
 
-H0 = 70 * u.km/u.s/u.Mpc
-Omega_lambda = 0.73 
-Omega_r_h2 = 2.47e-5
+H0 = 70 * u.km/u.s/u.Mpc # 70
+Omega_lambda = 0.679  # 0.73
+Omega_r_h2 = 4.53e-5 # 2.47e-5
 
 universe = Universe(H0, Omega_lambda, Omega_r_h2)
-kc, K, Omega_K = universe.Find_kc(n_k=110, n_range=20)
-print('kc='+str(kc))
+
+k_list = np.linspace(0, 6, 50)
+# kc_list = [0,0.6,0.9, 0.99,0.999, 1.001, 1.01, 1.1, 2,3]
+# color_list = ['lightsteelblue', 'cornflowerblue', 'royalblue', 'blue', 'navy', 'darkblue', 'midnightblue']
+# kc_list = [0,0.6,0.9, 0.999]
+# universe.plot_k_theta(k_list, kc_list)
+
+kc_list = np.linspace(0, 1.5, 200)
+universe.slope_kc_eta_tot(kc_list)
+
+# kc, K, Omega_K = universe.Find_kc(n_k=110, n_range=20)
+# print('kc='+str(kc))
 
 ###############################
 # Plot the allowed curves in the Omega_K, Omega_Lambda plane
@@ -337,7 +401,7 @@ def plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k, n_rang
     ndim = len(use_params)
     # Make the base corner plot
     #figure = corner.corner(samples1[use_params], range=[(00.6, 0.72), (-0.02, 0.0)], bins=20, color='r')
-    figure = corner.corner(samples1[use_params],  bins=20, color='r')
+    figure = corner.corner(samples1[use_params],  bins=30, color='r')
     # Extract the axes
     axes = np.array(figure.axes).reshape((ndim, ndim))
 
@@ -346,17 +410,18 @@ def plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k, n_rang
     Omega_K_list = [universe.Find_kc(n_k, n_range)[2] for universe in universe_list]
 
     ax = axes[1, 0]
-    ax.plot(H0_list, Omega_K_list, label = r"$\Omega_{\lambda,0}="+str(Omega_lambda)+r", \Omega_{r,0}h^2=$"+'{:.2e}'.format(Omega_r_h2))
-    ax.set_xlabel(r"$H_0$", fontsize=10)
-    ax.set_ylabel(r"$\Omega_{\kappa,0}$", fontsize=10)
-    ax.legend(fontsize=8)
+    # ax.plot(H0_list, Omega_K_list, label = r"$\Omega_{\lambda,0}="+str(Omega_lambda)+r", \Omega_{r,0}h^2=$"+'{:.2e}'.format(Omega_r_h2))
+    ax.plot(H0_list, Omega_K_list, label = r"Slope$=1$")
+    ax.set_xlabel(r"$H_0$", fontsize=14)
+    ax.set_ylabel(r"$\Omega_{K,0}$", fontsize=14)
+    ax.legend(fontsize=11)
     plt.savefig("H0-OmegaK-withPlanck2018.pdf")
 
 
 ### Set parameters
 
-# H0_list = np.linspace(45, 65, 5) * u.km/u.s/u.Mpc
-# Omega_r_h2 = 2.46e-5
-# Omega_lambda = 0.56 # np.linspace(0.6, 0.72, 5)
+# H0_list = np.linspace(55, 70, 5) * u.km/u.s/u.Mpc
+# Omega_r_h2 = 4.53e-5 # 2.47e-5
+# Omega_lambda = 0.679  # 0.73
 
 # plot_OmegaK_OmegaLambda_plane(H0_list, Omega_lambda, Omega_r_h2, n_k=110, n_range=20)
