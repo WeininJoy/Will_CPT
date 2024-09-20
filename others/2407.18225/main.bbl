@@ -1,0 +1,204 @@
+\begin{thebibliography}{29}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+
+\bibitem[{Planck Collaboration}(2020)]{2020A&A...641A...6P}
+{Planck Collaboration}.
+\newblock {Planck 2018 results. VI. Cosmological parameters}.
+\newblock \emph{\aap}, 641:\penalty0 A6, September 2020.
+\newblock \doi{10.1051/0004-6361/201833910}.
+
+\bibitem[{Peskin} and {Schroeder}(1995)]{1995iqft.book.....P}
+Michael~E. {Peskin} and Daniel~V. {Schroeder}.
+\newblock \emph{{An Introduction to Quantum Field Theory}}.
+\newblock 1995.
+
+\bibitem[{Dicke}(1972)]{1972grun.book.....D}
+R.~H. {Dicke}.
+\newblock \emph{{Gravitation and the universe.}}
+\newblock 1972.
+
+\bibitem[{Carrigan} and {Trower}(1983)]{1983Natur.305..673C}
+Jr. {Carrigan}, R.~A. and W.~P. {Trower}.
+\newblock {Magnetic monopoles}.
+\newblock \emph{\nat}, 305\penalty0 (5936):\penalty0 673--678, October 1983.
+\newblock \doi{10.1038/305673a0}.
+
+\bibitem[{Weinberg}(1989)]{1989RvMP...61....1W}
+Steven {Weinberg}.
+\newblock {The cosmological constant problem}.
+\newblock \emph{Reviews of Modern Physics}, 61\penalty0 (1):\penalty0 1--23,
+  January 1989.
+\newblock \doi{10.1103/RevModPhys.61.1}.
+
+\bibitem[{Duff}(1994)]{1994CQGra..11.1387D}
+M.~J. {Duff}.
+\newblock {REVIEW ARTICLE: Twenty years of the Weyl anomaly}.
+\newblock \emph{Classical and Quantum Gravity}, 11\penalty0 (6):\penalty0
+  1387--1403, June 1994.
+\newblock \doi{10.1088/0264-9381/11/6/004}.
+
+\bibitem[{'t Hooft}(1976)]{1976PhRvL..37....8T}
+G.~{'t Hooft}.
+\newblock {Symmetry Breaking through Bell-Jackiw Anomalies}.
+\newblock \emph{\prl}, 37\penalty0 (1):\penalty0 8--11, July 1976.
+\newblock \doi{10.1103/PhysRevLett.37.8}.
+
+\bibitem[{Guth}(1981)]{1981PhRvD..23..347G}
+Alan~H. {Guth}.
+\newblock {Inflationary universe: A possible solution to the horizon and
+  flatness problems}.
+\newblock \emph{\prd}, 23\penalty0 (2):\penalty0 347--356, January 1981.
+\newblock \doi{10.1103/PhysRevD.23.347}.
+
+\bibitem[{Profumo} et~al.(2019){Profumo}, {Giani}, and
+  {Piattella}]{2019Univ....5..213P}
+Stefano {Profumo}, Leonardo {Giani}, and Oliver~F. {Piattella}.
+\newblock {An Introduction to Particle Dark Matter}.
+\newblock \emph{Universe}, 5\penalty0 (10):\penalty0 213, October 2019.
+\newblock \doi{10.3390/universe5100213}.
+
+\bibitem[{Peccei} and {Quinn}(1977)]{1977PhRvL..38.1440P}
+R.~D. {Peccei} and Helen~R. {Quinn}.
+\newblock {CP conservation in the presence of pseudoparticles}.
+\newblock \emph{\prl}, 38\penalty0 (25):\penalty0 1440--1443, June 1977.
+\newblock \doi{10.1103/PhysRevLett.38.1440}.
+
+\bibitem[{Clifton} et~al.(2012){Clifton}, {Ferreira}, {Padilla}, and
+  {Skordis}]{2012PhR...513....1C}
+Timothy {Clifton}, Pedro~G. {Ferreira}, Antonio {Padilla}, and Constantinos
+  {Skordis}.
+\newblock {Modified gravity and cosmology}.
+\newblock \emph{\physrep}, 513\penalty0 (1):\penalty0 1--189, March 2012.
+\newblock \doi{10.1016/j.physrep.2012.01.001}.
+
+\bibitem[{ACT Collaboration}(2024)]{2024ApJ...966..157F}
+ ACT Collaboration.
+\newblock {The Atacama Cosmology Telescope: Cosmology from Cross-correlations
+  of unWISE Galaxies and ACT DR6 CMB Lensing}.
+\newblock \emph{\apj}, 966\penalty0 (2):\penalty0 157, May 2024.
+\newblock \doi{10.3847/1538-4357/ad31a5}.
+
+\bibitem[{Boyle} et~al.(2018){Boyle}, {Finn}, and {Turok}]{2018PhRvL.121y1301B}
+Latham {Boyle}, Kieran {Finn}, and Neil {Turok}.
+\newblock {C P T -Symmetric Universe}.
+\newblock \emph{\prl}, 121\penalty0 (25):\penalty0 251301, December 2018.
+\newblock \doi{10.1103/PhysRevLett.121.251301}.
+
+\bibitem[{Boyle} et~al.(2022{\natexlab{a}}){Boyle}, {Finn}, and
+  {Turok}]{2022AnPhy.43868767B}
+Latham {Boyle}, Kieran {Finn}, and Neil {Turok}.
+\newblock {The Big Bang, CPT, and neutrino dark matter}.
+\newblock \emph{Annals of Physics}, 438:\penalty0 168767, March
+  2022{\natexlab{a}}.
+\newblock \doi{10.1016/j.aop.2022.168767}.
+
+\bibitem[{Boyle} and {Turok}(2021{\natexlab{a}})]{2021arXiv211006258B}
+Latham {Boyle} and Neil {Turok}.
+\newblock {Cancelling the vacuum energy and Weyl anomaly in the standard model
+  with dimension-zero scalar fields}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2110.06258, October
+  2021{\natexlab{a}}.
+\newblock \doi{10.48550/arXiv.2110.06258}.
+
+\bibitem[{Boyle} et~al.(2022{\natexlab{b}}){Boyle}, {Teuscher}, and
+  {Turok}]{2022arXiv220810396B}
+Latham {Boyle}, Martin {Teuscher}, and Neil {Turok}.
+\newblock {The Big Bang as a Mirror: a Solution of the Strong CP Problem}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2208.10396, August
+  2022{\natexlab{b}}.
+\newblock \doi{10.48550/arXiv.2208.10396}.
+
+\bibitem[{Boyle} and {Turok}(2024)]{2024PhLB..84938442B}
+Latham {Boyle} and Neil {Turok}.
+\newblock {Thermodynamic solution of the homogeneity, isotropy and flatness
+  puzzles (and a clue to the cosmological constant)}.
+\newblock \emph{Physics Letters B}, 849:\penalty0 138442, February 2024.
+\newblock \doi{10.1016/j.physletb.2024.138442}.
+
+\bibitem[{Turok} and {Boyle}(2023)]{2023arXiv230200344T}
+Neil {Turok} and Latham {Boyle}.
+\newblock {A Minimal Explanation of the Primordial Cosmological Perturbations}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2302.00344, February 2023.
+\newblock \doi{10.48550/arXiv.2302.00344}.
+
+\bibitem[{Gibbons} and {Hawking}(1977)]{1977PhRvD..15.2752G}
+G.~W. {Gibbons} and S.~W. {Hawking}.
+\newblock {Action integrals and partition functions in quantum gravity}.
+\newblock \emph{\prd}, 15\penalty0 (10):\penalty0 2752--2756, May 1977.
+\newblock \doi{10.1103/PhysRevD.15.2752}.
+
+\bibitem[{Turok} and {Boyle}(2024)]{2024PhLB..84938443T}
+Neil {Turok} and Latham {Boyle}.
+\newblock {Gravitational entropy and the flatness, homogeneity and isotropy
+  puzzles}.
+\newblock \emph{Physics Letters B}, 849:\penalty0 138443, February 2024.
+\newblock \doi{10.1016/j.physletb.2024.138443}.
+
+\bibitem[{Lasenby} et~al.(2022){Lasenby}, {Handley}, {Bartlett}, and
+  {Negreanu}]{2022PhRvD.105h3514L}
+A.~N. {Lasenby}, W.~J. {Handley}, D.~J. {Bartlett}, and C.~S. {Negreanu}.
+\newblock {Perturbations and the future conformal boundary}.
+\newblock \emph{\prd}, 105\penalty0 (8):\penalty0 083514, April 2022.
+\newblock \doi{10.1103/PhysRevD.105.083514}.
+
+\bibitem[{Bartlett} et~al.(2022){Bartlett}, {Handley}, and
+  {Lasenby}]{2022PhRvD.105h3515B}
+D.~J. {Bartlett}, W.~J. {Handley}, and A.~N. {Lasenby}.
+\newblock {Improved cosmological fits with quantized primordial power spectra}.
+\newblock \emph{\prd}, 105\penalty0 (8):\penalty0 083515, April 2022.
+\newblock \doi{10.1103/PhysRevD.105.083515}.
+
+\bibitem[{Prathaban} and {Handley}(2022)]{2022PhRvD.105l3508P}
+Metha {Prathaban} and Will {Handley}.
+\newblock {Rescuing palindromic universes with improved recombination
+  modeling}.
+\newblock \emph{\prd}, 105\penalty0 (12):\penalty0 123508, June 2022.
+\newblock \doi{10.1103/PhysRevD.105.123508}.
+
+\bibitem[{Di Valentino} et~al.(2020){Di Valentino}, {Melchiorri}, and
+  {Silk}]{2020NatAs...4..196D}
+Eleonora {Di Valentino}, Alessandro {Melchiorri}, and Joseph {Silk}.
+\newblock {Planck evidence for a closed Universe and a possible crisis for
+  cosmology}.
+\newblock \emph{Nature Astronomy}, 4:\penalty0 196--203, February 2020.
+\newblock \doi{10.1038/s41550-019-0906-9}.
+
+\bibitem[{Handley}(2021)]{2021PhRvD.103d1301H}
+Will {Handley}.
+\newblock {Curvature tension: Evidence for a closed universe}.
+\newblock \emph{\prd}, 103\penalty0 (4):\penalty0 L041301, February 2021.
+\newblock \doi{10.1103/PhysRevD.103.L041301}.
+
+\bibitem[{Glanville} et~al.(2022){Glanville}, {Howlett}, and
+  {Davis}]{2022MNRAS.517.3087G}
+Aaron {Glanville}, Cullan {Howlett}, and Tamara {Davis}.
+\newblock {Full-shape galaxy power spectra and the curvature tension}.
+\newblock \emph{\mnras}, 517\penalty0 (2):\penalty0 3087--3100, December 2022.
+\newblock \doi{10.1093/mnras/stac2891}.
+
+\bibitem[{Efstathiou} and {Gratton}(2020)]{2020MNRAS.496L..91E}
+George {Efstathiou} and Steven {Gratton}.
+\newblock {The evidence for a spatially flat Universe}.
+\newblock \emph{\mnras}, 496\penalty0 (1):\penalty0 L91--L95, July 2020.
+\newblock \doi{10.1093/mnrasl/slaa093}.
+
+\bibitem[{Boyle} and {Turok}(2021{\natexlab{b}})]{2021arXiv210906204B}
+Latham {Boyle} and Neil {Turok}.
+\newblock {Two-Sheeted Universe, Analyticity and the Arrow of Time}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2109.06204, September
+  2021{\natexlab{b}}.
+\newblock \doi{10.48550/arXiv.2109.06204}.
+
+\bibitem[{Tram}(2017)]{2017CCoPh..22..852T}
+Thomas {Tram}.
+\newblock {Computation of Hyperspherical Bessel Functions}.
+\newblock \emph{Communications in Computational Physics}, 22\penalty0
+  (3):\penalty0 852--862, September 2017.
+\newblock \doi{10.4208/cicp.OA-2016-0071}.
+
+\end{thebibliography}

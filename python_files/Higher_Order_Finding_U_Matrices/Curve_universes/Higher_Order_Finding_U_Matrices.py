@@ -15,7 +15,7 @@ OmegaLambda = 0.68 # in Metha's code, OmegaLambda = 0.679 --> OmegaK = 0
 OmegaM = 0.33 # in Metha's code, OmegaM = 0.321
 OmegaR = 9.24e-5
 OmegaK = 1 - OmegaLambda - OmegaM - OmegaR
-H0 = 1/np.sqrt(3*OmegaLambda); #we are working in units of Lambda=c=1
+H0 = 1/np.sqrt(3*OmegaLambda) #we are working in units of Lambda=c=1
 
 #set tolerances
 atol = 1e-13

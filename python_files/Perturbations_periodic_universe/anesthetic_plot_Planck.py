@@ -11,28 +11,7 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams["font.family"] = "serif"
 plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 
-# https://stackoverflow.com/questions/37765197/darken-or-lighten-a-color-in-matplotlib
-def lighten_color(color, amount=0.5):
-    """
-    Lightens the given color by multiplying (1-luminosity) by the given amount.
-    Input can be matplotlib color string, hex string, or RGB tuple.
-
-    Examples:
-    >> lighten_color('g', 0.3)
-    >> lighten_color('#F034A3', 0.6)
-    >> lighten_color((.3,.55,.1), 0.5)
-    """
-    import matplotlib.colors as mc
-    import colorsys
-    try:
-        c = mc.cnames[color]
-    except:
-        c = color
-    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
-    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
-
-
-omegarh2 = 4.53e-5
+omegarh2 = 2.47e-5 
 
 ns = read_chains('/home/wnd22/Documents/Research/PlanckData_2018/base_omegak/plikHM_TTTEEE_lowl_lowE/base_omegak_plikHM_TTTEEE_lowl_lowE')
 column_names_raw = np.loadtxt('/home/wnd22/Documents/Research/PlanckData_2018/base_omegak/plikHM_TTTEEE_lowl_lowE/base_omegak_plikHM_TTTEEE_lowl_lowE.paramnames', dtype=str, usecols=[0])
@@ -63,7 +42,7 @@ ns.plot_2d(ax, **kwargs, color='orange', label="Planck 2018")
 
 
 discrete_kappa = [0.113284, 0.238231, 0.671658, 0.98607, 0.99969] # slope = [1/3, 1/2, 1, 2, 3] respectively 
-color_list = [lighten_color('b', 0.25* (n+1)) for n in range(7)] # slope = [1/5, 1/4, 1/3, 1/2, 1, 2, 3] respectively 
+color_list = ['aliceblue', 'lightcyan', 'lightblue', 'lightskyblue', 'deepskyblue', 'blue', 'darkblue'] # slope = [1/5, 1/4, 1/3, 1/2, 1, 2, 3] respectively 
 
 for n in range(len(discrete_kappa)):
     kappa = discrete_kappa[n]

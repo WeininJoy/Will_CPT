@@ -1,0 +1,11 @@
+1. a_eta_Latham.nb: a_eta solution from Latham's paper [2210.01142]
+2. a_eta_Latham_Lasenby_compare.nb: compare the a_eta solution from Latham with the one from Lasenby's paper [2104.02521]
+3. FCB_for_numerical_perturbation.nb and IC_for_numerical_perturbation.nb: calculate the variables' final and initial values through power series expansion.
+4. OGRE_perturbation_eq.nb: get perturbation equations from Einstein equation (use OGRE package)
+5. Preturbatiob_solution.nb: the analytic solution of perturbations (Heun and integration form), old equation
+6. simplier_Heun_sol_Latham.nb: perturbation Heun solution of new equation (from Latham)
+7. integral_form_psi_fromWill.nb: try to simplify the solution with integration form (from Will)
+8. Phi_eta_complex.nb: try to extend the perturbation solution to complex eta plane
+9. Slope_theta_k.nb: calculate slope of theta_k from the perturbation solution with integration form
+10. theta_eta_tot.nb: show that theta~eta_tot/sqrt(3) in high-k mode.
+11. imag_eta_contraint_params.nb: use both real and imaginary eta_tot to constrain cosmological parameters. 
