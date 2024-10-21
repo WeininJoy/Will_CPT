@@ -6,25 +6,43 @@ Created on Tue Apr  6 22:03:58 2021
 """
 
 from scipy.integrate import solve_ivp
+from scipy.optimize import root_scalar
 import numpy as np
 
 #working in units 8piG = Lambda = c = hbar = kB = 1 throughout
 
-#set cosmological parameters from Planck baseline
-OmegaLambda = 0.679
-OmegaM = 0.321
-OmegaR = 9.24e-5
-H0 = 1/np.sqrt(3*OmegaLambda); #we are working in units of Lambda=c=1
+#set cosmological parameters
+OmegaLambda = 0.68
+H0 = 1/np.sqrt(3*OmegaLambda) #we are working in units of Lambda=c=1
+lam = 1
+rt = 1
+mt = 400
+kt = 0.5
+
+def solve_a0(omega_lambda, rt, mt, kt):
+    def f(a0):
+        return (1./omega_lambda -1)*a0**4 + 3*kt*a0**2 - mt*a0 - rt
+    sol = root_scalar(f, bracket=[1, 1.e3])
+    return sol.root
+
+def transform(omega_lambda, rt, mt, kt):
+    a0 = solve_a0(omega_lambda, rt, mt, kt)
+    print("a0 = ", a0)
+    omega_r = omega_lambda / a0**4
+    omega_m = mt * omega_lambda**(1/4) * omega_r**(3/4)
+    omega_kappa = -3* kt * np.sqrt(omega_lambda* omega_r)
+    return a0, omega_lambda, omega_r, omega_m, omega_kappa
+
+a_now, OmegaLambda, OmegaR, OmegaM, OmegaK = transform(OmegaLambda, rt, mt, kt)
+print('a0, OmegaLambda, OmegaR, OmegaM, OmegaK=', a0, OmegaLambda, OmegaR, OmegaM, OmegaK)
 
 #set tolerances
 atol = 1e-13
 rtol = 1e-13
 stol = 1e-10
-num_variables = 75 # number of pert variables, 75 for original code
+num_variables = 20 # number of pert variables, 75 for original code
 swaptime = 2 #set time when we swap from s to sigma
-endtime = 6.15 # integrating from endtime to recombination time, instead of from FCB -> prevent numerical issues
-deltaeta = 6.150659839680297 - endtime 
-deltaeta = 6.6e-4
+deltaeta = 6.6e-7 # integrating from endtime-deltaeta to recombination time, instead of from FCB -> prevent numerical issues
 Hinf = H0*np.sqrt(OmegaLambda)
 
 #```````````````````````````````````````````````````````````````````````````````
@@ -33,28 +51,29 @@ Hinf = H0*np.sqrt(OmegaLambda)
 
 #write derivative function for background
 def ds_dt(t, s):
-    return -1*H0*np.sqrt((OmegaLambda + OmegaM*abs(((s**3))) + OmegaR*abs((s**4))))
+    return -1*H0*np.sqrt((OmegaLambda + OmegaK*abs((s**2)) + OmegaM*abs(((s**3))) + OmegaR*abs((s**4))))
 
 t0 = 1e-8
 
 #set coefficients for initial conditions
 smin1 = np.sqrt(3*OmegaLambda/OmegaR)
 szero = - OmegaM/(4*OmegaR)
-s1 = (OmegaM**2)/(16*np.sqrt(3*OmegaLambda*OmegaR**3))
-s2 = -(OmegaM**3)/(192*OmegaLambda*OmegaR**2)  # chamge sign here
-# s3 = (5*OmegaM**4 - 128*OmegaLambda*(OmegaR**3))/(3840*np.sqrt(3*(OmegaR**5)*(OmegaLambda**3)))
-# s4 = -(OmegaM**5)/(9216*(OmegaR**3)*(OmegaLambda**2))
+s1 = (OmegaM**2)/(16*np.sqrt(3*OmegaLambda*OmegaR**3)) - OmegaK/(6*np.sqrt(3*OmegaLambda*OmegaR))
+s2 = - (OmegaM**3)/(192*OmegaLambda*OmegaR**2) + OmegaK*OmegaM/(48*OmegaLambda*OmegaR) 
 
-# s0 = smin1/t0 + szero + s1*t0 + s2*t0**2 + s3*t0**3 + s4*t0**4
-s0 = smin1/t0 + szero + s1*t0 + s2*t0**2 
+s0 = smin1/t0 + szero + s1*t0 + s2*t0**2
 
 print('Performing Initial Background Integration')
-sol = solve_ivp(ds_dt, [t0,12], [s0], max_step = 0.25e-4, method='LSODA', atol=atol, rtol=rtol)
+
+def reach_FCB(t, s): return s[0]
+reach_FCB.terminal = True
+
+sol = solve_ivp(ds_dt, [t0,12], [s0], max_step = 0.25e-4, events=reach_FCB, method='LSODA', atol=atol, rtol=rtol)
 print('Initial Background Integration Done')
 
-idxfcb = np.where(np.diff(np.sign(sol.y[0])) != 0)[0]
-fcb_time = 0.5*(sol.t[idxfcb[0]] + sol.t[idxfcb[0] + 1])
-print('FCB time = ',fcb_time)
+fcb_time = sol.t_events[0][0]
+print('FCB time=', fcb_time)
+endtime = fcb_time - deltaeta
 
 #``````````````````````````````````````````````````````````````````````````````
 #RECOMBINATION CONFORMAL TIME
@@ -74,7 +93,7 @@ recConformalTime = sol.t[recScaleFactorDifference.argmin()]
 
 def dX1_dt(t,X):
     sigma, phi, dr, dm, vr, vm = X  # sigma is log(s)
-    sigmadot = -(H0)*np.sqrt((OmegaLambda*np.exp(-2*sigma)+OmegaM*np.exp(sigma)
+    sigmadot = -(H0)*np.sqrt((OmegaLambda*np.exp(-2*sigma)+OmegaK+OmegaM*np.exp(sigma)
                             +OmegaR*np.exp(2*sigma)))
     
     #calculate densities of matter and radiation
@@ -91,7 +110,7 @@ def dX1_dt(t,X):
 def dX2_dt(t,X):
     #print(t);
     s,phi,psi,dr,dm,vr,vm,fr2 = X[0:8]
-    sdot = -1*H0*np.sqrt((OmegaLambda + OmegaM*abs(((s**3))) + OmegaR*abs((s**4))))
+    sdot = -1*H0*np.sqrt((OmegaLambda + OmegaK*abs(((s**2)))+ OmegaM*abs(((s**3))) + OmegaR*abs((s**4))))
 
     #calculate densities of matter and radiation
     rho_m = 3*(H0**2)*OmegaM*(abs(s)**3)
@@ -102,7 +121,7 @@ def dX2_dt(t,X):
     psidot = phidot - (1/k**2)*(6*(H0**2)*OmegaR*s)*(sdot*fr2 + 0.5*s*fr2dot)
     drdot = (4/3)*(3*phidot + (k**2)*vr)
     dmdot = 3*phidot + vm*(k**2)
-    vrdot = -(psi + dr/4) + fr2/2
+    vrdot = -(psi + dr/4) + (1 + 3*OmegaK*H0**2/k**2)*fr2/2
     vmdot = (sdot/s)*vm - psi
     derivatives = [sdot, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
     #for l>2 terms, add derivates to above list
@@ -121,7 +140,7 @@ def dX2_dt(t,X):
 
 def dX3_dt(t,X):
     sigma,phi,psi,dr,dm,vr,vm,fr2 = X[0:8]
-    sigmadot = -(H0)*np.sqrt((OmegaLambda*np.exp(-2*sigma)+OmegaM*np.exp(sigma)
+    sigmadot = -(H0)*np.sqrt((OmegaLambda*np.exp(-2*sigma)+OmegaK+OmegaM*np.exp(sigma)
                             +OmegaR*np.exp(2*sigma)))
     #calculate densities of matter and radiation
     rho_m = 3*(H0**2)*OmegaM*(np.exp(3*sigma))
@@ -132,7 +151,7 @@ def dX3_dt(t,X):
     psidot = phidot - (1/k**2)*(6*(H0**2)*OmegaR*np.exp(sigma))*(sigmadot*np.exp(sigma)*fr2 + 0.5*np.exp(sigma)*fr2dot)
     drdot = (4/3)*(3*phidot + (k**2)*vr)
     dmdot = 3*phidot + vm*(k**2)
-    vrdot = -(psi + dr/4) + fr2/2
+    vrdot = -(psi + dr/4) + (1 + 3*OmegaK*H0**2/k**2)*fr2/2
     vmdot = (sigmadot)*vm - psi
     derivatives = [sigmadot, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
     #for l>2 terms, add derivates to above list
@@ -164,7 +183,7 @@ at_fcb.terminal = True
 # For each K, find ACmatrices, BDvectors and Xmatrices
 #-------------------------------------------------------------------------------
 
-kvalues = np.linspace(1e-5,15,num=300) # originally, num=300
+kvalues = np.linspace(1e-4,15,num=300) # originally: kvalues = np.linspace(1e-5,15,num=300)
 ABCmatrices = []
 DEFmatrices = []
 GHIvectors = []

@@ -9,15 +9,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-num_variables = 75  # number of pert variables, 75 for original code
+num_variables = 20  # number of pert variables, 75 for original code
 
-kvalues = np.load('./Origin/L70_kvalues.npy')
-ABCmatrices = np.load('./Origin/L70_ABCmatrices.npy')
-DEFmatrices = np.load('./Origin/L70_DEFmatrices.npy')
-GHIvectors = np.load('./Origin/L70_GHIvectors.npy')
-X1matrices = np.load('./Origin/L70_X1matrices.npy')
-X2matrices = np.load('./Origin/L70_X2matrices.npy')
-recValues = np.load('./Origin/L70_recValues.npy')
+kvalues = np.load('L70_kvalues.npy')
+ABCmatrices = np.load('L70_ABCmatrices.npy')
+DEFmatrices = np.load('L70_DEFmatrices.npy')
+GHIvectors = np.load('L70_GHIvectors.npy')
+X1matrices = np.load('L70_X1matrices.npy')
+X2matrices = np.load('L70_X2matrices.npy')
+recValues = np.load('L70_recValues.npy')
 
 #first extract A and D matrices from results
 
@@ -72,7 +72,7 @@ dmfcb = []
 vmdotfcb = []
 yrecs = []
 
-for j in range(len(kvalues)):
+for j in range(1,len(kvalues)):
     
     A = Amatrices[j]
     D = Dmatrices[j]
@@ -90,11 +90,11 @@ for j in range(len(kvalues)):
     #calculate full matrix but then remove top two rows
     AX1 = A.reshape(6,6) @ X1.reshape(6,4)
     DX2 = D.reshape(6,2) @ X2.reshape(2,4)
-    matrixog = AX1 + DX2 # + GX3
+    matrixog = AX1 + DX2 + GX3
     matrix = matrixog[[2,3,4,5], :]
     
     xrecs = [recs[2], recs[3], recs[4], recs[5]]
-
+    
     xinf = np.linalg.solve(matrix, xrecs)
     vrfcb.append(xinf[2])
     drfcb.append(xinf[0])
@@ -109,27 +109,12 @@ for j in range(len(kvalues)):
 
 #np.save('L70_vrfcb', vrfcb);
 
-
-# idxzeros = np.where(np.diff(np.sign(vrfcb)) != 0)[0]
-# allowedK = kvalues[idxzeros]
-
 idxzeros = np.where(np.diff(np.sign(vrfcb)) != 0)[0]
-allowedK = []
-for idx in idxzeros:
-    k1 = kvalues[idx]
-    k2 = kvalues[idx+1]
-    vrfcb1 = vrfcb[idx]
-    vrfcb2 = vrfcb[idx+1]
-    allowK = k1 - vrfcb1 * (k2 - k1) / (vrfcb2 - vrfcb1)
-    allowedK.append(allowK)
-# np.save('allowedK', allowedK)
+allowedK = kvalues[idxzeros]
 print(allowedK)
+print('delta K:',[allowedK[i+1] - allowedK[i] for i in range(len(allowedK)-1)] )
+np.save('allowedK', allowedK)
 
-deltaK_list = [allowedK[i+1] - allowedK[i] for i in range(len(allowedK)-1)]
-print('Delta K list = ', deltaK_list)
-deltaK = sum(deltaK_list[len(deltaK_list)//2:-2]) / len(deltaK_list[len(deltaK_list)//2:-2])
-print('Delta K = ', deltaK)
-
-plt.plot(kvalues, vrfcb)
+plt.plot(kvalues[1:], vrfcb)
 plt.plot(allowedK, np.zeros_like(allowedK), 'ro')
 plt.savefig('L70_vrfcb.pdf')
