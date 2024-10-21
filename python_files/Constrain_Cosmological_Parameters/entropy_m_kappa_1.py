@@ -119,7 +119,7 @@ class Universe:
         def f(a0):
             return (1./omega_lambda -1)*a0**4 + 3*kt*a0**2 - mt*a0 - rt
         a0 = brentq(f, 1., 3.)
-        return a0.x[0]
+        return a0
 
     def transform_kt1_3(self, omega_lambda, rt, mt, kt):
         a0 = self.solve_a0(omega_lambda, rt, mt, kt)

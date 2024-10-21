@@ -293,7 +293,7 @@ class Universe:
         ax.set_title(r"$S_g/S_{\Lambda}$ contour plot")
         ax.set_xlabel(r"$\tilde{\kappa}$")
         ax.set_ylabel(r"$\tilde{m}$")
-        ax.figure.savefig("entropy_g_contour_wholeRage.pdf", bbox_inches="tight")
+        ax.figure.savefig("entropy_g_contour.pdf", bbox_inches="tight")
 
         #####################
         # reproduce Fig. 2 in [2210.01142]
@@ -392,6 +392,7 @@ class Universe:
         kt_list, mt_list = self.find_kt_mt_on_contour(level)
         func_interpolate = interpolate.interp1d(mt_list, kt_list, fill_value="extrapolate")  # Use interpolator to construct interpolated function
         kt_values = func_interpolate(mt_values)
+        print("kt=", kt_values)
         return kt_values
     
     def expectation_value_mt(self):
@@ -417,9 +418,9 @@ rt = 1 # dimensionless radiation = r/lam
 universe = Universe(lam, rt, 0)
 # universe.plot_entropy_3D()
 
-mt = 580
-kt = universe.find_kt_for_mt(mt, 1./3)
-print(universe.transform(0.7, 1, mt, kt))
+mt = 430
+kt = universe.find_kt_for_mt(mt, 1./2.)
+print(universe.transform(0.68, 1, mt, kt))
 # print(universe.transform(0.7, 1, 1.7, 0.01))
 # print(universe.transform(0.7, 1, 1.6080402010050252, 0.0617093944077409))
 # print(universe.transform(0.7, 1, 6., 0.0617093944077409))

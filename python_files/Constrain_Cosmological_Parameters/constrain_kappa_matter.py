@@ -49,11 +49,11 @@ class Universe:
         return rho
 
     def ReEta(self, mm, rho):
-        ReEta = 2 * ellipk(mm)/rho
+        ReEta = ellipk(mm)/rho
         return ReEta
 
     def ImEta(self, mm, rho):
-        ImEta = 2 * ellipk(1 - mm)/rho
+        ImEta = ellipk(1 - mm)/rho
         return ImEta
     
     def divide(self, kt, mt):
@@ -129,10 +129,9 @@ class Universe:
 lam = 1
 rt = 1 # dimensionless radiation = r/lam
 universe = Universe(lam, rt, 0)
-universe.plot_eta_divide()
+# universe.plot_eta_divide()
 # print(universe.slope(0.3, 3.6)/np.pi*2)
 # print(universe.divide(0.3, 3.6))
 # kt, mt = universe.find_k_m()
 # print('kt =', kt)
 # print('mt =', mt)
-

@@ -12,3 +12,4 @@ for mt in mt_list:
     plt.plot(a_list, f(a_list, omega_lambda, kt, mt, rt), label = rf'$\tilde m$ = {mt}')
 plt.legend()
 plt.show()
+

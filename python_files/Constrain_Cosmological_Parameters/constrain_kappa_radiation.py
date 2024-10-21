@@ -49,11 +49,11 @@ class Universe:
         return zeta
 
     def ReEta(self, mm, zeta):
-        ReEta = 2 * ellipk(mm)/zeta
+        ReEta = ellipk(mm)/zeta
         return ReEta
 
     def ImEta(self, mm, zeta):
-        ImEta = 2 * ellipk(1 - mm)/zeta
+        ImEta = ellipk(1 - mm)/zeta
         return ImEta
     
     def divide(self, kt, rt):
