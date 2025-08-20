@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+class_weighting_env/
+venv/
+env/
+ENV/
+
+# CLASS compilation artifacts
+class_nu_spacing_weighting/build/
+class_nu_spacing_weighting/libclass.a
+class_nu_spacing_weighting/class
+class_nu_spacing_weighting/python/build/
+class_nu_spacing_weighting/python/dist/
+class_nu_spacing_weighting/python/classy.egg-info/
+class_nu_spacing_weighting/python/classy.cpp
+class_nu_spacing_weighting/output/
+
+# Backup and temporary folders
+class_nu_spacing_original/
+class_weiting_try1/
+content_class_weighting_try1/
+
+# Generated data and plots
+*.pdf
+*.png
+*.npy
+*.dat
+*.npz
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
