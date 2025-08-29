@@ -17,18 +17,49 @@ import matplotlib.pyplot as plt
 import time
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
+from scipy.optimize import root_scalar
 
 # =============================================================================
 # SECTION 1: FULL SOLUTION GENERATION ENGINE (MODIFIED FOR v_r)
 # =============================================================================
 start_time = time.time()
 folder_path = './data/'
-# --- Cosmological Parameters and Setup (No changes here) ---
+## --- Cosmological Parameters from Planck based_omegak best-fit values ---
 h = 0.5409; Omega_gamma_h2 = 2.47e-5; Neff = 3.046
 OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
 OmegaM, OmegaK = 0.483, -0.0438
 OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
 z_rec = 1089.411
+
+## --- Best-fit parameters for nu_spacing =4 ---
+# lam = 1
+# rt = 1
+# Omega_gamma_h2 = 2.47e-5 # photon density 
+# Neff = 3.046
+
+# def cosmological_parameters(mt, kt, h): 
+
+#     Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+
+#     def solve_a0(Omega_r, rt, mt, kt):
+#         def f(a0):
+#             return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+#         sol = root_scalar(f, bracket=[1, 1.e3])
+#         return sol.root
+
+#     a0 = solve_a0(Omega_r, rt, mt, kt)
+#     s0 = 1/a0
+#     Omega_lambda = Omega_r * a0**4
+#     Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+#     Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+#     return s0, Omega_lambda, Omega_m, Omega_K
+
+# # Best-fit parameters from nu_spacing=4
+# mt, kt, h, Omegab_ratio, A_s, n_s, tau_reio = 401.38626259929055, 1.4181566171960542, 0.16686454899542, 0.5635275092831583, 1.9375648884116028, 0.9787493821596979, 0.019760560255556746
+# s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+# OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+# z_rec = 1089.411  # the actual value still needs to be checked
+###############################################################################
 
 # assume s0 = 1/a0 = 1
 a0 = 1; s0 = 1/a0; H0 = np.sqrt(1 / (3 * OmegaLambda)); Hinf = H0 * np.sqrt(OmegaLambda)
@@ -93,8 +124,8 @@ def create_matrix_interpolator(k, m): return lambda k_val: np.array([[interp1d(k
 def create_vector_interpolator(k, v): return lambda k_val: np.array([interp1d(k, v[:,i], bounds_error=False, fill_value="extrapolate")(k_val) for i in range(v.shape[1])])
 get_A, get_D, get_X1, get_X2, get_recs = create_matrix_interpolator(k_grid_data, Amatrices), create_matrix_interpolator(k_grid_data, Dmatrices), create_matrix_interpolator(k_grid_data, X1matrices), create_matrix_interpolator(k_grid_data, X2matrices), create_vector_interpolator(k_grid_data, recValues)
 
-# --- MODIFIED Full Solution Generation Function for v_r ---
-def generate_vr_solution_to_fcb(k):
+# --- MODIFIED Full Solution Generation Function ---
+def generate_solution_to_fcb(k, perturbation_type='vr'): # default is 'vr'
     """
     Generates the COMPLETE v_r(eta) solution from Big Bang to FCB for a given k.
     Returns a time array and the corresponding v_r solution array.
@@ -108,9 +139,6 @@ def generate_vr_solution_to_fcb(k):
         x_inf = np.linalg.solve(M_matrix, x_rec_subset)
     except np.linalg.LinAlgError:
         print(f"Warning: Could not solve for x_inf for k={k}. Using zeros."); x_inf = np.zeros(4)
-    
-    # *** CHANGE: The value at the FCB is now vr_inf ***
-    vr_inf = x_inf[2]
     
     # Calculate initial conditions at eta'
     x_prime, y_prime_2_4 = X1 @ x_inf, X2 @ x_inf
@@ -141,15 +169,35 @@ def generate_vr_solution_to_fcb(k):
     t_left = np.concatenate((sol_perfect.t, t_backward[::-1], [fcb_time]))
     
     # *** CHANGE: Extract v_r (index 4 in perfect, 5 in Boltzmann) ***
-    vr_perfect = sol_perfect.y[4, :]
-    vr_backward = Y_backward[5, ::-1]
-    
-    vr_left = np.concatenate((vr_perfect, vr_backward, [vr_inf]))
-    
+
+    if perturbation_type == 'phi':
+        sol_inf = (X1 @ x_inf)[0] # the value of phi at FCB
+        sol_perfect = sol_perfect.y[1, :]
+        sol_backward = Y_backward[1, ::-1]
+    elif perturbation_type == 'dr':
+        sol_inf = x_inf[0]
+        sol_perfect = sol_perfect.y[2, :]
+        sol_backward = Y_backward[3, ::-1]
+    elif perturbation_type == 'dm':
+        sol_inf = x_inf[1]
+        sol_perfect = sol_perfect.y[3, :]
+        sol_backward = Y_backward[4, ::-1]
+    elif perturbation_type == 'vm':
+        sol_inf = (X1 @ x_inf)[3]
+        sol_perfect = sol_perfect.y[5, :]
+        sol_backward = Y_backward[6, ::-1]
+    else:  # Default to 'vr'
+        sol_inf = x_inf[2]
+        sol_perfect = sol_perfect.y[4, :]
+        sol_backward = Y_backward[5, ::-1]
+
+    sol_left = np.concatenate((sol_perfect, sol_backward, [sol_inf]))
+
     # Sort by time to ensure monotonicity for interpolation
-    sort_indices = np.argsort(t_left); t_sorted = t_left[sort_indices]; vr_sorted = vr_left[sort_indices]
+    sort_indices = np.argsort(t_left); t_sorted = t_left[sort_indices]; sol_sorted = sol_left[sort_indices]
     
-    return t_sorted, vr_sorted
+    return t_sorted, sol_sorted
+
 
 # =============================================================================
 # SECTION 2: GRAM-SCHMIDT ANALYSIS (MODIFIED FOR v_r)
@@ -177,8 +225,9 @@ def compute_coefficients(eigenvalues, eigenvectors, transformation_matrix):
     return coefficients
 
 if __name__=="__main__":
-    N = 32; N_t = 500
-    eigenvalues_threshold = 1.e-1; N_plot = 5
+    N = 5; N_t = 500
+    perturbation_type = 'vr'  # Change to 'vr', 'phi', 'dr', 'dm', or 'vm' as needed
+    eigenvalues_threshold = 1.e-1; N_plot = 10
     eta_grid = np.linspace(t0_integration, fcb_time, N_t)
     try:
         allowed_K = np.load(folder_path + 'allowedK.npy')
@@ -189,23 +238,23 @@ if __name__=="__main__":
         print(f"Error: {e}"); exit()
 
     basis_1, basis_2 = [], []
-    print("\nGenerating basis 1: Closed Universe Model (v_r solutions)...")
+    print("\nGenerating basis 1: Closed Universe Model ...")
     for i in range(1, N + 1):
-        k_effective = i * np.sqrt(K)
-        print(f"  Generating v_r solution for k_eff = {k_effective:.4f} (i={i})")
+        k_effective = 4* i * np.sqrt(K) # nu_spacing = 4
+        print(f"  Generating {perturbation_type} solution for k_eff = {k_effective:.4f} (i={i})")
         # *** CHANGE: Call the new function ***
-        t_sol, vr_sol = generate_vr_solution_to_fcb(k_effective)
-        vr_interpolated = interp1d(t_sol, vr_sol, bounds_error=False, fill_value=0.0)
+        t_sol, y_sol = generate_solution_to_fcb(k_effective, perturbation_type=perturbation_type)
+        vr_interpolated = interp1d(t_sol, y_sol, bounds_error=False, fill_value=0.0)
         basis_1.append(vr_interpolated(eta_grid))
 
-    print("\nGenerating basis 2: Palindromic Flat Universe Model (v_r solutions)...")
+    print("\nGenerating basis 2: Palindromic Universe Model ...")
     for k_val in allowed_K_basis:
-        print(f"  Generating v_r solution for allowed_k = {k_val:.4f}")
+        print(f"  Generating {perturbation_type} solution for allowed_k = {k_val:.4f}")
         # *** CHANGE: Call the new function ***
-        t_sol, vr_sol = generate_vr_solution_to_fcb(k_val)
-        vr_interpolated = interp1d(t_sol, vr_sol, bounds_error=False, fill_value=0.0)
+        t_sol, y_sol = generate_solution_to_fcb(k_val, perturbation_type=perturbation_type)
+        vr_interpolated = interp1d(t_sol, y_sol, bounds_error=False, fill_value=0.0)
         basis_2.append(vr_interpolated(eta_grid))
-    
+
     print("\nPerforming QR decomposition and eigenvalue analysis...")
     orthonormal_functions_1, transformation_matrix_1 = qr_decomposition(np.array(basis_1).T)
     orthonormal_functions_2, transformation_matrix_2 = qr_decomposition(np.array(basis_2).T)
@@ -215,12 +264,38 @@ if __name__=="__main__":
     coefficients_1 = compute_coefficients(eigenvalues_valid_1, eigenvectors_valid_1, transformation_matrix_1)
     coefficients_2 = compute_coefficients(eigenvalues_valid_2, eigenvectors_valid_2, transformation_matrix_2)
 
+    ############################################################################
+    # Use the linear combination coefficients for different perturbation types
+    ############################################################################
+    # perturbation_type = 'vr' # Change to 'vr', 'phi', 'dr', 'dm', or 'vm' as needed
+    # basis_1, basis_2 = [], []
+    # print("\nGenerating basis 1: Closed Universe Model ...")
+    # for i in range(1, N + 1):
+    #     k_effective = i * np.sqrt(K)
+    #     print(f"  Generating {perturbation_type} solution for k_eff = {k_effective:.4f} (i={i})")
+    #     # *** CHANGE: Call the new function ***
+    #     t_sol, y_sol = generate_solution_to_fcb(k_effective, perturbation_type=perturbation_type)
+    #     vr_interpolated = interp1d(t_sol, y_sol, bounds_error=False, fill_value=0.0)
+    #     basis_1.append(vr_interpolated(eta_grid))
+
+    # print("\nGenerating basis 2: Palindromic Universe Model ...")
+    # for k_val in allowed_K_basis:
+    #     print(f"  Generating {perturbation_type} solution for allowed_k = {k_val:.4f}")
+    #     # *** CHANGE: Call the new function ***
+    #     t_sol, y_sol = generate_solution_to_fcb(k_val, perturbation_type=perturbation_type)
+    #     vr_interpolated = interp1d(t_sol, y_sol, bounds_error=False, fill_value=0.0)
+    #     basis_2.append(vr_interpolated(eta_grid))
+    # print("\nPerforming QR decomposition and eigenvalue analysis...")
+    # orthonormal_functions_1, transformation_matrix_1 = qr_decomposition(np.array(basis_1).T)
+    # orthonormal_functions_2, transformation_matrix_2 = qr_decomposition(np.array(basis_2).T)
+    ###################################################################################
+
     print("\nPlotting results for comparison...")
     if N_plot > len(eigenvalues_valid_1): N_plot = len(eigenvalues_valid_1)
     if N_plot > 0:
         fig, axs = plt.subplots(N_plot, 1, figsize=(10, 2*N_plot), sharex=True, constrained_layout=True)
         if N_plot == 1: axs = [axs]
-        fig.suptitle(r"Comparison of Common Eigenfunctions of $v_r(\eta)$")
+        fig.suptitle(fr"Comparison of Common Eigenfunctions of {perturbation_type}")
         for i in range(N_plot):
             ax = axs[i]; solution_1, solution_2 = np.zeros_like(eta_grid), np.zeros_like(eta_grid)
             for j in range(N):
@@ -233,10 +308,10 @@ if __name__=="__main__":
                 solution_2 *= -1
 
             ax.plot(eta_grid, solution_1, color='red', linewidth=2.5, label='From Basis 1 (Closed)')
-            ax.plot(eta_grid, solution_2, color='green', linestyle='--', linewidth=2.0, label='From Basis 2 (Flat)')
+            ax.plot(eta_grid, solution_2, color='green', linestyle='--', linewidth=2.0, label='From Basis 2 (Palindromic)')
             ax.grid(True, linestyle='--', alpha=0.6); ax.set_ylabel(f"Eigenfunc. {i+1}"); ax.legend()
         axs[-1].set_xlabel(r"Conformal Time $\eta$")
-        plt.savefig(f"full_vr_eigenfunction_match_N{N:d}_Nt{N_t:d}_aligned.pdf")
+        plt.savefig(f"full_{perturbation_type}_eigenfunction_match_N{N:d}_Nt{N_t:d}.pdf")
         plt.show()
     else:
         print("No valid eigenfunctions found to plot.")

@@ -4,8 +4,6 @@ This script performs a Gram-Schmidt orthonormalization and eigenvalue analysis
 on two different bases of the COMPLETE cosmological perturbation solutions for
 the radiation velocity, v_r(eta).
 
-MODIFIED VERSION: Includes weighting calculation for k-dependent CLASS modifications.
-
 The solution generator is based on the user's verified script for plotting
 the full palindromic evolution.
 
@@ -13,29 +11,55 @@ the full palindromic evolution.
 - basis_2 is constructed from the 'allowed' wavenumbers for a palindromic flat universe.
 
 It identifies and compares the common eigenfunctions of v_r found in both bases.
-
-NEW FEATURES:
-- Calculates weighting(i) = |coefficient_1(i)|^2 * N / sum(|coefficient_1|^2)
-- Normalized so that sum(weights) = N (number of modes)
-- Outputs weighting as .dat file in format compatible with modified CLASS code
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
+from scipy.optimize import root_scalar
 
 # =============================================================================
 # SECTION 1: FULL SOLUTION GENERATION ENGINE (MODIFIED FOR v_r)
 # =============================================================================
 start_time = time.time()
 folder_path = './data/'
-# --- Cosmological Parameters and Setup (No changes here) ---
-h = 0.5409; Omega_gamma_h2 = 2.47e-5; Neff = 3.046
+## --- Cosmological Parameters from Planck based_omegak best-fit values ---
+# h = 0.5409; Omega_gamma_h2 = 2.47e-5; Neff = 3.046
+# OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+# OmegaM, OmegaK = 0.483, -0.0438
+# OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
+# z_rec = 1089.411
+
+## --- Best-fit parameters for nu_spacing =4 ---
+lam = 1
+rt = 1
+Omega_gamma_h2 = 2.47e-5 # photon density 
+Neff = 3.046
+
+def cosmological_parameters(mt, kt, h): 
+
+    Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+
+    def solve_a0(Omega_r, rt, mt, kt):
+        def f(a0):
+            return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+        sol = root_scalar(f, bracket=[1, 1.e3])
+        return sol.root
+
+    a0 = solve_a0(Omega_r, rt, mt, kt)
+    s0 = 1/a0
+    Omega_lambda = Omega_r * a0**4
+    Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+    Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+    return s0, Omega_lambda, Omega_m, Omega_K
+
+# Best-fit parameters from nu_spacing=4
+mt, kt, Omegab_ratio, h, A_s, n_s, tau_reio = 401.38626259929055, 1.4181566171960542, 0.16686454899542, 0.5635275092831583, 1.9375648884116028, 0.9787493821596979, 0.019760560255556746
+s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
 OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
-OmegaM, OmegaK = 0.483, -0.0438
-OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
-z_rec = 1089.411
+z_rec = 1089.411  # the actual value still needs to be checked
+###############################################################################
 
 # assume s0 = 1/a0 = 1
 a0 = 1; s0 = 1/a0; H0 = np.sqrt(1 / (3 * OmegaLambda)); Hinf = H0 * np.sqrt(OmegaLambda)
@@ -100,11 +124,16 @@ def create_matrix_interpolator(k, m): return lambda k_val: np.array([[interp1d(k
 def create_vector_interpolator(k, v): return lambda k_val: np.array([interp1d(k, v[:,i], bounds_error=False, fill_value="extrapolate")(k_val) for i in range(v.shape[1])])
 get_A, get_D, get_X1, get_X2, get_recs = create_matrix_interpolator(k_grid_data, Amatrices), create_matrix_interpolator(k_grid_data, Dmatrices), create_matrix_interpolator(k_grid_data, X1matrices), create_matrix_interpolator(k_grid_data, X2matrices), create_vector_interpolator(k_grid_data, recValues)
 
-# --- MODIFIED Full Solution Generation Function for v_r ---
-def generate_vr_solution_to_fcb(k):
+def generate_solution_to_fcb(k):
     """
-    Generates the COMPLETE v_r(eta) solution from Big Bang to FCB for a given k.
-    Returns a time array and the corresponding v_r solution array.
+    Generates the COMPLETE solutions (phi, dr, dm, vr, vm) from Big Bang to FCB for a given k.
+
+    Returns:
+        tuple: A tuple containing:
+            - t_sol (np.ndarray): A common time array for all solutions.
+            - y_sol (dict): A dictionary where keys are the perturbation types 
+              ('phi', 'dr', 'dm', 'vr', 'vm') and values are their corresponding 
+              solution arrays.
     """
     # Get transfer matrices & rec values for this k
     A, D, X1, X2, recs_vec = get_A(k), get_D(k), get_X1(k), get_X2(k), get_recs(k)
@@ -114,49 +143,84 @@ def generate_vr_solution_to_fcb(k):
     try:
         x_inf = np.linalg.solve(M_matrix, x_rec_subset)
     except np.linalg.LinAlgError:
-        print(f"Warning: Could not solve for x_inf for k={k}. Using zeros."); x_inf = np.zeros(4)
-    
-    # *** CHANGE: The value at the FCB is now vr_inf ***
-    vr_inf = x_inf[2]
+        print(f"Warning: Could not solve for x_inf for k={k}. Using zeros.")
+        x_inf = np.zeros(4)
     
     # Calculate initial conditions at eta'
     x_prime, y_prime_2_4 = X1 @ x_inf, X2 @ x_inf
     s_prime_val = np.interp(endtime, sol_bg.t, sol_bg.y[0])
-    Y_prime = np.zeros(num_variables_boltzmann); Y_prime[0], Y_prime[1:7], Y_prime[7:9] = s_prime_val, x_prime, y_prime_2_4
+    Y_prime = np.zeros(num_variables_boltzmann)
+    Y_prime[0], Y_prime[1:7], Y_prime[7:9] = s_prime_val, x_prime, y_prime_2_4
     
     # Integrate backwards
     sol_part1 = solve_ivp(dX_boltzmann_s, [endtime, swaptime], Y_prime, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
-    Y_swap = sol_part1.y[:, -1]; Y_swap[0] = np.log(Y_swap[0])
+    Y_swap = sol_part1.y[:, -1]
+    Y_swap[0] = np.log(Y_swap[0])
     sol_part2 = solve_ivp(dX_boltzmann_sigma, [swaptime, recConformalTime], Y_swap, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
-    t_backward = np.concatenate((sol_part1.t, sol_part2.t)); Y_backward_sigma = np.concatenate((sol_part1.y, sol_part2.y), axis=1)
-    Y_backward = Y_backward_sigma.copy(); mask = t_backward >= swaptime; Y_backward[0, mask] = np.exp(Y_backward_sigma[0, mask])
+    t_backward = np.concatenate((sol_part1.t, sol_part2.t))
+    Y_backward_sigma = np.concatenate((sol_part1.y, sol_part2.y), axis=1)
+    Y_backward = Y_backward_sigma.copy()
+    mask = t_backward >= swaptime
+    Y_backward[0, mask] = np.exp(Y_backward_sigma[0, mask])
     
     # Get solution from Big Bang to Recombination (perfect fluid)
     # The state vector for perfect fluid is [sigma, phi, dr, dm, vr, vm]
     phi1, _ = -OmegaM/(16*np.sqrt(3*OmegaR*OmegaLambda))/s0, (1/60)*(-2*k**2+(9*OmegaM**2)/(16*OmegaLambda*OmegaR*s0**2))-2*OmegaK/(15*OmegaLambda*s0**2)
-    _, _ = -OmegaM/(4*np.sqrt(3*OmegaR*OmegaLambda))/s0, (9*OmegaM**2-112*OmegaR*OmegaLambda*k**2*s0**2)/(240*s0**2*OmegaR*OmegaLambda)-8*OmegaK/(15*OmegaLambda*s0**2)
-    _, _ = -np.sqrt(3)*OmegaM/(16*s0*np.sqrt(OmegaR*OmegaLambda)), (9*OmegaM**2-112*OmegaR*OmegaLambda*k**2*s0**2)/(320*s0**2*OmegaR*OmegaLambda)-2*OmegaK/(5*OmegaLambda*s0**2)
+    # ... (rest of your initial condition calculations for perfect fluid)
     vr1, vr2, vr3 = -1/2, OmegaM/(16*np.sqrt(3*OmegaR*OmegaLambda)*s0), (-OmegaM**2+8*s0**2*OmegaR*OmegaLambda*k**2)/(160*s0**2*OmegaR*OmegaLambda)+4*OmegaK/(45*OmegaLambda*s0**2)
-    _, _, _ = -1/2, OmegaM/(16*np.sqrt(3*OmegaR*OmegaLambda)*s0), (-3*OmegaM**2+4*s0**2*OmegaR*OmegaLambda*k**2)/(480*s0**2*OmegaR*OmegaLambda)+17*OmegaK/(360*OmegaLambda*s0**2)
-    sigma0 = np.log(s_bang_init); phi0 = 1+phi1*t0_integration # simplified
+    sigma0 = np.log(s_bang_init)
+    phi0 = 1+phi1*t0_integration # simplified
     dr0, dm0 = 0, 0 # simplified
     vr0, vm0 = vr1*t0_integration+vr2*t0_integration**2+vr3*t0_integration**3, 0 # simplified
     Y0_perfect = [sigma0, phi0, dr0, dm0, vr0, vm0]
     sol_perfect = solve_ivp(dX_perfect_sigma, [t0_integration, recConformalTime], Y0_perfect, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
     
-    # Stitch the v_r solution from BB to FCB
-    t_left = np.concatenate((sol_perfect.t, t_backward[::-1], [fcb_time]))
+    # --- Stitch the solutions for ALL types from BB to FCB ---
     
-    # *** CHANGE: Extract v_r (index 4 in perfect, 5 in Boltzmann) ***
-    vr_perfect = sol_perfect.y[4, :]
-    vr_backward = Y_backward[5, ::-1]
+    # First, create the common time array
+    t_full_unsorted = np.concatenate((sol_perfect.t, t_backward[::-1], [fcb_time]))
+
+    # Now, assemble each solution vector individually
+    # Note: Indices come from your original if/elif block
+    # Perfect fluid state: [sigma, phi, dr, dm, vr, vm] -> indices 0, 1, 2, 3, 4, 5
+    # Boltzmann state: [s, phi, phidot, dr, dm, vr, vm, ...] -> indices 0, 1, 2, 3, 4, 5, 6
     
-    vr_left = np.concatenate((vr_perfect, vr_backward, [vr_inf]))
+    solutions_unsorted = {
+        'phi': np.concatenate((
+            sol_perfect.y[1, :],          # Perfect fluid phi
+            Y_backward[1, ::-1],          # Boltzmann phi
+            [(X1 @ x_inf)[0]]             # Value at FCB (phi_inf)
+        )),
+        'dr': np.concatenate((
+            sol_perfect.y[2, :],          # Perfect fluid dr
+            Y_backward[3, ::-1],          # Boltzmann dr
+            [x_inf[0]]                    # Value at FCB (dr_inf)
+        )),
+        'dm': np.concatenate((
+            sol_perfect.y[3, :],          # Perfect fluid dm
+            Y_backward[4, ::-1],          # Boltzmann dm
+            [x_inf[1]]                    # Value at FCB (dm_inf)
+        )),
+        'vr': np.concatenate((
+            sol_perfect.y[4, :],          # Perfect fluid vr
+            Y_backward[5, ::-1],          # Boltzmann vr
+            [x_inf[2]]                    # Value at FCB (vr_inf)
+        )),
+        'vm': np.concatenate((
+            sol_perfect.y[5, :],          # Perfect fluid vm
+            Y_backward[6, ::-1],          # Boltzmann vm
+            [(X1 @ x_inf)[3]]             # Value at FCB (vm_inf)
+        ))
+    }
     
     # Sort by time to ensure monotonicity for interpolation
-    sort_indices = np.argsort(t_left); t_sorted = t_left[sort_indices]; vr_sorted = vr_left[sort_indices]
+    sort_indices = np.argsort(t_full_unsorted)
+    t_sol = t_full_unsorted[sort_indices]
     
-    return t_sorted, vr_sorted
+    # Apply the same sorting to all solution arrays in the dictionary
+    y_sol = {key: value[sort_indices] for key, value in solutions_unsorted.items()}
+    
+    return t_sol, y_sol
 
 # =============================================================================
 # SECTION 2: GRAM-SCHMIDT ANALYSIS (MODIFIED FOR v_r)
@@ -183,103 +247,10 @@ def compute_coefficients(eigenvalues, eigenvectors, transformation_matrix):
         coefficients[i, :] = np.dot(np.array(eigenvectors[i]), transformation_matrix)
     return coefficients
 
-# =============================================================================
-# SECTION 3: NEW WEIGHTING CALCULATION FUNCTIONS
-# =============================================================================
-
-def calculate_weights(sol_idx, coefficients_1):
-    """
-    Calculate weights for each mode based on the first eigenfunction coefficients.
-    Normalized so that sum(weights) = number of weights.
-    
-    Parameters:
-    -----------
-    coefficients_1 : np.ndarray
-        Coefficient matrix where coefficients_1[i, j] is the coefficient of mode j 
-        in eigenfunction i for basis 1
-    
-    Returns:
-    --------
-    weights : np.ndarray
-        Array of weights for each mode index, normalized so sum = N
-    """
-    if len(coefficients_1) == 0:
-        print("Warning: No valid coefficients found. Returning unit weights.")
-        return np.ones(32)  # Default unit weights
-    
-    # Use the sol_idx eigenfunction coefficients
-    first_eigenfunction_coeffs = coefficients_1[sol_idx, :]
-    
-    # Calculate |coefficient_1(i)|^2 for each mode i
-    raw_weights = np.abs(first_eigenfunction_coeffs)**2
-    
-    # Normalize so that sum(weights) = number of weights
-    N = len(raw_weights)
-    weights = raw_weights * N / np.sum(raw_weights)
-    
-    return weights
-
-def save_weights_for_class(weights, filename="mode_weights.dat", max_index=None):
-    """
-    Save weights in the format required by the modified CLASS code.
-    
-    Parameters:
-    -----------
-    weights : np.ndarray
-        Array of weights for each mode
-    filename : str
-        Output filename
-    max_index : int
-        Maximum index to save (if None, saves all weights)
-    """
-    if max_index is None:
-        max_index = len(weights) - 1
-    
-    with open(filename, 'w') as f:
-        f.write("# Mode weights for CLASS k-dependent weighting\n")
-        f.write("# Format: index  weight\n")
-        f.write("# Generated from solve_real_cosmology_weighting.py\n")
-        f.write("#\n")
-        
-        for i in range(min(len(weights), max_index + 1)):
-            f.write(f"{i:3d}    {weights[i]:.8e}\n")
-    
-    print(f"Weights saved to {filename}")
-    print(f"Saved {min(len(weights), max_index + 1)} weight values")
-    print(f"Weight range: [{np.min(weights):.6e}, {np.max(weights):.6e}]")
-    print(f"Weight sum: {np.sum(weights[:min(len(weights), max_index + 1)]):.8f}")
-
-def plot_weights(weights, filename="mode_weights.pdf"):
-    """
-    Create a plot of the calculated weights.
-    """
-    plt.figure(figsize=(10, 6))
-    mode_indices = np.arange(len(weights))
-    
-    plt.bar(mode_indices, weights, alpha=0.7, color='blue', edgecolor='black')
-    plt.xlabel('Mode Index')
-    plt.ylabel('Weight')
-    plt.title('K-dependent Mode Weights for CLASS\n' + 
-              r'$w_i = |c_1(i)|^2 \cdot N / \sum_j |c_1(j)|^2$, $\sum w_i = N$')
-    plt.grid(True, alpha=0.3)
-    plt.yscale('log')  # Use log scale since weights might vary significantly
-    
-    # Add statistics text
-    stats_text = f'Total modes: {len(weights)}\n'
-    stats_text += f'Weight sum: {np.sum(weights):.6f}\n'
-    stats_text += f'Max weight: {np.max(weights):.3e}\n'
-    stats_text += f'Min weight: {np.min(weights):.3e}'
-    
-    plt.text(0.02, 0.98, stats_text, transform=plt.gca().transAxes, 
-             verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
-    
-    plt.tight_layout()
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
-    print(f"Weight plot saved to {filename}")
-
 if __name__=="__main__":
     N = 32; N_t = 500
-    eigenvalues_threshold = 1.e-1; N_plot = 5
+    perturbation_type = 'dr'  # Change to 'vr', 'phi', 'dr', 'dm', or 'vm' as needed
+    eigenvalues_threshold = 1.e-1; N_plot = 10
     eta_grid = np.linspace(t0_integration, fcb_time, N_t)
     try:
         allowed_K = np.load(folder_path + 'allowedK.npy')
@@ -290,21 +261,21 @@ if __name__=="__main__":
         print(f"Error: {e}"); exit()
 
     basis_1, basis_2 = [], []
-    print("\nGenerating basis 1: Closed Universe Model (v_r solutions)...")
+    print("\nGenerating basis 1: Closed Universe Model ...")
     for i in range(1, N + 1):
-        k_effective = i * np.sqrt(K) * 4
-        print(f"  Generating v_r solution for k_eff = {k_effective:.4f} (i={i})")
+        k_effective = i * np.sqrt(K)
+        print(f"  Generating {perturbation_type} solution for k_eff = {k_effective:.4f} (i={i})")
         # *** CHANGE: Call the new function ***
-        t_sol, vr_sol = generate_vr_solution_to_fcb(k_effective)
-        vr_interpolated = interp1d(t_sol, vr_sol, bounds_error=False, fill_value=0.0)
+        t_sol, y_sol = generate_solution_to_fcb(k_effective, perturbation_type=perturbation_type)
+        vr_interpolated = interp1d(t_sol, y_sol, bounds_error=False, fill_value=0.0)
         basis_1.append(vr_interpolated(eta_grid))
 
-    print("\nGenerating basis 2: Palindromic Flat Universe Model (v_r solutions)...")
+    print("\nGenerating basis 2: Palindromic Universe Model ...")
     for k_val in allowed_K_basis:
-        print(f"  Generating v_r solution for allowed_k = {k_val:.4f}")
+        print(f"  Generating {perturbation_type} solution for allowed_k = {k_val:.4f}")
         # *** CHANGE: Call the new function ***
-        t_sol, vr_sol = generate_vr_solution_to_fcb(k_val)
-        vr_interpolated = interp1d(t_sol, vr_sol, bounds_error=False, fill_value=0.0)
+        t_sol, y_sol = generate_solution_to_fcb(k_val, perturbation_type=perturbation_type)
+        vr_interpolated = interp1d(t_sol, y_sol, bounds_error=False, fill_value=0.0)
         basis_2.append(vr_interpolated(eta_grid))
     
     print("\nPerforming QR decomposition and eigenvalue analysis...")
@@ -316,52 +287,13 @@ if __name__=="__main__":
     coefficients_1 = compute_coefficients(eigenvalues_valid_1, eigenvectors_valid_1, transformation_matrix_1)
     coefficients_2 = compute_coefficients(eigenvalues_valid_2, eigenvectors_valid_2, transformation_matrix_2)
 
-    # =============================================================================
-    # SECTION 4: NEW WEIGHTING CALCULATION AND OUTPUT
-    # =============================================================================
-    
-    print("\n" + "="*60)
-    print("CALCULATING K-DEPENDENT WEIGHTS FOR CLASS")
-    print("="*60)
-    
-    # Calculate weights based on the first eigenfunction of basis 1
-    sol_idx = 0  # Use the first eigenfunction for weight calculation
-    weights = calculate_weights(sol_idx, coefficients_1)
-
-    # Print weight summary
-    print(f"\nWeight calculation summary:")
-    print(f"Number of modes: {len(weights)}")
-    print(f"Number of valid eigenfunctions found: {len(coefficients_1)}")
-    print(f"Weight sum: {np.sum(weights):.8f}")
-    print(f"Maximum weight: {np.max(weights):.6e} (mode {np.argmax(weights)})")
-    print(f"Minimum weight: {np.min(weights):.6e} (mode {np.argmin(weights)})")
-    
-    # Show first few weights
-    print(f"\nFirst 10 weights:")
-    for i in range(min(10, len(weights))):
-        print(f"  Mode {i:2d}: {weights[i]:.8e}")
-    
-    # Save weights for CLASS
-    save_weights_for_class(weights, "mode_weights.dat", max_index=31)
-    
-    # Create weight plot
-    plot_weights(weights, "mode_weights.pdf")
-    
-    # Also save raw coefficients for analysis
-    np.save("coefficients_basis1.npy", coefficients_1)
-    np.save("coefficients_basis2.npy", coefficients_2)
-    np.save("mode_weights.npy", weights)
-    print(f"\nRaw data saved:")
-    print(f"  coefficients_basis1.npy - Basis 1 coefficients")
-    print(f"  coefficients_basis2.npy - Basis 2 coefficients") 
-    print(f"  mode_weights.npy - Calculated weights")
 
     print("\nPlotting results for comparison...")
     if N_plot > len(eigenvalues_valid_1): N_plot = len(eigenvalues_valid_1)
     if N_plot > 0:
         fig, axs = plt.subplots(N_plot, 1, figsize=(10, 2*N_plot), sharex=True, constrained_layout=True)
         if N_plot == 1: axs = [axs]
-        fig.suptitle(r"Comparison of Common Eigenfunctions of $v_r(\eta)$" + "\n(Used for Weight Calculation)")
+        fig.suptitle(fr"Comparison of Common Eigenfunctions of {perturbation_type}")
         for i in range(N_plot):
             ax = axs[i]; solution_1, solution_2 = np.zeros_like(eta_grid), np.zeros_like(eta_grid)
             for j in range(N):
@@ -374,30 +306,12 @@ if __name__=="__main__":
                 solution_2 *= -1
 
             ax.plot(eta_grid, solution_1, color='red', linewidth=2.5, label='From Basis 1 (Closed)')
-            ax.plot(eta_grid, solution_2, color='green', linestyle='--', linewidth=2.0, label='From Basis 2 (Flat)')
+            ax.plot(eta_grid, solution_2, color='green', linestyle='--', linewidth=2.0, label='From Basis 2 (Palindromic)')
             ax.grid(True, linestyle='--', alpha=0.6); ax.set_ylabel(f"Eigenfunc. {i+1}"); ax.legend()
-            
-            # Add weight information for first eigenfunction
-            if i == 0:
-                weight_info = f"Weights calculated from this eigenfunction"
-                ax.text(0.02, 0.95, weight_info, transform=ax.transAxes, 
-                       bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
-        
         axs[-1].set_xlabel(r"Conformal Time $\eta$")
-        plt.savefig(f"full_vr_eigenfunction_match_N{N:d}_Nt{N_t:d}_aligned_with_weights.pdf")
+        plt.savefig(f"full_{perturbation_type}_eigenfunction_match_N{N:d}_Nt{N_t:d}_coeff_dr.pdf")
         plt.show()
     else:
         print("No valid eigenfunctions found to plot.")
 
 print("--- Total execution time: %s seconds ---" % (time.time() - start_time))
-print("\n" + "="*60)
-print("WEIGHT CALCULATION COMPLETE!")
-print("="*60)
-print("Files generated:")
-print("  - mode_weights.dat      (for CLASS input)")
-print("  - mode_weights.pdf      (visualization)")
-print("  - mode_weights.npy      (raw weights)")
-print("  - coefficients_basis*.npy (raw coefficients)")
-print("\nTo use with CLASS, add to your .ini file:")
-print("  weighting_filename = mode_weights.dat")
-print("  max_weight_index = 31")
