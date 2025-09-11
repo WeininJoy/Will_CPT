@@ -8,7 +8,7 @@ in a combined eigenvalue analysis.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-from solve_real_cosmology_2bases_aligned import generate_solution_to_fcb, K, fcb_time, t0_integration
+from solve_real_cosmology_2bases_aligned import generate_solution_to_fcb, K, fcb_time, t0_integration, recConformalTime
 
 def qr_decomposition(basis):
     """QR decomposition with proper handling"""
@@ -26,8 +26,8 @@ def compute_multi_perturbation_A_matrix(ortho_funcs_1_dict, ortho_funcs_2_dict):
     Returns:
     Combined eigenvalues and eigenvectors from all perturbations
     """
-    # perturbation_types = ['phi', 'psi', 'dr', 'dm', 'vr', 'vm']
-    perturbation_types = ['dr', 'dm', 'vr', 'vm'] # only those the oscillating modes
+    perturbation_types = ['phi', 'psi', 'dr', 'dm', 'vr', 'vm']
+    # perturbation_types = ['dr', 'dm', 'vr', 'vm'] # only those the oscillating modes
     
     # Initialize combined M matrix
     M_total = None
@@ -65,7 +65,7 @@ def choose_eigenvalues(eigenvalues, eigenvectors, eigenvalues_threshold, N):
     sorted_indices = np.argsort(np.real(eigenvalues))[::-1]
     
     eigenvalues_valid, eigenvectors_valid = [], []
-    n_select = min(N, len(eigenvalues), 5)  # Take at most 5 largest eigenvalues
+    n_select = min(N, len(eigenvalues), 10)  # Take at most 10 largest eigenvalues
     
     for i in range(n_select):
         idx = sorted_indices[i]
@@ -108,7 +108,7 @@ def generate_multi_perturbation_bases(k_values, eta_grid):
                     solution = interpolator(eta_grid)
                     
                     # Remove extreme values that could be numerical instabilities
-                    solution = remove_extreme_values(solution, pert_type, k_val)
+                    # solution = remove_extreme_values(solution, pert_type, k_val)
                     
                     basis_dict[pert_type].append(solution)
                 else:
@@ -126,6 +126,56 @@ def generate_multi_perturbation_bases(k_values, eta_grid):
         basis_dict[pert_type] = np.array(basis_dict[pert_type]).T  # Transpose for QR
     
     return basis_dict
+
+def find_vr_cutoff_time(k_val, safety_factor=2.0):
+    """
+    Find the time when vr solution exceeds safety_factor times its oscillation amplitude
+    Uses later stable region for oscillation analysis since recombination is early
+    
+    Parameters:
+    k_val: wavenumber  
+    safety_factor: multiplier for oscillation amplitude threshold
+    
+    Returns:
+    cutoff_time: eta value where solution becomes unstable, or recConformalTime if stable
+    """
+    try:
+        t_sol, y_sol = generate_solution_to_fcb(k_val)
+        
+        if 'vr' not in y_sol:
+            return recConformalTime
+        
+        vr_solution = y_sol['vr']
+        
+        # Use later stable region (middle 40-80% of solution) for oscillation amplitude
+        # This avoids both early instabilities and late blow-ups
+        start_idx = int(0.4 * len(vr_solution))
+        end_idx = int(0.8 * len(vr_solution))
+        stable_vr = vr_solution[start_idx:end_idx]
+        
+        if len(stable_vr) > 0:
+            oscillation_amplitude = np.std(stable_vr) * 2.0  # 2-sigma estimate
+            if oscillation_amplitude == 0:
+                oscillation_amplitude = np.max(np.abs(stable_vr))
+        else:
+            oscillation_amplitude = np.std(vr_solution) * 2.0
+        
+        # Find where |vr| exceeds safety_factor * oscillation_amplitude
+        threshold = safety_factor * oscillation_amplitude
+        unstable_mask = np.abs(vr_solution) > threshold
+        
+        if np.any(unstable_mask):
+            first_unstable_idx = np.where(unstable_mask)[0][0]
+            cutoff_time = t_sol[first_unstable_idx]
+            print(f"  k={k_val:.4f}: cutoff at eta={cutoff_time:.4e} (amp={oscillation_amplitude:.2e})")
+            return cutoff_time
+        else:
+            print(f"  k={k_val:.4f}: stable throughout (amp={oscillation_amplitude:.2e})")
+            return recConformalTime
+            
+    except Exception as e:
+        print(f"  k={k_val:.4f}: error finding cutoff ({e}), using recConformalTime")
+        return recConformalTime
 
 def remove_extreme_values(solution, pert_type, k_val, threshold_factor=10.0):
     """
@@ -168,20 +218,17 @@ def remove_extreme_values(solution, pert_type, k_val, threshold_factor=10.0):
 
 def multi_perturbation_analysis(N=30, N_t=300):
     """
-    Complete multi-perturbation eigenvalue analysis
+    Complete multi-perturbation eigenvalue analysis with adaptive time truncation
     """
     print(f"Starting multi-perturbation analysis with N={N}, N_t={N_t}")
     
-    # eta_grid = np.linspace(t0_integration, fcb_time, N_t)
-    eta_grid = np.linspace(fcb_time/10.0, fcb_time, N_t)
-    
-    # Generate k values for both bases
+    # Generate k values for both bases first
     folder_path = './data/'
     try:
         allowed_K_data = np.load(folder_path + 'allowedK.npy')
         if len(allowed_K_data) < N:
             raise ValueError(f"Need {N} allowed K values, found {len(allowed_K_data)}")
-        allowed_K_basis = allowed_K_data[:N]
+        allowed_K_basis = allowed_K_data[2:N+2]
         print(f"Loaded {len(allowed_K_data)} allowed K values from file.")
     except (FileNotFoundError, ValueError) as e:
         print(f"Error loading allowedK.npy: {e}")
@@ -189,7 +236,25 @@ def multi_perturbation_analysis(N=30, N_t=300):
         allowed_K_basis = np.linspace(0.001, 0.1, N)
     
     # Basis 1: Closed Universe (integer multiples of sqrt(K))
-    k_basis_1 = np.array([4* i * np.sqrt(np.abs(K)) for i in range(1, N + 1)])
+    k_basis_1 = np.array([4* i * np.sqrt(np.abs(K)) for i in range(1+2, N + 1+2)])
+    
+    # Find adaptive cutoff time using larger k values (more oscillations)
+    print(f"Finding adaptive cutoff time using larger k values...")
+    # Use larger k values (better oscillations) from the middle-to-end of the range
+    start_idx = 0
+    sample_k_values = k_basis_1[start_idx:start_idx+5]  
+    cutoff_times = []
+    
+    for k_val in sample_k_values:
+        cutoff_time = find_vr_cutoff_time(k_val, safety_factor=2.0)
+        cutoff_times.append(cutoff_time)
+    
+    # Use the most conservative (earliest) cutoff time
+    adaptive_cutoff = max(cutoff_times) 
+    
+    # Define eta_grid from cutoff_time to fcb_time as requested
+    eta_grid = np.linspace(adaptive_cutoff, fcb_time, N_t)
+    print(f"Using eta_grid from cutoff to FCB: eta ∈ [{adaptive_cutoff:.4e}, {fcb_time:.4e}]")
     
     # Basis 2: Palindromic Universe (allowed K values)
     k_basis_2 = allowed_K_basis
@@ -295,7 +360,7 @@ def plot_multi_perturbation_results(results, N_plot=3):
     perturbation_types = ['phi', 'dr', 'dm', 'vr', 'vm']
     n_pert = len(perturbation_types)
     
-    fig, axes = plt.subplots(N_plot, n_pert, figsize=(16, 4*N_plot), 
+    fig, axes = plt.subplots(N_plot, n_pert, figsize=(16, 2*N_plot), 
                            constrained_layout=True)
     if N_plot == 1:
         axes = axes.reshape(1, -1)
@@ -338,38 +403,49 @@ def plot_multi_perturbation_results(results, N_plot=3):
             if i == N_plot - 1:
                 ax.set_xlabel("Conformal Time η")
     
-    plt.savefig("multi_perturbation_eigenfunctions_oscillating.pdf", dpi=300, bbox_inches='tight')
+    plt.savefig("multi_perturbation_eigenfunctions_k2.pdf", dpi=300, bbox_inches='tight')
     plt.show()
 
-def plot_basis1_diagnostic(k_values, eta_grid, N_plot=5):
+def plot_basis1_diagnostic(N_k=5, N_t=300):
     """
     Plot individual solutions from basis 1 to identify instabilities
     """
-    N_plot = min(N_plot, len(k_values))
+    print(f"Diagnostic analysis for first {N_k} k-modes in basis 1")
+    
+    # Create time grid - start from fcb_time/100 to avoid Big Bang instabilities
+    eta_start = fcb_time / 100.0
+    eta_grid = np.linspace(eta_start, fcb_time, N_t)
+    print(f"Time range: eta ∈ [{eta_start:.6e}, {fcb_time:.6e}]")
+    
+    # Generate first few k values from basis 1 (Closed Universe)
+    k_values = np.array([4 * i * np.sqrt(np.abs(K)) for i in range(1, N_k + 1)])
+    print(f"K = {K:.6e}")
+    print(f"k values: {k_values}")
+    
     perturbation_types = ['phi', 'dr', 'dm', 'vr', 'vm']
     
-    fig, axes = plt.subplots(N_plot, len(perturbation_types), figsize=(20, 4*N_plot))
-    if N_plot == 1:
+    fig, axes = plt.subplots(N_k, len(perturbation_types), figsize=(20, 4*N_k))
+    if N_k == 1:
         axes = axes.reshape(1, -1)
     
     fig.suptitle("Basis 1 Individual Solutions - Diagnostic Plot", fontsize=16)
     
-    for i in range(N_plot):
+    for i in range(N_k):
         k_val = k_values[i]
-        print(f"Plotting diagnostic for k[{i}] = {k_val:.6f}")
+        print(f"Processing k[{i}] = {k_val:.6f}")
         
         try:
             # Generate solution for this k
             t_sol, y_sol = generate_solution_to_fcb(k_val)
             
             for j, pert_type in enumerate(perturbation_types):
-                ax = axes[i, j] if N_plot > 1 else axes[j]
+                ax = axes[i, j] if N_k > 1 else axes[j]
                 
                 if pert_type in y_sol:
-                    # Plot full solution and highlight problematic regions
+                    # Plot full solution
                     ax.semilogy(t_sol, np.abs(y_sol[pert_type]), 'b-', alpha=0.7, label='|solution|')
                     
-                    # Interpolate onto eta_grid
+                    # Interpolate onto truncated eta_grid
                     interpolator = interp1d(t_sol, y_sol[pert_type], bounds_error=False, fill_value=0.0)
                     solution = interpolator(eta_grid)
                     
@@ -383,39 +459,50 @@ def plot_basis1_diagnostic(k_values, eta_grid, N_plot=5):
                         ax.scatter(eta_grid[extreme_mask], abs_solution[extreme_mask], 
                                  c='red', s=20, alpha=0.8, label=f'Extreme (>{threshold:.1e})')
                     
+                    # Mark important time points
+                    ax.axvline(t0_integration, color='red', linestyle='-', alpha=0.5, label='t0_integration')
                     ax.axvline(eta_grid[0], color='green', linestyle='--', alpha=0.7, label='Truncation start')
                     ax.axvline(fcb_time/100.0, color='orange', linestyle='--', alpha=0.7, label='fcb_time/100')
+                    
+                    # Show where solution might blow up
+                    max_val = np.max(abs_solution)
+                    min_val = np.min(abs_solution[abs_solution > 0]) if np.any(abs_solution > 0) else 1e-20
+                    print(f"  {pert_type}: range [{min_val:.2e}, {max_val:.2e}], extreme points: {np.sum(extreme_mask)}")
                     
                 else:
                     ax.text(0.5, 0.5, f"No {pert_type}\ndata", ha='center', va='center')
                 
                 ax.set_title(f"k[{i}]={k_val:.4f}, {pert_type}")
+                ax.set_ylabel("Amplitude")
                 ax.grid(True, alpha=0.3)
                 if i == 0 and j == 0:
                     ax.legend()
-                if i == N_plot - 1:
+                if i == N_k - 1:
                     ax.set_xlabel("Conformal Time η")
                     
         except Exception as e:
-            print(f"Error plotting k[{i}] = {k_val}: {e}")
+            print(f"Error processing k[{i}] = {k_val}: {e}")
             for j, pert_type in enumerate(perturbation_types):
-                ax = axes[i, j] if N_plot > 1 else axes[j]
+                ax = axes[i, j] if N_k > 1 else axes[j]
                 ax.text(0.5, 0.5, f"Error:\n{str(e)[:30]}", ha='center', va='center')
     
     plt.savefig("basis1_diagnostic_plot.pdf", dpi=300, bbox_inches='tight')
+    print("Diagnostic plot saved as basis1_diagnostic_plot.pdf")
     plt.show()
+
 
 if __name__ == "__main__":
     # Run the analysis
     results = multi_perturbation_analysis(N=30, N_t=300)
     
-    # Plot diagnostic for basis 1 first
-    print("\nGenerating diagnostic plots for first few k values in basis 1...")
-    plot_basis1_diagnostic(results['k_basis_1'], results['eta_grid'], N_plot=5)
-    
+    # # Plot diagnostic for basis 1 first
+    # print("\nGenerating diagnostic plots for first few k values in basis 1...")
+    # plot_basis1_diagnostic(results['k_basis_1'], results['eta_grid'], N_plot=5)
+
+
     # Plot results
     if len(results['eigenvals_1']) > 0:
-        plot_multi_perturbation_results(results, N_plot=3)
+        plot_multi_perturbation_results(results, N_plot=5)
     else:
         print("No eigenvalues found for plotting")
     

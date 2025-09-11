@@ -25,40 +25,40 @@ from scipy.optimize import root_scalar
 start_time = time.time()
 folder_path = './data/'
 ## --- Cosmological Parameters from Planck based_omegak best-fit values ---
-# h = 0.5409; Omega_gamma_h2 = 2.47e-5; Neff = 3.046
-# OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
-# OmegaM, OmegaK = 0.483, -0.0438
-# OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
-# z_rec = 1089.411
+h = 0.5409; Omega_gamma_h2 = 2.47e-5; Neff = 3.046
+OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+OmegaM, OmegaK = 0.483, -0.0438
+OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
+z_rec = 1089.411
 
 ## --- Best-fit parameters for nu_spacing =4 ---
-lam = 1
-rt = 1
-Omega_gamma_h2 = 2.47e-5 # photon density 
-Neff = 3.046
+# lam = 1
+# rt = 1
+# Omega_gamma_h2 = 2.47e-5 # photon density 
+# Neff = 3.046
 
-def cosmological_parameters(mt, kt, h): 
+# def cosmological_parameters(mt, kt, h): 
 
-    Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+#     Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
 
-    def solve_a0(Omega_r, rt, mt, kt):
-        def f(a0):
-            return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
-        sol = root_scalar(f, bracket=[1, 1.e3])
-        return sol.root
+#     def solve_a0(Omega_r, rt, mt, kt):
+#         def f(a0):
+#             return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+#         sol = root_scalar(f, bracket=[1, 1.e3])
+#         return sol.root
 
-    a0 = solve_a0(Omega_r, rt, mt, kt)
-    s0 = 1/a0
-    Omega_lambda = Omega_r * a0**4
-    Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
-    Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
-    return s0, Omega_lambda, Omega_m, Omega_K
+#     a0 = solve_a0(Omega_r, rt, mt, kt)
+#     s0 = 1/a0
+#     Omega_lambda = Omega_r * a0**4
+#     Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+#     Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+#     return s0, Omega_lambda, Omega_m, Omega_K
 
-# Best-fit parameters from nu_spacing=4
-mt, kt, Omegab_ratio, h, A_s, n_s, tau_reio = 401.38626259929055, 1.4181566171960542, 0.16686454899542, 0.5635275092831583, 1.9375648884116028, 0.9787493821596979, 0.019760560255556746
-s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
-OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
-z_rec = 1089.411  # the actual value still needs to be checked
+# # Best-fit parameters from nu_spacing=4
+# mt, kt, Omegab_ratio, h, A_s, n_s, tau_reio = 401.38626259929055, 1.4181566171960542, 0.16686454899542, 0.5635275092831583, 1.9375648884116028, 0.9787493821596979, 0.019760560255556746
+# s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+# OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+# z_rec = 1089.411  # the actual value still needs to be checked
 ###############################################################################
 
 # assume s0 = 1/a0 = 1
@@ -86,11 +86,11 @@ def dX_boltzmann_s(t, X, k):
     phidot = H*psi - ((4/3)*rho_r*vr + rho_m*vm)/(2*s**2)
     fr2, fr3 = fr_all[0], fr_all[1]; fr2dot = -(8/15)*(k**2)*vr - (3/5)*k*fr3
     psidot = phidot - (3*H0**2*OmegaR/s0**4/k**2)*(2*s*sdot*fr2 + s**2*fr2dot)
-    drdot, dmdot, vrdot, vmdot = (4/3)*(3*phidot+(k**2)*vr), 3*phidot+k**2*vm, -(psi+dr/4), H*vm-psi
+    drdot, dmdot, vrdot, vmdot = (4/3)*(3*phidot+(k**2)*vr), 3*phidot+k**2*vm, -(psi+dr/4)+ (1 + 3*OmegaK/s0**2*H0**2/k**2)*fr2/2, H*vm-psi
     derivatives = [sdot, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
     for j in range(1, l_max - 2):
         l = j + 2; derivatives.append((k/(2*l+1))*(l*fr_all[j-1]-(l+1)*fr_all[j+1]))
-    derivatives.append((k*l_max/(2*l_max+1))*fr_all[l_max-3])
+    derivatives.append(k*X[(num_variables_boltzmann-1)-1] - (((num_variables_boltzmann-1)-5 + 1)*X[(num_variables_boltzmann-1)])/t)
     return derivatives
 def dX_boltzmann_sigma(t, X, k):
     sigma, phi, psi, dr, dm, vr, vm = X[0:7]; fr_all = X[7:]
@@ -99,11 +99,11 @@ def dX_boltzmann_sigma(t, X, k):
     phidot = H*psi - ((4/3)*rho_r*vr + rho_m*vm)/(2*np.exp(2*sigma))
     fr2, fr3 = fr_all[0], fr_all[1]; fr2dot = -(8/15)*(k**2)*vr - (3/5)*k*fr3
     psidot = phidot - (3*H0**2*OmegaR/s0**4/k**2)*np.exp(2*sigma)*(2*H*fr2+fr2dot)
-    drdot, dmdot, vrdot, vmdot = (4/3)*(3*phidot+(k**2)*vr), 3*phidot+k**2*vm, -(psi+dr/4), H*vm-psi
+    drdot, dmdot, vrdot, vmdot = (4/3)*(3*phidot+(k**2)*vr), 3*phidot+k**2*vm, -(psi+dr/4)+ (1 + 3*OmegaK/s0**2*H0**2/k**2)*fr2/2, H*vm-psi
     derivatives = [H, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
     for j in range(1, l_max-2):
         l = j+2; derivatives.append((k/(2*l+1))*(l*fr_all[j-1]-(l+1)*fr_all[j+1]))
-    derivatives.append((k*l_max/(2*l_max+1))*fr_all[l_max-3])
+    derivatives.append(k*X[(num_variables_boltzmann-1)-1] - (((num_variables_boltzmann-1)-5 + 1)*X[(num_variables_boltzmann-1)])/t)
     return derivatives
 def dX_perfect_sigma(t, X, k):
     sigma, phi, dr, dm, vr, vm = X
