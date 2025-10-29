@@ -14,7 +14,7 @@ import numpy as np
 from math import *
 
 #working in units 8piG = Lambda = c = hbar = kB = 1 throughout
-def compute_X_recs(params, z_rec, folder_path, nu_spacing=4):
+def compute_X_recs(params, z_rec, folder_path):
     """
     Compute perturbation values at recombination for perturbation analysis.
 

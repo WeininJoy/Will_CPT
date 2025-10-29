@@ -274,7 +274,7 @@ def process_single_k(k, s_init, endtime, swaptime, recConformalTime,
 
     return (ABC_matrix, DEF_matrix, GHI_vector, X1, X2)
 
-def compute_U_matrices(params, z_rec, folder_path, nu_spacing=4, n_processes=None):
+def compute_U_matrices(params, z_rec, folder_path, n_processes=None):
     """
     Compute ABC/DEF/GHI matrices and X1/X2 matrices for perturbation analysis.
 

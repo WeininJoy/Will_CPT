@@ -11,8 +11,9 @@ import matplotlib as mpl
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 
+
 #working in units 8piG = Lambda = c = hbar = kB = 1 throughout
-def compute_allowedK(folder_path):
+def compute_allowedK(params, folder_path):
     """
     Compute allowedK values, which satisfy (anti)-symmetric condition at FCB.
 
@@ -157,7 +158,6 @@ def compute_allowedK(folder_path):
                 # Note: Your original code scaled by s0 here. If your physical s0 is not 1,
                 # you should re-introduce that scaling. Since we set s0=1, this is fine.
                 allowedK_refined.append(refined_k)
-                print(f"Found root at k = {refined_k:.8f} in bracket {k_bracket}")
             else:
                 print(f"Warning: Root finding failed to converge for bracket {k_bracket}")
                 
@@ -173,6 +173,36 @@ def compute_allowedK(folder_path):
     np.save(folder_path+output_filename, allowedK_refined)
     print(f"\nSaved {len(allowedK_refined)} refined allowed K values to {output_filename}")
 
+    # Unpack parameters
+    mt, kt, omega_b_ratio, h = params
+    lam = 1
+    rt = 1
+    Omega_gamma_h2 = 2.47e-5 # photon density 
+    Neff = 3.046
+
+    def cosmological_parameters(mt, kt, h): 
+
+        Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+
+        def solve_a0(Omega_r, rt, mt, kt):
+            def f(a0):
+                return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+            sol = root_scalar(f, bracket=[1, 1.e3])
+            return sol.root
+
+        a0 = solve_a0(Omega_r, rt, mt, kt)
+        Omega_lambda = Omega_r * a0**4
+        Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+        Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+        return Omega_lambda, Omega_m, Omega_K
+
+    OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+    H0 = 1/np.sqrt(3*OmegaLambda); #we are working in units of Lambda=c=1
+    a0=1; K=-OmegaK * a0**2 * H0**2
+    allowedK_integer = [k / np.sqrt(np.abs(K)) for k in allowedK_refined]
+    np.save(folder_path+'allowedK_integer.npy', allowedK_integer)
+
+
     # Optional: Plot for verification
     plt.figure(figsize=(10, 6))
     plt.plot(k_grid, vrfcb_grid, 'b-', label=r'$v_r^\infty(k)$ from grid')
@@ -185,3 +215,5 @@ def compute_allowedK(folder_path):
     plt.grid(True)
     plt.ylim(-2, 2) # Adjust ylim to see the oscillations clearly
     plt.savefig(folder_path + 'vrfcb_refined_roots.pdf')
+
+    return allowedK_integer
