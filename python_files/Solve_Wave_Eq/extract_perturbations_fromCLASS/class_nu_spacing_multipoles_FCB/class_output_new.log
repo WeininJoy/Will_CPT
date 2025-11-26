@@ -1,0 +1,8 @@
+Computing sources
+Evolving mode 1/1
+Evolving ic 1/1
+evolving 107 wavenumbers
+DEBUG before primordial_get_lnk_list: pba->K=1.297795e-09, pba->sgnK=1, pba->nu_spacing=3
+DEBUG primordial_get_lnk_list: sgnK=1, K=1.297795e-09, nu_spacing=3
+DEBUG primordial: has_cls=0, k_output_values_num=5
+Closed universe mode: Using only k_output_values (no CMB computation)

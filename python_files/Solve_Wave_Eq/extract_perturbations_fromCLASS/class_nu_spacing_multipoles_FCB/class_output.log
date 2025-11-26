@@ -1,0 +1,26 @@
+Running CLASS version v3.2.5
+Computing background
+DEBUG: loga_ini=-3.223619e+01, loga_final=4.605170e+00
+DEBUG: loga_table[0]=-3.223619e+01, loga_table[bt_size-1]=4.605170e+00
+DEBUG: After integration, tau_table[0]=4.635518e-09, tau_table[bt_size-1]=2.176018e+04
+DEBUG: conformal_age from integration=2.176018e+04
+ -> age = 128.679431 Gyr
+ -> conformal age = 21760.183897 Mpc
+ -> N_eff = 3.044 (summed over all species that are non-relativistic at early times) 
+ -> radiation/matter equality at z = 3403.879066
+    corresponding to conformal time = 112.784878 Mpc
+Computing thermodynamics using HyRec 2020
+ -> with primordial helium mass fraction Y_He = 0.2452
+ -> recombination (maximum of visibility function) at z = 1089.187684
+    corresponding to conformal time = 280.609916 Mpc
+    with comoving sound horizon = 144.712740 Mpc
+    angular diameter distance = 19.702639 Mpc
+    sound horizon angle 100*theta_s = 0.673723
+    Thomson optical depth crosses one at z_* = 1085.612173
+    giving an angle 100*theta_* = 0.675201
+ -> baryon drag stops at z = 1059.145747
+    corresponding to conformal time = 286.512334 Mpc
+    with comoving sound horizon rs = 147.388841 Mpc
+ -> reionization at z = 7.573898
+    corresponding to conformal time = 5160.006127 Mpc
+Computing sources

@@ -1,0 +1,8 @@
+README
+setup.py
+/home/wnd22/Documents/Research/Will_CPT/python_files/CLASS_weighting/class_nu_spacing_original/python/../python/classy.cpp
+/home/wnd22/Documents/Research/Will_CPT/python_files/Solve_Wave_Eq/extract_perturbations_fromCLASS/class_nu_spacing_multipoles/python/../python/classy.cpp
+classy.egg-info/PKG-INFO
+classy.egg-info/SOURCES.txt
+classy.egg-info/dependency_links.txt
+classy.egg-info/top_level.txt
