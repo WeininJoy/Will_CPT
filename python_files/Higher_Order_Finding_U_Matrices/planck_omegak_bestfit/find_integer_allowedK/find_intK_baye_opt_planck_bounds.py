@@ -18,7 +18,7 @@ from Higher_Order_Solving_for_Vrinf import compute_allowedK
 from multiprocessing import cpu_count
 from bayes_opt import BayesianOptimization
 
-data_folder = './data/try_intK_planck_bounds/'
+data_folder = './data/try_intK_planck_bounds_2/'
 
 nu_spacing = 4
 print("nu_spacing = ", nu_spacing)

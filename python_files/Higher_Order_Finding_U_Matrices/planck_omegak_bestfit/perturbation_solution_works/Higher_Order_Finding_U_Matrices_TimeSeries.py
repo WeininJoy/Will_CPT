@@ -15,19 +15,17 @@ from scipy.optimize import root_scalar
 import numpy as np
 import matplotlib.pyplot as plt
 
+nu_spacing = 4
 # --- Basic Setup (Unchanged) ---
 # working in units 8piG = Lambda = c = hbar = kB = 1 throughout
-folder_path = './nu_spacing4/data_allowedK_timeseries/'
-allowedK_path = './nu_spacing4/data_all_k/allowedK.npy'
+folder =  './data/'
+# folder_path = folder + 'data_allowedK_timeseries/'
+# kvalues_path = folder + 'data_allowedK/L70_kvalues.npy'
+folder_path = folder + 'data_integerK_timeseries/'
+kvalues_path = folder + 'data_integerK/L70_kvalues.npy'
 import os
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
-
-# # set cosmological parameters from Planck baseline
-# OmegaLambda = 0.679
-# OmegaM = 0.321
-# OmegaR = 9.24e-5
-# H0 = 1/np.sqrt(3*OmegaLambda) # we are working in units of Lambda=c=1
 
 ## --- Best-fit parameters for nu_spacing =8 ---
 lam = 1
@@ -51,13 +49,12 @@ def cosmological_parameters(mt, kt, h):
     Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
     return Omega_lambda, Omega_m, Omega_K
 
-# # Best-fit parameters from nu_spacing=8
-# mt, kt, Omegab_ratio, h = 374.09852041763577, 0.3513780000350142, 0.16073476133403286, 0.6449862051259417
-# Best-fit parameters from nu_spacing=4
-mt, kt, Omegab_ratio, h = 401.38626259929055, 1.4181566171960542, 0.16686454899542, 0.5635275092831583
+###############################################################################
+# params with integerK and best-fit with observation
+mt, kt, Omegab_ratio, h, As, ns, tau = 409.969398,1.459351,0.163514,0.547313,2.095762,0.972835,0.053017
 OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
 OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
-z_rec = 1065.0  # the actual value still needs to be checked
+z_rec = 1063.4075 # calculated based on the calculate_z_rec() output
 ###############################################################################
 
 #set tolerances
@@ -76,25 +73,37 @@ Hinf = H0*np.sqrt(OmegaLambda);
 
 #write derivative function for background
 def ds_dt(t, s):
-    return -1*H0*np.sqrt((OmegaLambda + OmegaM*abs(((s**3))) + OmegaR*abs((s**4))))
+    return -1*H0*np.sqrt((OmegaLambda + OmegaK*abs(((s**2))) + OmegaM*abs(((s**3))) + OmegaR*abs((s**4))))
 
-t0 = 1e-8;
+def da_dt(t, a):
+    return a**2*H0*np.sqrt((OmegaLambda + OmegaK/abs(((a**2))) + OmegaM/abs(((a**3))) + OmegaR/abs((a**4))))
+
+t0 = 1e-5;
 
 #set coefficients for initial conditions
-smin1 = np.sqrt(3*OmegaLambda/OmegaR);
-szero = - OmegaM/(4*OmegaR);
-s1 = (OmegaM**2)/(16*np.sqrt(3*OmegaLambda*OmegaR**3)) - OmegaK/(6*np.sqrt(3*OmegaLambda*OmegaR));
-s2 = (OmegaM**3)/(192*OmegaLambda*OmegaR**2) + OmegaK*OmegaM/(48*OmegaLambda*OmegaR) ;
-s3 = (5*OmegaM**4 - 128*OmegaLambda*(OmegaR**3) -80./3.*OmegaM**2*OmegaR*OmegaK + 224./9.*OmegaR**2*OmegaK**2)/(3840*np.sqrt(3*(OmegaR**5)*(OmegaLambda**3)));
-s4 = (-OmegaM**5+20./3.*OmegaM**3*OmegaR*OmegaK - 32./3.*OmegaM*OmegaR**2*OmegaK**2)/(9216*(OmegaR**3)*(OmegaLambda**2))
+# smin1 = np.sqrt(3*OmegaLambda/OmegaR);
+# szero = - OmegaM/(4*OmegaR);
+# s1 = (OmegaM**2)/(16*np.sqrt(3*OmegaLambda*OmegaR**3)) - OmegaK/(6*np.sqrt(3*OmegaLambda*OmegaR));
+# s2 = (OmegaM**3)/(192*OmegaLambda*OmegaR**2) + OmegaK*OmegaM/(48*OmegaLambda*OmegaR) ;
+# s3 = (5*OmegaM**4 - 128*OmegaLambda*(OmegaR**3) -80./3.*OmegaM**2*OmegaR*OmegaK + 224./9.*OmegaR**2*OmegaK**2)/(3840*np.sqrt(3*(OmegaR**5)*(OmegaLambda**3)));
+# s4 = (-OmegaM**5+20./3.*OmegaM**3*OmegaR*OmegaK - 32./3.*OmegaM*OmegaR**2*OmegaK**2)/(9216*(OmegaR**3)*(OmegaLambda**2))
 
-s0 = smin1/t0 + szero + s1*t0 + s2*t0**2 + s3*t0**3 + s4*t0**4;
+# s0 = smin1/t0 + szero + s1*t0 + s2*t0**2 + s3*t0**3 + s4*t0**4;
+
+a1 = np.sqrt(OmegaR)/(np.sqrt(3)*np.sqrt(OmegaLambda));
+a2 = OmegaM/(12*OmegaLambda);
+a3 = (OmegaK * np.sqrt(OmegaR))/(18 * np.sqrt(3) * OmegaLambda**(3/2));
+a4 = (OmegaK * OmegaM)/(432 * OmegaLambda**2);
+a5 = (np.sqrt(OmegaR) * (OmegaK**2 + 12 * OmegaR * OmegaLambda))/(1080 * np.sqrt(3) * OmegaLambda**(5/2));
+a6 = (OmegaM * (OmegaK**2 + 72 * OmegaR * OmegaLambda))/(38880 * OmegaLambda**3);
+a_Bang = a1*t0 + a2*t0**2 + a3*t0**3 + a4*t0**4 + a5*t0**5 + a6*t0**6; 
 
 print('Performing Initial Background Integration')
 def reach_FCB(t, s): return s[0]
 reach_FCB.terminal = True
 
-sol = solve_ivp(ds_dt, [t0,12], [s0], max_step = 0.25e-4, events=reach_FCB, method='LSODA', atol=atol, rtol=rtol)
+sol_a = solve_ivp(da_dt, [t0,swaptime], [a_Bang], max_step = 0.25e-4, method='LSODA', atol=atol, rtol=rtol)
+sol = solve_ivp(ds_dt, [swaptime, 12], [1./sol_a.y[0][-1]], max_step = 0.25e-4, events=reach_FCB, method='LSODA', atol=atol, rtol=rtol)
 print('Initial Background Integration Done')
 
 # Check if t_events[0] is not empty before trying to access its elements
@@ -120,80 +129,73 @@ endtime = fcb_time - deltaeta
 #```````````````````````````````````````````````````````````````````````````````
 
 #find conformal time at recombination
-s_rec = 1+z_rec  #reciprocal scale factor at recombination
+a_rec = 1./(1+z_rec)  #reciprocal scale factor at recombination
 
 #take difference between s values and s_rec to find where s=s_rec i.e where recScaleFactorDifference=0
-recScaleFactorDifference = abs(sol.y[0] - s_rec) #take difference between s values and s_rec to find where s=s_rec 
-recConformalTime = sol.t[recScaleFactorDifference.argmin()]
+recScaleFactorDifference = abs(sol_a.y[0] - a_rec) #take difference between s values and s_rec to find where s=s_rec
+recConformalTime = sol_a.t[recScaleFactorDifference.argmin()]
+print(f"Recombination conformal time: {recConformalTime}")
 
 # --- Derivative Functions (Unchanged, but ensure lmax is handled correctly) ---
-l_max = num_variables - 7 + 2 # Assuming this is the logic
-def dX2_dt(t, X, k): # s-evolution
-    s,phi,psi,dr,dm,vr,vm = X[0:7]
-    fr2 = X[7]
-    sdot = ds_dt(t, s)
+
+def dX2_dt(t, X, k):
+    s, phi, psi, dr, dm, vr, vm, fr2 = X[0:8]
+    sdot = -1*H0*np.sqrt((OmegaLambda + OmegaK*abs(s**2) + OmegaM*abs(s**3) + OmegaR*abs(s**4)))
+
     rho_m = 3*(H0**2)*OmegaM*(abs(s)**3)
     rho_r = 3*(H0**2)*OmegaR*(abs(s)**4)
+
     phidot = (sdot/s)*psi - ((4/3)*rho_r*vr + rho_m*vm)/(2*s**2)
     fr2dot = -(8/15)*(k**2)*vr - 0.6*k*X[8]
     psidot = phidot - (1/k**2)*(6*(H0**2)*OmegaR*s)*(sdot*fr2 + 0.5*s*fr2dot)
     drdot = (4/3)*(3*phidot + (k**2)*vr)
     dmdot = 3*phidot + vm*(k**2)
-    vrdot = -(psi + dr/4) + (1 + 3*OmegaK*H0**2/k**2)*fr2/2 #+ fr2/2
+    vrdot = -(psi + dr/4) + (1 + 3*OmegaK*H0**2/k**2)*fr2/2
     vmdot = (sdot/s)*vm - psi
     derivatives = [sdot, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
-    #for l>2 terms, add derivates to above list
-    for j in range(8,num_variables):
-        l = j - 5;
-        derivatives.append((k/(2*l+1))*(l*X[j-1] - (l+1)*X[j+1]));
-    #now add final term
-    """
-    lmax = num_variables - 5;
-    lastderiv = (k*lmax*X[num_variables-1])/(2*lmax + 1);
-    """
-    lastderiv = k*X[num_variables-1] - ((num_variables-5 + 1)*X[num_variables])/t;
-    
-    derivatives.append(lastderiv);
+
+    for j in range(8, num_variables):
+        l = j - 5
+        derivatives.append((k/(2*l+1))*(l*X[j-1] - (l+1)*X[j+1]))
+
+    lastderiv = k*X[num_variables-1] - ((num_variables-5 + 1)*X[num_variables])/t
+    derivatives.append(lastderiv)
     return derivatives
 
-def dX3_dt(t, X, k): # sigma-evolution
-    sigma,phi,psi,dr,dm,vr,vm = X[0:7]
-    fr2 = X[7]
-    sigmadot = -(H0)*np.sqrt(OmegaLambda*np.exp(-2*sigma)+OmegaM*np.exp(sigma)+OmegaR*np.exp(2*sigma))
-    rho_m = 3*(H0**2)*OmegaM*(np.exp(3*sigma))
-    rho_r = 3*(H0**2)*OmegaR*(np.exp(4*sigma))
-    phidot = sigmadot*psi - ((4/3)*rho_r*vr + rho_m*vm)/(2*np.exp(2*sigma))
-    fr2dot = -(8/15)*(k**2)*vr - (3/5)*k*X[8]
-    psidot = phidot - (1/k**2)*(6*(H0**2)*OmegaR*np.exp(sigma))*(sigmadot*np.exp(sigma)*fr2 + 0.5*np.exp(sigma)*fr2dot)
+def dX3_dt(t, X, k):
+    a, phi, psi, dr, dm, vr, vm, fr2 = X[0:8]
+    adot = a**2*H0*np.sqrt((OmegaLambda + OmegaK/abs(a**2) + OmegaM/abs(a**3) + OmegaR/abs(a**4)))
+
+    rho_m = 3*(H0**2)*OmegaM/(abs(a)**3)
+    rho_r = 3*(H0**2)*OmegaR/(abs(a)**4)
+
+    phidot = - (adot/a)*psi - ((4/3)*rho_r*vr + rho_m*vm)*(a**2/2)
+    fr2dot = -(8/15)*(k**2)*vr - 0.6*k*X[8]
+    psidot = phidot - (1/k**2)*(6*(H0**2)*OmegaR/a)*(-adot*fr2/a**2 + 0.5*fr2dot/a)
     drdot = (4/3)*(3*phidot + (k**2)*vr)
     dmdot = 3*phidot + vm*(k**2)
-    vrdot = -(psi + dr/4) + (1 + 3*OmegaK*H0**2/k**2)*fr2/2 #+ fr2/2
-    vmdot = sigmadot*vm - psi
-    derivatives = [sigmadot, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
-    #for l>2 terms, add derivates to above list
-    for j in range(8,num_variables):
-        l = j - 5;
-        derivatives.append((k/(2*l+1))*(l*X[j-1] - (l+1)*X[j+1]));
-    #now add final term
-    """
-    lmax = num_variables - 5;
-    lastderiv = (k*lmax*X[num_variables-1])/(2*lmax + 1);
-    """
-    lastderiv = k*X[num_variables-1] - ((num_variables-5 + 1)*X[num_variables])/t;
-    
-    derivatives.append(lastderiv);
+    vrdot = -(psi + dr/4) + (1 + 3*OmegaK*H0**2/k**2)*fr2/2
+    vmdot = (-adot/a)*vm - psi
+    derivatives = [adot, phidot, psidot, drdot, dmdot, vrdot, vmdot, fr2dot]
+
+    for j in range(8, num_variables):
+        l = j - 5
+        derivatives.append((k/(2*l+1))*(l*X[j-1] - (l+1)*X[j+1]))
+
+    lastderiv = k*X[num_variables-1] - ((num_variables-5 + 1)*X[num_variables])/t
+    derivatives.append(lastderiv)
     return derivatives
 
 # --- Main Calculation Loop ---
 
-kvalues = np.load(allowedK_path)
+kvalues = np.load(kvalues_path);
 
 # *** NEW: Define a common time grid ***
 num_time_points = 500
 t_grid = np.linspace(recConformalTime, endtime, num=num_time_points)
 
 # Split grid for the two integration domains
-t_grid_sigma = t_grid[t_grid < swaptime]
+t_grid_a = t_grid[t_grid < swaptime]
 t_grid_s = t_grid[t_grid >= swaptime]
 
 # *** NEW: Initialize lists to hold the full solution tensors ***
@@ -228,24 +230,24 @@ for i in range(len(kvalues)):
                           method='LSODA', atol=atol, rtol=rtol, args=(k,))
         
         # Prepare for next integration leg
-        inits_sigma = sol_s.y[:, -1]
-        inits_sigma[0] = np.log(inits_sigma[0])
+        inits_a = sol_s.y[:, -1]
+        inits_a[0] = 1./inits_a[0]
         
         # Integrate from swaptime to recombination (sigma-domain)
-        sol_sigma = solve_ivp(dX3_dt, [swaptime, recConformalTime], inits_sigma, dense_output=True,
+        sol_a = solve_ivp(dX3_dt, [swaptime, recConformalTime], inits_a, dense_output=True,
                               method='LSODA', atol=atol, rtol=rtol, args=(k,))
 
         # *** NEW: Evaluate solutions on the grid and stitch them ***
         # Evaluate on the respective parts of the grid
         sol_on_s_grid = sol_s.sol(t_grid_s)
-        sol_on_sigma_grid = sol_sigma.sol(t_grid_sigma)
+        sol_on_a_grid = sol_a.sol(t_grid_a)
         
-        # Convert sigma back to s for consistency
-        sol_on_sigma_grid[0, :] = np.exp(sol_on_sigma_grid[0, :])
-        
+        # Convert a back to s for consistency
+        sol_on_a_grid[0, :] = 1./sol_on_a_grid[0, :]
+
         # Stitch the solutions together
-        full_solution = np.concatenate((sol_on_sigma_grid, sol_on_s_grid), axis=1)
-        
+        full_solution = np.concatenate((sol_on_a_grid, sol_on_s_grid), axis=1)
+
         # Store the perturbation part (ignoring the background variable)
         ABC_sols_k[:, n, :] = full_solution[1:, :]
 
@@ -259,14 +261,14 @@ for i in range(len(kvalues)):
         inits_s = np.concatenate(([s_init], x0))
         
         sol_s = solve_ivp(dX2_dt, [endtime, swaptime], inits_s, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
-        inits_sigma = sol_s.y[:, -1]
-        inits_sigma[0] = np.log(inits_sigma[0])
-        sol_sigma = solve_ivp(dX3_dt, [swaptime, recConformalTime], inits_sigma, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
+        inits_a = sol_s.y[:, -1]
+        inits_a[0] = 1/inits_a[0]
+        sol_a = solve_ivp(dX3_dt, [swaptime, recConformalTime], inits_a, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
 
         sol_on_s_grid = sol_s.sol(t_grid_s)
-        sol_on_sigma_grid = sol_sigma.sol(t_grid_sigma)
-        sol_on_sigma_grid[0, :] = np.exp(sol_on_sigma_grid[0, :])
-        full_solution = np.concatenate((sol_on_sigma_grid, sol_on_s_grid), axis=1)
+        sol_on_a_grid = sol_a.sol(t_grid_a)
+        sol_on_a_grid[0, :] = 1./sol_on_a_grid[0, :]
+        full_solution = np.concatenate((sol_on_a_grid, sol_on_s_grid), axis=1)
         DEF_sols_k[:, j, :] = full_solution[1:, :]
         
     all_DEF_solutions.append(DEF_sols_k)
@@ -279,14 +281,14 @@ for i in range(len(kvalues)):
     inits_s = np.concatenate(([s_init], x0))
 
     sol_s = solve_ivp(dX2_dt, [endtime, swaptime], inits_s, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
-    inits_sigma = sol_s.y[:, -1]
-    inits_sigma[0] = np.log(inits_sigma[0])
-    sol_sigma = solve_ivp(dX3_dt, [swaptime, recConformalTime], inits_sigma, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
+    inits_a = sol_s.y[:, -1]
+    inits_a[0] = 1./inits_a[0]
+    sol_a = solve_ivp(dX3_dt, [swaptime, recConformalTime], inits_a, dense_output=True, method='LSODA', atol=atol, rtol=rtol, args=(k,))
 
     sol_on_s_grid = sol_s.sol(t_grid_s)
-    sol_on_sigma_grid = sol_sigma.sol(t_grid_sigma)
-    sol_on_sigma_grid[0, :] = np.exp(sol_on_sigma_grid[0, :])
-    full_solution = np.concatenate((sol_on_sigma_grid, sol_on_s_grid), axis=1)
+    sol_on_a_grid = sol_a.sol(t_grid_a)
+    sol_on_a_grid[0, :] = 1./sol_on_a_grid[0, :]
+    full_solution = np.concatenate((sol_on_a_grid, sol_on_s_grid), axis=1)
     GHI_sols_k[:, :] = full_solution[1:, :]
     
     all_GHI_solutions.append(GHI_sols_k)

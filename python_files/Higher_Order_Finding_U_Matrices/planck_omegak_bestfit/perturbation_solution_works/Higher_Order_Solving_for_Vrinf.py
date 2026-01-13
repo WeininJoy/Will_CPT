@@ -11,7 +11,10 @@ import matplotlib as mpl
 from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 
-folder_path = './nu_spacing4/data_all_k/'
+nu_spacing = 4
+folder = f'./data/'
+# folder_path = folder + 'data_all_k/'
+folder_path = folder + 'data_small_k/'
 
 num_variables = 75;
 
@@ -94,7 +97,7 @@ for j in range(len(kvalues)):
     #calculate full matrix but then remove top two rows
     AX1 = A.reshape(6,6) @ X1.reshape(6,4);
     DX2 = D.reshape(6,2) @ X2.reshape(2,4);
-    matrixog = AX1 + DX2 + GX3;
+    matrixog = AX1 + DX2 # + GX3;
     matrix = matrixog[[2,3,4,5], :];
     
     xrecs = [recs[2], recs[3], recs[4], recs[5]];
@@ -154,11 +157,41 @@ for idx in idxzeros:
         print(f"Skipping bracket {k_bracket} due to ValueError: {e}")
 
 allowedK_refined = np.array(allowedK_refined)
+print(f"allowed K values: {allowedK_refined}")
 
 # Save the new, highly accurate wavenumbers
 output_filename = 'allowedK.npy'
 np.save(folder_path+output_filename, allowedK_refined)
 print(f"\nSaved {len(allowedK_refined)} refined allowed K values to {output_filename}")
+
+# Unpack parameters
+mt, kt, Omegab_ratio, h, As, ns, tau = 409.969398,1.459351,0.163514,0.547313,2.095762,0.972835,0.053017
+lam = 1
+rt = 1
+Omega_gamma_h2 = 2.47e-5 # photon density 
+Neff = 3.046
+
+def cosmological_parameters(mt, kt, h): 
+
+    Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+
+    def solve_a0(Omega_r, rt, mt, kt):
+        def f(a0):
+            return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+        sol = root_scalar(f, bracket=[1, 1.e3])
+        return sol.root
+
+    a0 = solve_a0(Omega_r, rt, mt, kt)
+    Omega_lambda = Omega_r * a0**4
+    Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+    Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+    return Omega_lambda, Omega_m, Omega_K
+
+OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+H0 = 1/np.sqrt(3*OmegaLambda); #we are working in units of Lambda=c=1
+a0=1; K=-OmegaK * a0**2 * H0**2
+allowedK_integer = [k / np.sqrt(np.abs(K)) for k in allowedK_refined]
+np.save(folder_path+'allowedK_integer.npy', allowedK_integer)
 
 # Optional: Plot for verification
 plt.figure(figsize=(10, 6))
