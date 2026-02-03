@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-num_variables = 20  # number of pert variables, 75 for original code
+num_variables = 75  # number of pert variables, 75 for original code
 
 kvalues = np.load('L70_kvalues.npy')
 ABCmatrices = np.load('L70_ABCmatrices.npy')
@@ -107,13 +107,22 @@ for j in range(1,len(kvalues)):
     
     #yrecs.append(yrec);
 
-#np.save('L70_vrfcb', vrfcb);
+np.save('L70_vrfcb', vrfcb)
 
 idxzeros = np.where(np.diff(np.sign(vrfcb)) != 0)[0]
-allowedK = kvalues[idxzeros]
-print(allowedK)
-print('delta K:',[allowedK[i+1] - allowedK[i] for i in range(len(allowedK)-1)] )
+allowedK = []
+for idx in idxzeros:
+    k1 = kvalues[idx]
+    k2 = kvalues[idx+1]
+    vrfcb1 = vrfcb[idx]
+    vrfcb2 = vrfcb[idx+1]
+    allowK = k1 - vrfcb1 * (k2 - k1) / (vrfcb2 - vrfcb1)
+    allowedK.append(allowK)
 np.save('allowedK', allowedK)
+deltaK_list = [allowedK[i+1] - allowedK[i] for i in range(len(allowedK)-1)]
+print('Delta K list = ', deltaK_list)
+deltaK = sum(deltaK_list[len(deltaK_list)//2:-2]) / len(deltaK_list[len(deltaK_list)//2:-2])
+print('Delta K = ', deltaK)
 
 plt.plot(kvalues[1:], vrfcb)
 plt.plot(allowedK, np.zeros_like(allowedK), 'ro')

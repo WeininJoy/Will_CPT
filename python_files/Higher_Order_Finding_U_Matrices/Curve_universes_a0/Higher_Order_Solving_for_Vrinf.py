@@ -7,22 +7,48 @@ Created on Tue Apr  6 22:22:53 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import root_scalar
 import matplotlib as mpl
+from scipy.optimize import root_scalar
 import sys
 
 input_number = int(sys.argv[1])
 
+# set cosmological parameters
+OmegaLambda = 0.68
+H0 = 1/np.sqrt(3*OmegaLambda) #we are working in units of Lambda=c=1
+lam = 1
+rt = 1
+mt_list = np.linspace(300, 450, 10)
+kt_list = np.linspace(1.e-4, 1, 10)
+mt = mt_list[input_number//10]
+kt = kt_list[input_number%10]
+
+# calculate present scale factor a0 and energy densities
+def solve_a0(omega_lambda, rt, mt, kt):
+    def f(a0):
+        return (1./omega_lambda -1)*a0**4 + 3*kt*a0**2 - mt*a0 - rt
+    sol = root_scalar(f, bracket=[1, 1.e3])
+    return sol.root
+
+def transform(omega_lambda, rt, mt, kt):
+    a0 = solve_a0(omega_lambda, rt, mt, kt)
+    s0 = 1/a0
+    omega_r = omega_lambda / a0**4
+    omega_m = mt * omega_lambda**(1/4) * omega_r**(3/4)
+    omega_kappa = -3* kt * np.sqrt(omega_lambda* omega_r)
+    return s0, omega_lambda, omega_r, omega_m, omega_kappa
+
+s0, OmegaLambda, OmegaR, OmegaM, OmegaK = transform(OmegaLambda, rt, mt, kt)
 
 num_variables = 75  # number of pert variables, 75 for original code
 
-kvalues = np.load(f'L70_kvalues_{input_number}.npy')
-ABCmatrices = np.load(f'L70_ABCmatrices_{input_number}.npy')
-DEFmatrices = np.load(f'L70_DEFmatrices_{input_number}.npy')
-# GHIvectors = np.load(f'L70_GHIvectors_{input_number}.npy')
-X1matrices = np.load(f'L70_X1matrices_{input_number}.npy')
-X2matrices = np.load(f'L70_X2matrices_{input_number}.npy')
-recValues = np.load(f'L70_recValues_{input_number}.npy')
+kvalues = np.load(f'./data/L70_kvalues_{input_number}.npy')
+ABCmatrices = np.load(f'./data/L70_ABCmatrices_{input_number}.npy')
+DEFmatrices = np.load(f'./data/L70_DEFmatrices_{input_number}.npy')
+# GHIvectors = np.load(f'./data/L70_GHIvectors_{input_number}.npy')
+X1matrices = np.load(f'./data/L70_X1matrices_{input_number}.npy')
+X2matrices = np.load(f'./data/L70_X2matrices_{input_number}.npy')
+recValues = np.load(f'./data/L70_recValues_{input_number}.npy')
 
 #first extract A and D matrices from results
 
@@ -95,7 +121,7 @@ for j in range(1,len(kvalues)):
     #calculate full matrix but then remove top two rows
     AX1 = A.reshape(6,6) @ X1.reshape(6,4)
     DX2 = D.reshape(6,2) @ X2.reshape(2,4)
-    matrixog = AX1 + DX2 # + GX3
+    matrixog = AX1 + DX2 #+ GX3
     matrix = matrixog[[2,3,4,5], :]
     
     xrecs = [recs[2], recs[3], recs[4], recs[5]]
@@ -112,48 +138,7 @@ for j in range(1,len(kvalues)):
     
     #yrecs.append(yrec);
 
-np.save(f'L70_vrfcb_{input_number}', vrfcb);
-
-#set cosmological parameters
-# OmegaLambda = 0.68
-# H0 = 1/np.sqrt(3*OmegaLambda) #we are working in units of Lambda=c=1
-# lam = 1
-# rt = 1
-# mt_list = np.linspace(300, 450, 10)
-# kt_list = np.linspace(1.e-4, 1, 10)
-# mt = mt_list[input_number//10]
-# kt = kt_list[input_number%10]
-
-OmegaLambda = 0.679 # in Metha's code, OmegaLambda = 0.679 --> OmegaK = 0
-OmegaM = 0.321 # in Metha's code, OmegaM = 0.321
-OmegaR = 9.24e-5
-OmegaK = 0
-H0 = 1/np.sqrt(3*OmegaLambda) #we are working in units of Lambda=c=1
-s0 = 1
-
-# lam = rt = 1
-# a0 = (OmegaLambda/OmegaR)**(1./4.)
-# s0 = 1/a0
-# mt = OmegaM / (OmegaLambda**(1./4.) * OmegaR**(3./4.))
-# kt = - OmegaK / np.sqrt(OmegaLambda* OmegaR) / 3
-
-# calculate present scale factor a0 and energy densities
-def solve_a0(omega_lambda, rt, mt, kt):
-    def f(a0):
-        return (1./omega_lambda -1)*a0**4 + 3*kt*a0**2 - mt*a0 - rt
-    sol = root_scalar(f, bracket=[1, 1.e3])
-    return sol.root
-
-def transform(omega_lambda, rt, mt, kt):
-    a0 = solve_a0(omega_lambda, rt, mt, kt)
-    s0 = 1/a0
-    omega_r = omega_lambda / a0**4
-    omega_m = mt * omega_lambda**(1/4) * omega_r**(3/4)
-    omega_kappa = -3* kt * np.sqrt(omega_lambda* omega_r)
-    return s0, omega_lambda, omega_r, omega_m, omega_kappa
-
-# s0, OmegaLambda, OmegaR, OmegaM, OmegaK = transform(OmegaLambda, rt, mt, kt)
-print('s0, OmegaLambda, OmegaR, OmegaM, OmegaK=', s0, OmegaLambda, OmegaR, OmegaM, OmegaK)
+np.save(f'./data/L70_vrfcb_{input_number}', vrfcb)
 
 idxzeros = np.where(np.diff(np.sign(vrfcb)) != 0)[0]
 allowedK = []
@@ -163,25 +148,14 @@ for idx in idxzeros:
     vrfcb1 = vrfcb[idx]
     vrfcb2 = vrfcb[idx+1]
     allowK = k1 - vrfcb1 * (k2 - k1) / (vrfcb2 - vrfcb1)
-    allowedK.append(allowK)
-np.save(f'allowedK_{input_number}', allowedK)
+    allowedK.append(allowK / s0)  # transfer discerete wave vectoer back to the correct value.
+np.save(f'./data/allowedK_{input_number}', allowedK)
 deltaK_list = [allowedK[i+1] - allowedK[i] for i in range(len(allowedK)-1)]
 print('Delta K list = ', deltaK_list)
 deltaK = sum(deltaK_list[len(deltaK_list)//2:-2]) / len(deltaK_list[len(deltaK_list)//2:-2])
 print('Delta K = ', deltaK)
 
-# from astropy import units as u
-# from astropy.constants import c
-
-# H0 = 66.88 * u.km/u.s/u.Mpc  # 66.86 km/s/Mpc
-
-# Lambda = OmegaLambda * 3 * H0**2 / c**2 
-# Lambda = Lambda.si.to(u.Mpc**-2).value
-
-# print('dimensional Delta k in Mpc^-1 = ', deltaK * s0 * np.sqrt(Lambda))
-
-plt.plot(kvalues[1:] , vrfcb)
+plt.plot(kvalues[1:], vrfcb)
 plt.plot(allowedK, np.zeros_like(allowedK), 'ro')
-plt.ylim(-2, 4)
-plt.xlim(0, 20)
-plt.savefig(f'L70_vrfcb_{input_number}.pdf')
+# plt.ylim(-0.05, 0.05)
+plt.savefig(f'./data/L70_vrfcb_{input_number}.pdf')

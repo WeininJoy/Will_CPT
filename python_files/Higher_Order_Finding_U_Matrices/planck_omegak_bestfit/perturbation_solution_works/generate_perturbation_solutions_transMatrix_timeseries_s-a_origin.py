@@ -202,7 +202,7 @@ num_modes_to_plot = min(3, len(allowedK))
 
 for i in range(num_modes_to_plot):
     # This logic now selects the first few modes for simplicity
-    k_index = i + 2 # Skip the first two modes as before
+    k_index = i
     k = allowedK[k_index]
     print(f"\nProcessing mode n={i+1} with k={k:.6f} (index {k_index})")
 
@@ -471,7 +471,7 @@ for i, sol in enumerate(solutions):
     ax.axhline(0, color='k', linestyle='--', linewidth=0.8, dashes=(5, 5))
     
     # Y-axis label
-    ax.set_ylabel(f'$n = {i+2+1}$', rotation=90, labelpad=15, va='center', fontsize=14)
+    ax.set_ylabel(f'$n = {i+1}$', rotation=90, labelpad=15, va='center', fontsize=14)
     
     # Y-axis ticks and limits
     ax.set_ylim(-2.1*sol['Y_left'][2, -1], 2.1*sol['Y_left'][2, -1]) 

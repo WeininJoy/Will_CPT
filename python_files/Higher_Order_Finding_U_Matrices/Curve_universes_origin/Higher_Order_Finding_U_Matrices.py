@@ -11,36 +11,17 @@ import numpy as np
 
 #working in units 8piG = Lambda = c = hbar = kB = 1 throughout
 
-#set cosmological parameters
-OmegaLambda = 0.68
+OmegaLambda = 0.679 # in Metha's code, OmegaLambda = 0.679 --> OmegaK = 0
+OmegaM = 0.321 # in Metha's code, OmegaM = 0.321
+OmegaR = 9.24e-5
+OmegaK = 0
 H0 = 1/np.sqrt(3*OmegaLambda) #we are working in units of Lambda=c=1
-lam = 1
-rt = 1
-mt = 400
-kt = 0.5
-
-def solve_a0(omega_lambda, rt, mt, kt):
-    def f(a0):
-        return (1./omega_lambda -1)*a0**4 + 3*kt*a0**2 - mt*a0 - rt
-    sol = root_scalar(f, bracket=[1, 1.e3])
-    return sol.root
-
-def transform(omega_lambda, rt, mt, kt):
-    a0 = solve_a0(omega_lambda, rt, mt, kt)
-    print("a0 = ", a0)
-    omega_r = omega_lambda / a0**4
-    omega_m = mt * omega_lambda**(1/4) * omega_r**(3/4)
-    omega_kappa = -3* kt * np.sqrt(omega_lambda* omega_r)
-    return a0, omega_lambda, omega_r, omega_m, omega_kappa
-
-a_now, OmegaLambda, OmegaR, OmegaM, OmegaK = transform(OmegaLambda, rt, mt, kt)
-print('a0, OmegaLambda, OmegaR, OmegaM, OmegaK=', a0, OmegaLambda, OmegaR, OmegaM, OmegaK)
 
 #set tolerances
 atol = 1e-13
 rtol = 1e-13
 stol = 1e-10
-num_variables = 20 # number of pert variables, 75 for original code
+num_variables = 75 # number of pert variables, 75 for original code
 swaptime = 2 #set time when we swap from s to sigma
 deltaeta = 6.6e-7 # integrating from endtime-deltaeta to recombination time, instead of from FCB -> prevent numerical issues
 Hinf = H0*np.sqrt(OmegaLambda)
@@ -183,7 +164,7 @@ at_fcb.terminal = True
 # For each K, find ACmatrices, BDvectors and Xmatrices
 #-------------------------------------------------------------------------------
 
-kvalues = np.linspace(1e-4,15,num=300) # originally: kvalues = np.linspace(1e-5,15,num=300)
+kvalues = np.linspace(1e-4,15,num=100) # originally: kvalues = np.linspace(1e-5,15,num=300)
 ABCmatrices = []
 DEFmatrices = []
 GHIvectors = []

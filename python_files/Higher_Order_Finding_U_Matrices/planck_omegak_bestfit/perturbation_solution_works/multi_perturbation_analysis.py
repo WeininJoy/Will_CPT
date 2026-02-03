@@ -169,6 +169,7 @@ def generate_multi_perturbation_bases(discreteK_type, eta_grid): # discreteK_typ
         # *** NEW: Load the time-series data ***
         t_grid = np.load(folder_path_timeseries + 't_grid.npy')
         allowedK = np.load(folder_path_timeseries + 'L70_kvalues.npy')
+        print(f"K values from {discreteK_type}:", allowedK)
         all_ABC_solutions = np.load(folder_path_timeseries + 'L70_ABC_solutions.npy')
         all_DEF_solutions = np.load(folder_path_timeseries + 'L70_DEF_solutions.npy')
         all_GHI_solutions = np.load(folder_path_timeseries + 'L70_GHI_solutions.npy')
@@ -420,16 +421,17 @@ def compute_multi_perturbation_A_matrix(ortho_funcs_1_dict, ortho_funcs_2_dict):
     
     return eigenvalues_1, eigenvectors_1, eigenvalues_2, eigenvectors_2, M_total
 
-def choose_eigenvalues(eigenvalues, eigenvectors, eigenvalues_threshold, N):
+def choose_eigenvalues(eigenvalues, eigenvectors, eigenvalues_threshold=0.99):
     """Select the largest eigenvalues"""
     # Sort eigenvalues in descending order and get indices
     sorted_indices = np.argsort(np.real(eigenvalues))[::-1]
     
     eigenvalues_valid, eigenvectors_valid = [], []
-    n_select = min(N, len(eigenvalues), 10)  # Take at most 10 largest eigenvalues
     
-    for i in range(n_select):
+    for i in range(len(eigenvalues)):
         idx = sorted_indices[i]
+        if np.real(eigenvalues[idx]) < eigenvalues_threshold:
+            break
         eigenvalues_valid.append(eigenvalues[idx])
         eigenvectors_valid.append(eigenvectors[:, idx])
     
@@ -442,11 +444,11 @@ def compute_coefficients(eigenvalues, eigenvectors, transformation_matrix):
         coefficients[i, :] = np.dot(np.array(eigenvectors[i]), transformation_matrix)
     return coefficients
 
-def multi_perturbation_analysis(N=23, N_t=500):
+def multi_perturbation_analysis(N=23, N_t=500, eigenvalues_threshold=0.99):
     """
     Complete multi-perturbation eigenvalue analysis with adaptive time truncation
     """
-    print(f"Starting multi-perturbation analysis with N={N}, N_t={N_t}")
+    print(f"Starting multi-perturbation analysis with N={N}, N_t={N_t}, eigenvalues_threshold={eigenvalues_threshold}")
     
     # Define eta_grid from cutoff_time to fcb_time as requested
     eta_grid = np.linspace(0, fcb_time, N_t)
@@ -493,9 +495,9 @@ def multi_perturbation_analysis(N=23, N_t=500):
     
     # Select largest eigenvalues
     eigenvals_valid_1, eigenvecs_valid_1 = choose_eigenvalues(
-        eigenvals_1, eigenvecs_1, None, N)
+        eigenvals_1, eigenvecs_1, eigenvalues_threshold)
     eigenvals_valid_2, eigenvecs_valid_2 = choose_eigenvalues(
-        eigenvals_2, eigenvecs_2, None, N)
+        eigenvals_2, eigenvecs_2, eigenvalues_threshold)
     
     print(f"\nFound {len(eigenvals_valid_1)} valid eigenvalues for basis 1")
     print(f"Found {len(eigenvals_valid_2)} valid eigenvalues for basis 2")
@@ -517,14 +519,16 @@ def multi_perturbation_analysis(N=23, N_t=500):
             coefficients_2_dict[pert_type] = compute_coefficients(
                 eigenvals_valid_2, eigenvecs_valid_2, transform_2_dict[pert_type])
     
-    # save the coefficients
-    with open("multi_perturbation_coefficients1.pickle", 'wb') as f:
-        pickle.dump(coefficients_1_dict, f)
+    # # save the coefficients
+    # with open("multi_perturbation_coefficients1.pickle", 'wb') as f:
+    #     pickle.dump(coefficients_1_dict, f)
 
     return {
         'eta_grid': eta_grid,
         'eigenvals_1': eigenvals_valid_1,
         'eigenvals_2': eigenvals_valid_2,
+        'eigenvecs_1': eigenvecs_valid_1,
+        'eigenvecs_2': eigenvecs_valid_2,
         'coefficients_1': coefficients_1_dict,
         'coefficients_2': coefficients_2_dict,
         'basis_1': basis_1_dict,
@@ -595,10 +599,8 @@ def plot_multi_perturbation_results(results, N_plot=3):
                 ax.set_xlabel("Conformal Time η")
 
     plt.savefig("multi_perturbation_eigenfunctions_after_recombination.pdf", dpi=300, bbox_inches='tight')
-    plt.show()
 
-def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=10,
-                                    reference_perturbation='vr'):
+def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.99, N_plot=10):
     """
     Plot coefficients of eigenfunctions sorted by dominant k mode
 
@@ -610,16 +612,9 @@ def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=1
         Minimum eigenvalue to include (default: 0.95)
     N_plot : int
         Maximum number of eigenfunctions to plot
-    reference_perturbation : str
-        Which perturbation type to use for determining dominant k (default: 'vr')
     """
     eigenvals_1 = np.array(results['eigenvals_1'])
-    coefficients_1 = results['coefficients_1']
-
-    if reference_perturbation not in coefficients_1:
-        print(f"Error: {reference_perturbation} not found in coefficients")
-        print(f"Available perturbation types: {list(coefficients_1.keys())}")
-        return
+    eigenvecs_1 = results['eigenvecs_1']
 
     # Step 1: Filter eigenvectors with eigenvalues > threshold
     valid_mask = eigenvals_1.real > eigenvalue_threshold
@@ -637,7 +632,9 @@ def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=1
 
     # Step 2: Sort by dominant k mode
     # Extract coefficients for the reference perturbation
-    coeffs_ref = coefficients_1[reference_perturbation][valid_indices]
+    # Convert list of eigenvectors to numpy array first
+    eigenvecs_1_array = np.array([eigenvecs_1[i] for i in range(len(eigenvecs_1))])
+    coeffs_ref = eigenvecs_1_array[valid_indices]
 
     # Find the index of the maximum coefficient for each eigenfunction (dominant k)
     max_indices = np.argmax(np.abs(coeffs_ref.real), axis=1)
@@ -657,7 +654,7 @@ def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=1
     if N_plot == 1:
         axs = [axs]
 
-    fig.suptitle(f"Coefficients sorted by dominant k ({reference_perturbation})", fontsize=10)
+    fig.suptitle(f"Coefficients sorted by dominant k", fontsize=10)
 
     # Plot each eigenfunction's coefficients
     for i in range(N_plot):
@@ -696,7 +693,7 @@ def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=1
     fig.tight_layout()
 
     # Save figure
-    output_filename = f"multi_perturbation_coefficients_{reference_perturbation}_sorted.pdf"
+    output_filename = f"multi_perturbation_coefficients_sorted.pdf"
     plt.savefig(output_filename, dpi=300, bbox_inches='tight')
     print(f"\nSaved coefficient plot to {output_filename}")
     plt.show()
@@ -708,10 +705,122 @@ def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=1
         'eigenvals_valid': eigenvals_valid
     }
 
+
+# def plot_coefficients_by_dominant_k_pert_type(results, eigenvalue_threshold=0.95, N_plot=10,
+#                                     reference_perturbation='vr'):
+#     """
+#     Plot coefficients of eigenfunctions sorted by dominant k mode
+
+#     Parameters:
+#     -----------
+#     results : dict
+#         Results dictionary from multi_perturbation_analysis
+#     eigenvalue_threshold : float
+#         Minimum eigenvalue to include (default: 0.95)
+#     N_plot : int
+#         Maximum number of eigenfunctions to plot
+#     reference_perturbation : str
+#         Which perturbation type to use for determining dominant k (default: 'vr')
+#     """
+#     eigenvals_1 = np.array(results['eigenvals_1'])
+#     coefficients_1 = results['coefficients_1']
+
+#     if reference_perturbation not in coefficients_1:
+#         print(f"Error: {reference_perturbation} not found in coefficients")
+#         print(f"Available perturbation types: {list(coefficients_1.keys())}")
+#         return
+
+#     # Step 1: Filter eigenvectors with eigenvalues > threshold
+#     valid_mask = eigenvals_1.real > eigenvalue_threshold
+#     eigenvals_valid = eigenvals_1[valid_mask]
+
+#     print(f"\nFiltering eigenvectors with eigenvalue > {eigenvalue_threshold}")
+#     print(f"Found {len(eigenvals_valid)} eigenvectors above threshold out of {len(eigenvals_1)} total")
+
+#     if len(eigenvals_valid) == 0:
+#         print("No eigenvectors found above threshold. Try lowering the threshold.")
+#         return
+
+#     # Get valid indices
+#     valid_indices = np.where(valid_mask)[0]
+
+#     # Step 2: Sort by dominant k mode
+#     # Extract coefficients for the reference perturbation
+#     coeffs_ref = coefficients_1[reference_perturbation][valid_indices]
+
+#     # Find the index of the maximum coefficient for each eigenfunction (dominant k)
+#     max_indices = np.argmax(np.abs(coeffs_ref.real), axis=1)
+
+#     # Sort eigenfunctions based on the dominant k mode (from small to large)
+#     sorted_order = np.argsort(max_indices)
+
+#     print(f"Dominant k indices: {max_indices[sorted_order]}")
+#     print(f"Corresponding eigenvalues: {eigenvals_valid[sorted_order].real}")
+
+#     # Step 3: Create bar chart plots
+#     N_plot = min(N_plot, len(eigenvals_valid))
+#     N_basis = coeffs_ref.shape[1]  # Number of basis functions
+
+#     # Create figure with subplots
+#     fig, axs = plt.subplots(N_plot, figsize=(3.8, 0.7*N_plot))
+#     if N_plot == 1:
+#         axs = [axs]
+
+#     fig.suptitle(f"Coefficients sorted by dominant k ({reference_perturbation})", fontsize=10)
+
+#     # Plot each eigenfunction's coefficients
+#     for i in range(N_plot):
+#         plot_idx = sorted_order[i]  # Index in the filtered arrays
+#         global_idx = valid_indices[plot_idx]  # Index in the original arrays
+
+#         coefficients = coeffs_ref[plot_idx, :].real
+#         dominant_k = max_indices[plot_idx]
+#         eigenval = eigenvals_valid[plot_idx].real
+
+#         # Create bar plot
+#         k_values = np.arange(1, N_basis + 1)
+#         axs[i].bar(k_values, coefficients, width=0.4)
+#         axs[i].set_xlim(0, min(20, N_basis + 1))
+#         axs[i].set_ylim(-1, 1.)
+
+#         # Add title with dominant k and eigenvalue
+#         axs[i].set_title(f"λ={eigenval:.3f}, dominant k={dominant_k+1}",
+#                         fontsize=8, loc='right')
+
+#         # Highlight the dominant k
+#         axs[i].axvline(dominant_k + 1, color='red', linestyle='--',
+#                       alpha=0.5, linewidth=1)
+
+#     # Format axes
+#     for ax in axs:
+#         ax.xaxis.set_tick_params(labelsize=8)
+#         ax.yaxis.set_tick_params(labelsize=8)
+#         ax.label_outer()
+#         ax.grid(True, alpha=0.3, axis='y')
+
+#     axs[-1].xaxis.set_major_locator(MaxNLocator(integer=True))
+#     axs[-1].set_xlabel(r"$k$ mode index", fontsize=8)
+#     fig.text(0.02, 0.5, 'Coefficient', va='center', rotation='vertical', fontsize=9)
+
+#     fig.tight_layout()
+
+#     # Save figure
+#     output_filename = f"multi_perturbation_coefficients_{reference_perturbation}_sorted.pdf"
+#     plt.savefig(output_filename, dpi=300, bbox_inches='tight')
+#     print(f"\nSaved coefficient plot to {output_filename}")
+#     plt.show()
+
+#     return {
+#         'valid_indices': valid_indices,
+#         'sorted_order': sorted_order,
+#         'dominant_k': max_indices,
+#         'eigenvals_valid': eigenvals_valid
+#     }
+
 if __name__ == "__main__":
     # Run the analysis
     folder_path = f'./data/'
-    allowedK = np.load(folder_path + 'data_all_k/allowedK.npy')
+    allowedK = np.load(folder_path + 'data_allowedK/L70_kvalues.npy')
     results = multi_perturbation_analysis(N=len(allowedK), N_t=1000)
 
     # Plot results
@@ -724,9 +833,8 @@ if __name__ == "__main__":
         print("="*80)
         sorting_results = plot_coefficients_by_dominant_k(
             results,
-            eigenvalue_threshold=0.95,
-            N_plot=6,
-            reference_perturbation='vr'  # Use radiation velocity as reference
+            eigenvalue_threshold=0.9,
+            N_plot=6
         )
     else:
         print("No eigenvalues found for plotting")
