@@ -1,0 +1,382 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+
+\newcommand{\va}{\bm{a}}
+\newcommand{\vb}{\bm{b}}
+\newcommand{\vc}{\bm{c}}
+\newcommand{\vct}{\tilde{\bm{c}}}
+\newcommand{\ve}{\bm{e}}
+\newcommand{\vu}{\bm{u}}
+\newcommand{\vv}{\bm{v}}
+\newcommand{\Xb}[2]{X_{#1}^{#2}}
+\newcommand{\Xn}[2]{\bar{X}_{#1}^{#2}}
+\newcommand{\Gb}[1]{G_{#1}}
+\newcommand{\frob}[1]{\lVert #1 \rVert_{\mathrm{F}}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\Nk}{N_k}
+\newcommand{\Nt}{N_\tau}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
+
+\title{Matching Solution Method for Joint Eigenfunctions\\
+       of Cosmological Perturbation Bases}
+\author{Will Handley \and Wei Ning Deng}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We address the problem of finding coefficient vectors $\va, \vb \in \mathbb{R}^{\Nk}$
+such that the time evolutions $\Xb{1}{p}\va$ and $\Xb{2}{p}\vb$ are \emph{equal} for
+every perturbation type $p$ simultaneously, not merely correlated.
+We show that canonical correlation analysis (CCA, see \texttt{cca\_formulation.pdf})
+is insufficient for this goal because it maximises a single aggregate correlation,
+allowing strong agreement in some fields to mask a poor match in others.
+The correct formulation is to minimise the sum of squared per-field residuals, which
+reduces to the minimum-eigenvalue problem on a $(2\Nk\times 2\Nk)$ block matrix.
+The framework is equivalent to finding a vector in the intersection of null spaces,
+a classical construction in linear algebra.
+\end{abstract}
+
+%----------------------------------------------------------------------
+\section{Problem Statement}
+\label{sec:problem}
+%----------------------------------------------------------------------
+
+The setup is the same as in \texttt{cca\_formulation.pdf}.
+A Boltzmann code produces solutions for perturbation variables
+$\delta_r, \delta_m, v_r, v_m$ as functions of conformal time $\tau$ and
+wavenumber $k$.
+For $\Nk$ wavenumbers we have two bases:
+\begin{itemize}
+    \item \textbf{Basis 1} (integer-$k$): $\Xb{1}{p} \in \mathbb{R}^{\Nt\times\Nk}$,
+    \item \textbf{Basis 2} (allowed-$k$): $\Xb{2}{p} \in \mathbb{R}^{\Nt\times\Nk}$,
+\end{itemize}
+for each perturbation type $p$.
+
+\textbf{Goal.} Find sparse coefficient vectors $\va, \vb \in \mathbb{R}^{\Nk}$
+such that
+\begin{equation}
+    \Xb{1}{p}\va = \Xb{2}{p}\vb \qquad \text{for all } p.
+    \label{eq:goal}
+\end{equation}
+This is a stricter requirement than the CCA goal of maximising the correlation
+between $\Xb{1}{p}\va$ and $\Xb{2}{p}\vb$: we want the two time-series vectors
+to be \emph{identical}, not merely proportional.
+
+%----------------------------------------------------------------------
+\section{Limitation of CCA for Exact Matching}
+\label{sec:cca-limit}
+%----------------------------------------------------------------------
+
+The CCA objective is
+\begin{equation}
+    \rho(\va,\vb) = \frac{\va^\top \Gb{12}\,\vb}{\sqrt{\va^\top \Gb{1}\,\va
+    \;\cdot\; \vb^\top \Gb{2}\,\vb}},
+    \label{eq:cca}
+\end{equation}
+where $\Gb{12} = \sum_p w_p (\Xn{1}{p})^\top \Xn{2}{p}$ aggregates the
+cross-field agreement into a \emph{single scalar} via a weighted sum over $p$.
+
+Two structural problems prevent CCA from guaranteeing exact per-field matching.
+
+\paragraph{Problem 1: outvoting.}
+A high value $\rho \approx 1$ only means that the \emph{weighted average}
+agreement across all fields is high.
+If $\delta_r, v_r, v_m$ match well but $\delta_m$ does not, the three
+well-matching fields can dominate the sum and push $\rho$ close to 1 while
+$\delta_m$ remains poorly matched.
+This is precisely what is observed: modes with $\rho = 0.999$ show a systematic
+offset in $\delta_m$ not present in the other three fields.
+
+\paragraph{Problem 2: correlation vs.\ equality.}
+Even if the per-field contribution of $\delta_m$ to $\rho$ were 1, this would
+only guarantee that $\Xn{1}{\delta_m}\va$ and $\Xn{2}{\delta_m}\vb$ are
+\emph{proportional}, i.e.\
+$\Xn{1}{\delta_m}\va = \lambda\,\Xn{2}{\delta_m}\vb$ for some scalar $\lambda$.
+The Frobenius pre-normalisation further obscures the relationship between the
+unnormalised time series.
+Correlation is scale-invariant; equality is not.
+
+%----------------------------------------------------------------------
+\section{The Matching Solution Formulation}
+\label{sec:matching}
+%----------------------------------------------------------------------
+
+\subsection{Residual objective}
+\label{sec:residual}
+
+Define the per-field residual vector for coefficient pair $(\va, \vb)$:
+\begin{equation}
+    \bm{r}^p(\va,\vb) = \Xn{1}{p}\va - \Xn{2}{p}\vb.
+    \label{eq:residual}
+\end{equation}
+The goal~\eqref{eq:goal} (after Frobenius pre-normalisation) is $\bm{r}^p = \bm{0}$
+for all $p$.
+We seek non-trivial $(\va, \vb)$ that minimise the total squared residual:
+\begin{equation}
+    J(\va,\vb) = \sum_p w_p \lVert\bm{r}^p(\va,\vb)\rVert^2
+               = \sum_p w_p \lVert\Xn{1}{p}\va - \Xn{2}{p}\vb\rVert^2.
+    \label{eq:objective}
+\end{equation}
+Unlike the CCA correlation, $J = 0$ guarantees~\eqref{eq:goal} exactly.
+The value of $J$ provides an absolute, per-field measure of disagreement:
+it is not normalised by any self-energy, so a small $J$ cannot be achieved
+by making $\va$ or $\vb$ small unless they are truly zero.
+
+\subsection{Block matrix construction}
+\label{sec:block}
+
+Expand the squared norm in~\eqref{eq:objective}:
+\begin{equation}
+    \lVert\Xn{1}{p}\va - \Xn{2}{p}\vb\rVert^2
+    = \va^\top \Gb{1}^p \va - 2\,\va^\top \Gb{12}^p \vb + \vb^\top \Gb{2}^p \vb,
+\end{equation}
+where the \emph{per-field} Gram matrices are
+\begin{equation}
+    \Gb{1}^p = (\Xn{1}{p})^\top\Xn{1}{p}, \quad
+    \Gb{2}^p = (\Xn{2}{p})^\top\Xn{2}{p}, \quad
+    \Gb{12}^p = (\Xn{1}{p})^\top\Xn{2}{p},
+    \label{eq:pergram}
+\end{equation}
+each of shape $(\Nk,\Nk)$.
+Note these are the same objects used in \texttt{cca\_formulation.pdf}, but here
+kept separate per field rather than summed.
+
+Concatenate $\vc = (\va^\top, \vb^\top)^\top \in \mathbb{R}^{2\Nk}$.
+The objective becomes a quadratic form:
+\begin{equation}
+    J(\vc) = \vc^\top M\,\vc,
+    \label{eq:quadratic}
+\end{equation}
+where $M \in \mathbb{R}^{2\Nk\times 2\Nk}$ is the symmetric positive semi-definite
+block matrix
+\begin{equation}
+    M = \sum_p w_p
+    \begin{pmatrix}
+        \Gb{1}^p & -\Gb{12}^p \\[4pt]
+        -(\Gb{12}^p)^\top & \Gb{2}^p
+    \end{pmatrix}.
+    \label{eq:M}
+\end{equation}
+Note that $M$ is the weighted sum of matrices of the form
+$(Z^p)^\top Z^p \succeq 0$ where $Z^p = [\Xn{1}{p},\,-\Xn{2}{p}]$,
+so $M \succeq 0$ always.
+The diagonal blocks of $M$ recover the aggregate Gram matrices
+$\Gb{1} = \sum_p w_p \Gb{1}^p$ and $\Gb{2} = \sum_p w_p \Gb{2}^p$
+from \texttt{cca\_formulation.pdf}; the off-diagonal block is
+$-\Gb{12} = -\sum_p w_p \Gb{12}^p$.
+
+\subsection{Eigenvalue problem}
+\label{sec:eigen}
+
+Minimising $\vc^\top M\,\vc$ subject to $\|\vc\|=1$ is the standard minimum
+eigenvalue problem.
+Since $M \succeq 0$, its eigenvalues $\lambda_1 \leq \lambda_2 \leq \cdots$
+are non-negative, and the minimisers are the eigenvectors corresponding to the
+smallest eigenvalues:
+\begin{equation}
+    M\,\vc_i = \lambda_i\,\vc_i.
+    \label{eq:eig}
+\end{equation}
+Each eigenvector $\vc_i = (\va_i^\top, \vb_i^\top)^\top$ splits into the
+basis-1 coefficient $\va_i = \vc_i[:N_k]$ and the basis-2 coefficient
+$\vb_i = \vc_i[N_k:]$.
+
+The eigenvalue $\lambda_i$ is the minimum achievable value of the objective:
+\begin{equation}
+    \lambda_i = J(\vc_i) = \sum_p w_p \lVert\Xn{1}{p}\va_i - \Xn{2}{p}\vb_i\rVert^2.
+\end{equation}
+A mode with $\lambda_i \approx 0$ is a valid joint solution for \emph{all}
+perturbation types simultaneously.
+Modes with $\lambda_i$ large are incompatible between the two bases.
+
+To set a threshold, it is convenient to normalise by the maximum eigenvalue
+and keep modes with
+\begin{equation}
+    \frac{\lambda_i}{\lambda_{\max}} < \lambda_{\min},
+    \label{eq:threshold}
+\end{equation}
+for a chosen $\lambda_{\min}$ (e.g.\ $10^{-3}$).
+Alternatively, the raw value of $\lambda_i$ can be inspected directly: since
+the data are Frobenius-normalised, $\lambda_i = 0$ is exact agreement.
+
+\subsection{Null space interpretation}
+\label{sec:null}
+
+The condition~\eqref{eq:goal} is equivalent to
+\begin{equation}
+    Z^p\,\vc = \bm{0} \qquad \text{for all } p,
+    \qquad Z^p = [\Xn{1}{p},\,-\Xn{2}{p}] \in \mathbb{R}^{\Nt\times 2\Nk}.
+    \label{eq:null}
+\end{equation}
+So the exact solutions lie in the intersection of null spaces:
+\begin{equation}
+    \vc \in \ker(Z^{\delta_r}) \cap \ker(Z^{\delta_m})
+           \cap \ker(Z^{v_r}) \cap \ker(Z^{v_m}).
+    \label{eq:intersection}
+\end{equation}
+In general this intersection may be trivial (containing only $\bm{0}$), in which
+case no exact joint eigenfunction exists.
+The minimum-eigenvalue problem finds the vector $\vc$ that is ``closest'' to
+being in all null spaces simultaneously, in the least-squares sense.
+
+%----------------------------------------------------------------------
+\section{Relationship to CCA}
+\label{sec:relation}
+%----------------------------------------------------------------------
+
+The CCA and the matching-solution method optimise different objectives:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & CCA & Matching solution \\
+\midrule
+\textbf{Objective} & Maximise $\rho(\va,\vb) \in [0,1]$ (correlation)
+                   & Minimise $J(\va,\vb) \geq 0$ (squared difference) \\
+\textbf{Found when} & $\va \propto \vb$ (same shape)
+                    & $\Xb{1}{p}\va = \Xb{2}{p}\vb$ (same value) \\
+\textbf{Quality metric} & $\rho \to 1$ (high = good)
+                        & $\lambda \to 0$ (low = good) \\
+\textbf{Outvoting} & Yes: 3 fields can hide $\delta_m$ mismatch
+                   & No: $J$ penalises every field independently \\
+\textbf{Scale sensitivity} & No (correlation is scale-invariant)
+                            & Yes ($\lambda = 0$ requires exact equality) \\
+\textbf{Matrix size} & $(\Nk\times\Nk)$ Gram matrices
+                     & $(2\Nk\times 2\Nk)$ block matrix \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{theorem}
+\label{thm:equiv}
+If $\Xb{1}{p}\vc_0 = \Xb{2}{p}\vc_0$ for all $p$ for some $\vc_0 \neq \bm{0}$,
+then $\vc = (\vc_0^\top, \vc_0^\top)^\top / \|\vc_0\|$ achieves $\lambda = 0$
+in the matching-solution method and $\rho = 1$ in CCA (when
+$\frob{\Xb{1}{p}} = \frob{\Xb{2}{p}}$ for all $p$).
+\end{theorem}
+
+\begin{proof}
+Direct substitution: $J(\vc) = \sum_p w_p\|\Xn{1}{p}\vc_0/\|\vc_0\|
+- \Xn{2}{p}\vc_0/\|\vc_0\|\|^2 = 0$, so $\lambda = 0$.
+The CCA claim follows from Theorem~1 of \texttt{cca\_formulation.pdf}.
+\end{proof}
+
+The converse does not hold for CCA: $\rho = 1$ implies only proportionality,
+not equality.
+The converse \emph{does} hold for the matching-solution method: $\lambda = 0$
+and $\vc\neq\bm{0}$ imply $\Xn{1}{p}\va = \Xn{2}{p}\vb$ for all $p$.
+
+%----------------------------------------------------------------------
+\section{Sparse Basis via Oblique Rotation}
+\label{sec:sparsity}
+%----------------------------------------------------------------------
+
+The eigenvectors $\vc_i$ are dense in general.
+Let $A = [\va_1 \mid \cdots \mid \va_m]$ and
+$B = [\vb_1 \mid \cdots \mid \vb_m]$ collect the $m$ valid coefficient vectors.
+We seek an invertible $M \in \mathbb{R}^{m\times m}$ such that the rotated
+columns of $\tilde{A} = AM^\top$ are sparse (concentrated on one or a few
+$k$-modes), applying the same rotation to $B$.
+
+The same analysis as in \texttt{cca\_formulation.pdf} applies: Varimax is
+inappropriate (the $\va_i$ are not orthonormal in $k$-space), while Promax
+oblique rotation or FastICA are recommended.
+
+%----------------------------------------------------------------------
+\section{Complete Pipeline}
+\label{sec:pipeline}
+%----------------------------------------------------------------------
+
+\begin{algorithm}[H]
+\caption{Matching-solution sparse joint eigenfunction method}
+\label{alg:pipeline}
+\begin{algorithmic}[1]
+\Statex \textbf{Input:} $\Xb{1}{p}, \Xb{2}{p} \in \mathbb{R}^{\Nt\times\Nk}$
+        for each $p$; weights $\{w_p\}$; threshold $\lambda_{\min}$
+
+\State \textbf{Frobenius normalise}
+\State \quad $\Xn{\alpha}{p} \gets \Xb{\alpha}{p}/\frob{\Xb{\alpha}{p}}$
+       for all $\alpha, p$
+
+\State \textbf{Compute per-field Gram matrices} \Comment{Eq.~\eqref{eq:pergram}}
+\State \quad $\Gb{1}^p \gets (\Xn{1}{p})^\top\Xn{1}{p}$ for each $p$
+\State \quad $\Gb{2}^p \gets (\Xn{2}{p})^\top\Xn{2}{p}$
+\State \quad $\Gb{12}^p \gets (\Xn{1}{p})^\top\Xn{2}{p}$
+
+\State \textbf{Construct block matrix} \Comment{Eq.~\eqref{eq:M}}
+\State \quad $M \gets \sum_p w_p
+        \bigl[\begin{smallmatrix} \Gb{1}^p & -\Gb{12}^p \\
+        -(\Gb{12}^p)^\top & \Gb{2}^p \end{smallmatrix}\bigr]$
+       \Comment{$(2\Nk, 2\Nk)$}
+
+\State \textbf{Solve eigenvalue problem} \Comment{Eq.~\eqref{eq:eig}}
+\State \quad $M\,\vc_i = \lambda_i\,\vc_i$, \quad
+       $\lambda_1 \leq \lambda_2 \leq \cdots$
+\State \quad Keep $m$ eigenvectors with $\lambda_i/\lambda_{\max} < \lambda_{\min}$
+\State \quad $\va_i \gets \vc_i[:N_k]$, \quad
+       $\vb_i \gets \vc_i[N_k:]$ for $i = 1,\ldots,m$
+
+\State \textbf{Oblique rotation for sparsity} \Comment{\S\ref{sec:sparsity}}
+\State \quad $A \gets [\va_1\mid\cdots\mid\va_m]$,\quad
+       $B \gets [\vb_1\mid\cdots\mid\vb_m]$
+\State \quad $\tilde{A}, \tilde{B} \gets \mathrm{Promax}(A, B)$
+       \Comment{or FastICA}
+
+\Statex \textbf{Output:} $\tilde{A}, \tilde{B} \in \mathbb{R}^{\Nk\times m}$
+\Statex \quad Each column pair $(\tilde{\va}_j, \tilde{\vb}_j)$: sparse coefficients
+        satisfying $\Xb{1}{p}\tilde{\va}_j \approx \Xb{2}{p}\tilde{\vb}_j$
+        for all $p$
+\end{algorithmic}
+\end{algorithm}
+
+%----------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+%----------------------------------------------------------------------
+
+\begin{enumerate}
+    \item \textbf{Stricter criterion.} The eigenvalue $\lambda_i$ measures
+    the total squared difference across all perturbation types.
+    No field can be ``outvoted'': even a small mismatch in a single field
+    contributes positively to $\lambda_i$.
+    This directly addresses the $\delta_m$ mismatch observed with the CCA method.
+
+    \item \textbf{Larger matrix.} The block matrix $M$ is $(2\Nk\times 2\Nk)$
+    compared to $(\Nk\times\Nk)$ for the CCA Gram matrices.
+    For $\Nk \lesssim 10^3$ this remains computationally cheap; only the
+    smallest few eigenvalues need to be computed (e.g.\ via
+    \texttt{scipy.sparse.linalg.eigsh}).
+
+    \item \textbf{Separate coefficient vectors.} The method naturally produces
+    $\va_i \neq \vb_i$ in general.
+    For exact joint eigenfunctions the two coincide; for approximate ones
+    ($\lambda_i$ small but non-zero) they may differ slightly, and both are
+    meaningful.
+
+    \item \textbf{Weighting.} The weights $w_p$ encode the relative importance
+    of each perturbation type.
+    Unlike in CCA, a larger weight for $\delta_m$ now directly penalises
+    $\delta_m$ mismatch rather than merely up-weighting its contribution to an
+    aggregate correlation.
+    Setting all $w_p = 1$ gives equal treatment to all fields.
+
+    \item \textbf{Relation to CCA.} The CCA method can be recovered
+    approximately from the matching-solution method.
+    When the two bases are similar ($\frob{\Xb{1}{p}} \approx \frob{\Xb{2}{p}}$),
+    modes with $\lambda_i \approx 0$ also achieve $\rho_i \approx 1$, but
+    the converse does not hold.
+    Use CCA when shape agreement is sufficient; use the matching-solution method
+    when exact pointwise equality of time evolutions is required.
+\end{enumerate}
+
+\end{document}

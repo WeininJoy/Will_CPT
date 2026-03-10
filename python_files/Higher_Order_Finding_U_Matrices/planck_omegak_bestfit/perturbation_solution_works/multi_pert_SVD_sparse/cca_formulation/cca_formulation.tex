@@ -1,0 +1,352 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+
+\newcommand{\va}{\bm{a}}
+\newcommand{\vb}{\bm{b}}
+\newcommand{\vc}{\bm{c}}
+\newcommand{\vct}{\tilde{\bm{c}}}
+\newcommand{\ve}{\bm{e}}
+\newcommand{\vu}{\bm{u}}
+\newcommand{\vv}{\bm{v}}
+\newcommand{\Xb}[2]{X_{#1}^{#2}}
+\newcommand{\Xn}[2]{\bar{X}_{#1}^{#2}}
+\newcommand{\Gb}[1]{G_{#1}}
+\newcommand{\frob}[1]{\lVert #1 \rVert_{\mathrm{F}}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\Nk}{N_k}
+\newcommand{\Nt}{N_\tau}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+
+\title{Canonical Correlation Analysis for Joint Eigenfunctions\\of Cosmological Perturbation Bases}
+\author{Will Handley \and Wei Ning Deng}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formulate the problem of finding joint eigenfunctions of two cosmological perturbation bases as canonical correlation analysis (CCA) in $k$-space.
+This provides a principled framework for the stacked-SVD approach, makes the choice of weighting across perturbation types explicit, and clarifies the conditions under which the results are independent of this choice.
+We present the complete pipeline from raw Boltzmann code output to a sparse set of joint eigenfunctions.
+\end{abstract}
+
+%----------------------------------------------------------------------
+\section{Problem Statement}
+\label{sec:problem}
+%----------------------------------------------------------------------
+
+A Boltzmann code produces solutions for cosmological perturbation variables $\delta_r, \delta_m, v_r, v_m$ (and potentially others) as functions of conformal time $\tau$ and wavenumber $k$.
+For a given set of $\Nk$ wavenumbers, we have two bases of solutions:
+\begin{itemize}
+    \item \textbf{Basis 1} (e.g.\ integer-$k$): matrices $\Xb{1}{p}$ of shape $(\Nt, \Nk)$ for each perturbation type $p$,
+    \item \textbf{Basis 2} (e.g.\ allowed-$k$): matrices $\Xb{2}{p}$ of the same shape,
+\end{itemize}
+where rows index conformal time and columns index $k$-modes.
+
+We seek coefficient vectors such that the time evolution produced by basis~1 matches that of basis~2, for all perturbation types simultaneously.
+The final result should be a set of \emph{sparse} coefficient vectors, each concentrated on one or a few $k$-modes, representing the joint eigenfunctions of the two bases.
+
+%----------------------------------------------------------------------
+\section{The Stacked-SVD Approach}
+\label{sec:stacking}
+%----------------------------------------------------------------------
+
+The current method normalises each perturbation type per basis by its Frobenius norm $\frob{A} = \sqrt{\sum_{ij} A_{ij}^2}$, defining
+\begin{equation}
+    \Xn{\alpha}{p} = \frac{\Xb{\alpha}{p}}{\frob{\Xb{\alpha}{p}}},
+    \label{eq:normalise}
+\end{equation}
+then stacks vertically:
+\begin{equation}
+    \bar{X}_\alpha = \begin{pmatrix} \Xn{\alpha}{\delta_r} \\ \Xn{\alpha}{\delta_m} \\ \Xn{\alpha}{v_r} \\ \Xn{\alpha}{v_m} \end{pmatrix}, \qquad \alpha \in \{1, 2\},
+    \label{eq:stacking}
+\end{equation}
+producing matrices of shape $(4\Nt, \Nk)$, and then applies SVD to each.
+While effective, this obscures the structure of the problem: the stacking is an ad hoc device to reduce a multi-field problem to a single-matrix one, and the Frobenius normalisation is a specific choice for handling the dimensional mismatch between perturbation types.
+
+%----------------------------------------------------------------------
+\section{CCA Formulation}
+\label{sec:cca}
+%----------------------------------------------------------------------
+
+\subsection{Gram matrices in $k$-space}
+\label{sec:gram}
+
+For a set of positive dimensionless weights $\{w_p\}$ indexed by perturbation type, define the $k$-space Gram matrices from the normalised data~\eqref{eq:normalise}:
+\begin{align}
+    \Gb{1} &= \sum_p w_p \, (\Xn{1}{p})^\top \Xn{1}{p}, \label{eq:G1} \\
+    \Gb{2} &= \sum_p w_p \, (\Xn{2}{p})^\top \Xn{2}{p}, \label{eq:G2} \\
+    \Gb{12} &= \sum_p w_p \, (\Xn{1}{p})^\top \Xn{2}{p}, \label{eq:G12}
+\end{align}
+each of shape $(\Nk, \Nk)$.
+Because the data is pre-normalised~\eqref{eq:normalise}, all Gram matrices are dimensionless regardless of the physical dimensions of the perturbation types.
+The normalisation absorbs the per-basis, per-type scales, so that $\Gb{12}$ naturally carries the correct cross-normalisation $(\frob{\Xb{1}{p}} \frob{\Xb{2}{p}})^{-1}$ for each type.
+
+The matrix $\Gb{\alpha}$ encodes the inner product between $k$-modes as measured across all perturbation types in basis $\alpha$, while $\Gb{12}$ encodes the cross-correlation between the two bases.
+
+\subsection{Two-vector canonical correlation analysis}
+\label{sec:cca-def}
+
+CCA seeks two coefficient vectors $\va \in \mathbb{R}^{\Nk}$ and $\vb \in \mathbb{R}^{\Nk}$ --- one for each basis --- that maximise the correlation between the resulting time evolutions:
+\begin{equation}
+    \rho(\va, \vb) = \frac{\va^\top \Gb{12} \, \vb}{\sqrt{\va^\top \Gb{1} \, \va \;\cdot\; \vb^\top \Gb{2} \, \vb}}.
+    \label{eq:cca}
+\end{equation}
+The maximisers are found by computing the SVD
+\begin{equation}
+    \Gb{1}^{-1/2} \, \Gb{12} \, \Gb{2}^{-1/2} = U \Sigma V^\top,
+    \label{eq:svd}
+\end{equation}
+where $\Sigma = \mathrm{diag}(\sigma_1, \sigma_2, \ldots)$ with $\sigma_1 \geq \sigma_2 \geq \cdots \geq 0$.
+The canonical correlations are $\rho_i = \sigma_i$, with corresponding coefficient vectors
+\begin{align}
+    \va_i &= \Gb{1}^{-1/2} \, \vu_i, \label{eq:a} \\
+    \vb_i &= \Gb{2}^{-1/2} \, \vv_i, \label{eq:b}
+\end{align}
+where $\vu_i$ and $\vv_i$ are the $i$-th columns of $U$ and $V$ respectively.
+These are already in $k$-space --- no additional back-transform is required.
+
+Equivalently, the left canonical vectors $\va_i$ can be found from the eigenvalue problem
+\begin{equation}
+    \Gb{1}^{-1/2} \, \Gb{12} \, \Gb{2}^{-1} \, \Gb{12}^\top \, \Gb{1}^{-1/2} \, \vu = \lambda \, \vu,
+    \label{eq:gev}
+\end{equation}
+with $\lambda_i = \sigma_i^2 = \rho_i^2$.
+Modes with $\rho_i \approx 1$ are joint eigenfunctions; modes with $\rho_i \ll 1$ are incompatible between the two bases.
+
+\subsection{Why whitening is necessary}
+\label{sec:whitening}
+
+A natural simplification would be to apply SVD directly to the cross-Gram matrix,
+\begin{equation}
+    \Gb{12} = U\Sigma V^\top,
+    \label{eq:svd-G12-simple}
+\end{equation}
+and set $\va_i = \vu_i$, $\vb_i = \vv_i$, avoiding the need to compute $\Gb{1}^{-1/2}$
+and $\Gb{2}^{-1/2}$.
+This is simpler, but it solves the wrong problem.
+
+\paragraph{Covariance versus correlation.}
+The SVD of $\Gb{12}$ maximises the \emph{cross-covariance}
+$\va^\top \Gb{12}\vb$ subject to Euclidean constraints $\|\va\|=\|\vb\|=1$.
+CCA instead maximises the \emph{correlation}~\eqref{eq:cca}, which normalises by the
+self-energy of each basis independently via $\va^\top \Gb{1}\va$ and $\vb^\top \Gb{2}\vb$.
+Without this normalisation, $k$-modes that happen to carry large time-evolution amplitude
+dominate the singular value spectrum even if they agree poorly between the two bases.
+Furthermore, the raw singular values of $\Gb{12}$ have no natural bound and no
+interpretable threshold, whereas the canonical correlations satisfy $\sigma_i\in[0,1]$
+with $\sigma_i=1$ signalling an exact joint eigenfunction.
+
+\paragraph{Frobenius normalisation is not sufficient.}
+One might expect the Frobenius pre-normalisation~\eqref{eq:normalise} to already remove
+this amplitude bias.
+It does not, because Frobenius normalisation and $\Gb{\alpha}^{-1/2}$ whitening act at
+different levels:
+\begin{itemize}
+    \item \textbf{Frobenius normalisation} sets $\|\Xn{\alpha}{p}\|_{\mathrm{F}}=1$ for
+    each perturbation type~$p$ separately.
+    It removes \emph{inter-field} amplitude differences, ensuring that
+    $\delta_r,\delta_m,v_r,v_m$ contribute equally to the Gram matrices regardless of
+    their physical dimensions.
+    It is a property of the whole matrix, not of individual $k$-mode columns.
+    \item \textbf{$\Gb{\alpha}^{-1/2}$ whitening} normalises individual \emph{$k$-mode}
+    amplitudes within the combined, multi-field space.
+    The diagonal entry $(\Gb{\alpha})_{ii}=\sum_p w_p\|\Xn{\alpha}{p}[\,\cdot\,,i]\|^2$
+    is the total time-evolution power of mode~$i$ across all perturbation types.
+    Even after Frobenius normalisation, individual modes can carry very different power,
+    since $\sum_i(\Gb{\alpha})_{ii}=\sum_p w_p$ is fixed but individual entries are not.
+\end{itemize}
+
+\paragraph{Counterexample.}
+Consider a single field after Frobenius normalisation, with two $k$-modes whose
+column norms satisfy $\|\Xn{1}{}[\,\cdot\,,1]\|=0.01$ and
+$\|\Xn{1}{}[\,\cdot\,,2]\|\approx 0.99$.
+Suppose mode~1 is a \emph{perfect} joint eigenfunction ($\rho_1=1$) while mode~2
+agrees only moderately ($\rho_2=0.5$).
+The cross-Gram entries are then
+\begin{align}
+    \Gb{12}[1,1] &= 0.01^2 = 10^{-4} \quad\text{(tiny)},\\
+    \Gb{12}[2,2] &\approx 0.5\times 0.99^2 \approx 0.49 \quad\text{(large)}.
+\end{align}
+The SVD of $\Gb{12}$ ranks mode~2 first, incorrectly.
+CCA recovers the correct ordering via whitening:
+\begin{equation}
+    \rho_1 = \frac{\Gb{12}[1,1]}{\sqrt{\Gb{1}[1,1]\,\Gb{2}[1,1]}}
+           = \frac{10^{-4}}{10^{-4}} = 1. \qquad \checkmark
+\end{equation}
+Frobenius normalisation set the overall matrix norm to unity, but did nothing to equalise
+the column norms of the two modes; the $\Gb{\alpha}^{-1/2}$ whitening supplies the missing
+per-mode normalisation.
+
+\subsection{Relationship to stacking}
+\label{sec:equivalence}
+
+The stacked-SVD approach is equivalent to two-vector CCA on the normalised data~\eqref{eq:normalise} with unit weights $w_p = 1$.
+The stacked Gram matrices are
+\begin{equation}
+    \bar{X}_1^\top \bar{X}_1 = \sum_p (\Xn{1}{p})^\top \Xn{1}{p} = \Gb{1}\big|_{w_p = 1},
+\end{equation}
+and similarly for $\Gb{2}$ and $\Gb{12}$.
+The CCA formulation generalises this by allowing $w_p \neq 1$, weighting perturbation types unequally.
+
+%----------------------------------------------------------------------
+\section{Weight-Independence of Exact Matches}
+\label{sec:weight-independence}
+%----------------------------------------------------------------------
+
+\begin{theorem}
+\label{thm:weight-indep}
+If\/ $\Xb{1}{p} \vc = \Xb{2}{p} \vc$ for all perturbation types $p$, and $\Xb{1}{p}\vc \neq 0$ for at least one $p$, then $(\va, \vb) = (\vc, \vc)$ achieves $\rho(\vc, \vc) = 1$ for any choice of positive weights $\{w_p\}$.
+\end{theorem}
+
+\begin{proof}
+The hypothesis $\Xb{1}{p}\vc = \Xb{2}{p}\vc$ implies $\lVert\Xb{1}{p}\vc\rVert = \lVert\Xb{2}{p}\vc\rVert$ for each $p$, and therefore
+\begin{equation}
+    (\Xn{1}{p}\vc)^\top (\Xn{2}{p}\vc) = \frac{(\Xb{1}{p}\vc)^\top(\Xb{2}{p}\vc)}{\frob{\Xb{1}{p}}\frob{\Xb{2}{p}}} = \frac{\lVert\Xb{1}{p}\vc\rVert^2}{\frob{\Xb{1}{p}}\frob{\Xb{2}{p}}}.
+\end{equation}
+Similarly,
+\begin{equation}
+    \lVert\Xn{1}{p}\vc\rVert^2 = \frac{\lVert\Xb{1}{p}\vc\rVert^2}{\frob{\Xb{1}{p}}^2}, \qquad
+    \lVert\Xn{2}{p}\vc\rVert^2 = \frac{\lVert\Xb{2}{p}\vc\rVert^2}{\frob{\Xb{2}{p}}^2} = \frac{\lVert\Xb{1}{p}\vc\rVert^2}{\frob{\Xb{2}{p}}^2}.
+\end{equation}
+Writing $s_p = \lVert\Xb{1}{p}\vc\rVert^2$, $f_p = \frob{\Xb{1}{p}}$, $g_p = \frob{\Xb{2}{p}}$:
+\begin{align}
+    \vc^\top \Gb{12} \, \vc &= \sum_p w_p \frac{s_p}{f_p g_p}, \\
+    \vc^\top \Gb{1} \, \vc &= \sum_p w_p \frac{s_p}{f_p^2}, \\
+    \vc^\top \Gb{2} \, \vc &= \sum_p w_p \frac{s_p}{g_p^2}.
+\end{align}
+By the Cauchy--Schwarz inequality applied to the sequences $(\sqrt{w_p s_p}/f_p)$ and $(\sqrt{w_p s_p}/g_p)$:
+\begin{equation}
+    \left(\sum_p w_p \frac{s_p}{f_p g_p}\right)^2 \leq \left(\sum_p w_p \frac{s_p}{f_p^2}\right)\left(\sum_p w_p \frac{s_p}{g_p^2}\right),
+\end{equation}
+so $\rho(\vc,\vc) \leq 1$.
+Equality holds if and only if $f_p / g_p$ is the same for all $p$ with $s_p > 0$, i.e.\ $\frob{\Xb{1}{p}}/\frob{\Xb{2}{p}}$ is constant across active perturbation types.
+\end{proof}
+
+\noindent\textbf{Remark.}
+In general, $\rho(\vc,\vc) = 1$ requires not only $\Xb{1}{p}\vc = \Xb{2}{p}\vc$ for all $p$, but also that the ratio $\frob{\Xb{1}{p}}/\frob{\Xb{2}{p}}$ is the same across perturbation types.
+This ratio is a property of the bases, not of $\vc$.
+When the two bases have similar overall amplitudes (as is typical), $f_p \approx g_p$ and $\rho(\vc,\vc) \approx 1$.
+
+However, the two-vector CCA will still identify these modes.
+If $\Xb{1}{p}\vc = \Xb{2}{p}\vc$ for all $p$, then $\Xn{1}{p}\vc$ and $\Xn{2}{p}\vc$ differ only by the ratio $g_p/f_p$, which is independent of $\vc$.
+The CCA optimisation is free to choose $\va \neq \vb$ and will find $\rho = 1$ with $\va$ and $\vb$ related by a rescaling that compensates the norm ratios.
+In the limit $f_p = g_p$ for all $p$, the two coefficient vectors coincide: $\va = \vb = \vc$.
+
+%----------------------------------------------------------------------
+\section{Sparse Basis via Oblique Rotation}
+\label{sec:sparsity}
+%----------------------------------------------------------------------
+
+The CCA coefficient vectors $\va_i$ are not generally sparse: they are global linear combinations of $k$-modes, chosen to maximise correlation rather than sparsity.
+We seek an invertible matrix $M \in \mathbb{R}^{m \times m}$ such that the rotated vectors
+\begin{equation}
+    \vct_j = \sum_{i=1}^{m} M_{ji} \, \va_i, \qquad \text{i.e.} \quad \tilde{A} = A M^\top, \quad A = [\va_1 \mid \cdots \mid \va_m] \in \mathbb{R}^{\Nk \times m},
+    \label{eq:rotation}
+\end{equation}
+are sparse (concentrated on one or a few $k$-modes).
+Orthogonality of the $\vct_j$ is not required --- only sparsity.
+
+\subsection{Why Varimax fails}
+\label{sec:varimax}
+
+Varimax rotation requires orthonormal input.
+The CCA coefficient vectors $\va_i$ are not orthonormal in $k$-space in general.
+Applying Varimax directly would produce incorrect results.
+
+\subsection{Oblique rotation (Promax)}
+\label{sec:promax}
+
+Promax generalises Varimax by relaxing the orthogonality constraint.
+It finds $M$ such that the columns of $\tilde{A} = A M^\top$ have ``simple structure'' (maximally sparse), with $M$ invertible but not necessarily orthogonal.
+The additional degrees of freedom allow sparser solutions than any orthogonal rotation.
+
+\subsection{Independent component analysis (FastICA)}
+\label{sec:ica}
+
+An alternative approach models the problem as blind source separation: the sparse $\vct_j$ are ``independent sources'' mixed by a matrix to produce the observed $\va_i$.
+FastICA recovers the sources by maximising non-Gaussianity (kurtosis), which for peaked distributions is equivalent to maximising sparsity.
+
+\subsection{Comparison of methods}
+\label{sec:comparison}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+Method & Orthogonality & Sparsity objective & Notes \\
+\midrule
+Varimax & Required & Maximise kurtosis of columns & Not applicable \\
+\textbf{Promax} & \textbf{Not required} & \textbf{Simple structure / kurtosis} & \textbf{Recommended} \\
+FastICA & Not required & Maximise non-Gaussianity & Excellent alternative \\
+$\ell_1$ + log-det & Not required & Direct $\ell_1$ minimisation & Most rigorous \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%----------------------------------------------------------------------
+\section{Complete Pipeline}
+\label{sec:pipeline}
+%----------------------------------------------------------------------
+
+\begin{algorithm}[H]
+\caption{CCA-based sparse joint eigenfunction method}
+\label{alg:pipeline}
+\begin{algorithmic}[1]
+\Statex \textbf{Input:} $\Xb{1}{p}, \Xb{2}{p} \in \mathbb{R}^{\Nt \times \Nk}$ for each perturbation type $p$; weights $\{w_p\}$; correlation threshold $\rho_{\min}$
+\Statex
+
+\State \textbf{Normalise} \Comment{\S\ref{sec:gram}}
+\State \quad $\Xn{\alpha}{p} \gets \Xb{\alpha}{p} / \frob{\Xb{\alpha}{p}}$ for all $\alpha, p$
+\Statex
+
+\State \textbf{Compute Gram matrices} \Comment{\S\ref{sec:gram}}
+\State \quad $\Gb{1} \gets \sum_p w_p \, (\Xn{1}{p})^\top \Xn{1}{p}$ \Comment{$(\Nk, \Nk)$}
+\State \quad $\Gb{2} \gets \sum_p w_p \, (\Xn{2}{p})^\top \Xn{2}{p}$
+\State \quad $\Gb{12} \gets \sum_p w_p \, (\Xn{1}{p})^\top \Xn{2}{p}$
+\Statex
+
+\State \textbf{Solve CCA} \Comment{\S\ref{sec:cca-def}}
+\State \quad $U \Sigma V^\top \gets \mathrm{SVD}(\Gb{1}^{-1/2} \, \Gb{12} \, \Gb{2}^{-1/2})$
+\State \quad Keep $m$ components with $\sigma_i > \rho_{\min}$
+\State \quad $\va_i \gets \Gb{1}^{-1/2} \vu_i$ for $i = 1, \ldots, m$ \Comment{basis-1 $k$-space coefficients}
+\State \quad $\vb_i \gets \Gb{2}^{-1/2} \vv_i$ for $i = 1, \ldots, m$ \Comment{basis-2 $k$-space coefficients}
+\Statex
+
+\State \textbf{Oblique rotation for sparsity} \Comment{\S\ref{sec:sparsity}}
+\State \quad $A \gets [\va_1 \mid \cdots \mid \va_m]$ \Comment{$(\Nk, m)$}
+\State \quad $\tilde{A} \gets \mathrm{Promax}(A)$ \Comment{or FastICA}
+\Statex
+
+\Statex \textbf{Output:} $\tilde{A} \in \mathbb{R}^{\Nk \times m}$
+\Statex \quad Each column: sparse coefficient vector for a valid joint eigenfunction
+\Statex \quad For modes with $\rho \approx 1$: $\va_i \approx \vb_i$ (same coefficients in both bases)
+\end{algorithmic}
+\end{algorithm}
+
+%----------------------------------------------------------------------
+\section{Discussion}
+\label{sec:discussion}
+%----------------------------------------------------------------------
+
+\begin{enumerate}
+    \item \textbf{Principled framework.} CCA is a well-studied statistical method with known optimality properties. The stacked-SVD approach is recovered as the special case $w_p = 1$ on the normalised data $\Xn{\alpha}{p}$.
+
+    \item \textbf{Explicit weighting.} The dependence on perturbation-type weights $\{w_p\}$ is made transparent. Pre-normalisation~\eqref{eq:normalise} renders the data dimensionless, so the weights $w_p$ are dimensionless and encode only relative importance.
+
+    \item \textbf{Works in $k$-space.} The Gram matrices are $(\Nk, \Nk)$, compared to $(4\Nt, \Nk)$ for the stacked matrices. For $\Nt \gg \Nk$ this is more efficient.
+
+    \item \textbf{No back-transform.} The CCA coefficient vectors~\eqref{eq:a}--\eqref{eq:b} are already in $k$-space. The stacked-SVD approach requires an explicit back-transform through the right singular vectors.
+
+    \item \textbf{Two coefficient vectors.} CCA naturally produces separate coefficient vectors $\va_i$ and $\vb_i$ for each basis. For well-matched modes ($\rho_i \approx 1$), these nearly coincide. The stacked-SVD approach implicitly discards $\vb_i$ and reports only $\va_i$.
+
+    \item \textbf{Weight-independence.} Theorem~\ref{thm:weight-indep} shows that exact joint eigenfunctions ($\Xb{1}{p}\vc = \Xb{2}{p}\vc$ for all $p$) are identified by CCA regardless of the weighting, up to a small correction from the ratio of Frobenius norms across bases.
+\end{enumerate}
+
+\end{document}
