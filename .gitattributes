@@ -1,0 +1,1 @@
+python_files/Higher_Order_Finding_U_Matrices/planck_omegak_bestfit/perturbation_solution_works/extendk_0-65/data/**/*.npy filter=lfs diff=lfs merge=lfs -text
