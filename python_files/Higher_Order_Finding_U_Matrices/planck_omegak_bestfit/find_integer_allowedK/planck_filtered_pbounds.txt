@@ -1,0 +1,6 @@
+# Parameter bounds from filtered Planck data (nu_spacing=4, 2-sigma)
+# Format: parameter lower_bound upper_bound median
+mt 407.0534751673 435.3014226753 421.9698432594
+kt 1.3959813805 1.5374660849 1.4692077297
+Omegab_ratio 0.1558443407 0.1642857321 0.1594813807
+h 0.5415640127 0.5611450000 0.5504517000

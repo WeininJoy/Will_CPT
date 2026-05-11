@@ -239,74 +239,7 @@ def calculate_integer_loss(params, folder_path, n_min_stable=12, spacing_tol_fac
     print(f"  Total loss={total_loss:.6e}")
 
     return total_loss
-    
-def calculate_integer_loss_old(params, folder_path, n_tail=7, slope_weight=2.0):
-    """
-    Calculate loss focusing on the high-K tail where oscillations stabilize.
 
-    Strategy:
-    1. Use broad range (after n_ignore) to determine ideal asymptotic spacing
-    2. Focus on last n_tail points where wiggles stabilize
-    3. Penalize both deviation from ideal AND the slope of deviations
-
-    Parameters:
-    -----------
-    params : list
-        Cosmological parameters [mt, kt, omega_b_ratio, h]
-    folder_path : str
-        Path to save/load data
-    n_tail : int
-        Number of final k-values to use for loss calculation (default: 7)
-    slope_weight : float
-        Weight for penalizing slope of deviations (default: 10.0)
-    """
-    allowedK_integer = calculate_allowedK(params, folder_path)
-    if allowedK_integer is None:
-        return float('inf')
-    else:
-        print("allowedK_integer =", allowedK_integer)
-
-        # Need enough data points
-        if len(allowedK_integer) <= n_tail + 5:
-            return float('inf')
-
-        all_k = np.array(allowedK_integer)
-        tail_k = all_k[-n_tail:]
-        tail_indices = np.arange(len(tail_k))
-
-        slope_tail, _ = np.polyfit(tail_indices, tail_k, 1)
-        if slope_tail == 0:
-            return float('inf')
-
-        print(f"  Ideal spacing from fit: {slope_tail} (slope: {slope_tail:.6f})")
-        ideal_spacing_tail = np.round(slope_tail)
-
-        # Compute ideal sequence for the tail
-        ideal_intercept_tail = np.mean(tail_k - ideal_spacing_tail * tail_indices)
-        ideal_tail_sequence = ideal_spacing_tail * tail_indices + np.round(ideal_intercept_tail)
-        # Step 3: Compute deviations from ideal
-        deviations = tail_k - ideal_tail_sequence
-
-        print(f"  Tail deviations: min={np.min(deviations):.6f}, max={np.max(deviations):.6f}, mean={np.mean(deviations):.6f}")
-
-        # Step 4: Loss components
-        # (a) Mean squared deviation (penalizes offset from ideal)
-        mse_loss = np.mean(deviations**2)
-
-        # (b) Slope of deviations (penalizes trending up or down)
-        # We want the deviations to be flat (slope ≈ 0)
-        deviation_slope, _ = np.polyfit(tail_indices, deviations, 1)
-        slope_loss = deviation_slope**2
-
-        print(f"  MSE loss: {mse_loss:.6e}, Deviation slope: {deviation_slope:.6f}, Slope loss: {slope_loss:.6e}")
-
-        # Step 5: Combined loss
-        # The slope term is weighted more heavily because we want flat deviations
-        total_loss = mse_loss + slope_weight * slope_loss
-
-        print(f"  Total loss: {total_loss:.6e}")
-
-        return total_loss
 
 def log_posterior(mt, kt, Omegab_ratio, h):
     """

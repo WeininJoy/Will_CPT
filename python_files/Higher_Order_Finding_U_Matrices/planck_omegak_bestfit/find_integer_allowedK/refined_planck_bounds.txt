@@ -1,0 +1,11 @@
+# Refined parameter bounds from Bayesian optimization
+# Generated from top 17 points out of 172 evaluations
+# Best loss: 3.683653e-04
+# Mean loss: 4.652441e-03
+#
+# Format: parameter_name  lower_bound  upper_bound
+#
+mt              407.0534751673  429.0267657475
+kt              1.3978375254  1.4747149569
+Omegab_ratio    0.1558443407  0.1641204779
+h               0.5415640127  0.5611450000

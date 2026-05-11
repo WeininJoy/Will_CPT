@@ -1,0 +1,228 @@
+Top 10 folders with MCMC best-fit parameters
+================================================================================
+
+
+Rank 1: try_155
+--------------------------------------------------------------------------------
+Loss integer: 0.000413
+Number of MCMC points within tolerance: 14
+chi2_CMB: 2770.0860
+Mean K spacing: 4.01
+
+Model parameters (from loss_params file):
+  mt = 417.6757
+  kt = 1.4476
+  omega_b_ratio = 0.155880
+  h = 0.548887
+
+Best-fit MCMC parameters:
+  A_s = 2.034081
+  n_s = 0.968492
+  tau = 0.039182
+  H0 = 55.1453
+
+Cosmological parameters:
+  Omega_m = 0.467777
+  omegabh2 = 0.022301
+  Omega_K = -0.037126
+  Omega_lambda = 0.569349
+
+Rank 2: try_125
+--------------------------------------------------------------------------------
+Loss integer: 0.000620
+Number of MCMC points within tolerance: 614
+chi2_CMB: 2756.9390
+Mean K spacing: 4.01
+
+Model parameters (from loss_params file):
+  mt = 417.8316
+  kt = 1.4471
+  omega_b_ratio = 0.164286
+  h = 0.541564
+
+Best-fit MCMC parameters:
+  A_s = 2.107393
+  n_s = 0.968053
+  tau = 0.054310
+  H0 = 54.8816
+
+Cosmological parameters:
+  Omega_m = 0.471864
+  omegabh2 = 0.022555
+  Omega_K = -0.039124
+  Omega_lambda = 0.567260
+
+Rank 3: try_166
+--------------------------------------------------------------------------------
+Loss integer: 0.000935
+Number of MCMC points within tolerance: 596
+chi2_CMB: 2757.1070
+Mean K spacing: 4.01
+
+Model parameters (from loss_params file):
+  mt = 417.7648
+  kt = 1.4468
+  omega_b_ratio = 0.158968
+  h = 0.553932
+
+Best-fit MCMC parameters:
+  A_s = 2.043034
+  n_s = 0.972175
+  tau = 0.045755
+  H0 = 55.5017
+
+Cosmological parameters:
+  Omega_m = 0.459249
+  omegabh2 = 0.022524
+  Omega_K = -0.036999
+  Omega_lambda = 0.577751
+
+Rank 4: try_170
+--------------------------------------------------------------------------------
+Loss integer: 0.002107
+Number of MCMC points within tolerance: 193
+chi2_CMB: 2758.1140
+Mean K spacing: 4.01
+
+Model parameters (from loss_params file):
+  mt = 417.7405
+  kt = 1.4483
+  omega_b_ratio = 0.155844
+  h = 0.561145
+
+Best-fit MCMC parameters:
+  A_s = 2.076545
+  n_s = 0.969180
+  tau = 0.051768
+  H0 = 55.5701
+
+Cosmological parameters:
+  Omega_m = 0.454997
+  omegabh2 = 0.022588
+  Omega_K = -0.037446
+  Omega_lambda = 0.582448
+
+Rank 5: try_139
+--------------------------------------------------------------------------------
+Loss integer: 0.004320
+Number of MCMC points within tolerance: 2
+chi2_CMB: 2769.8710
+Mean K spacing: 4.04
+
+Model parameters (from loss_params file):
+  mt = 426.6749
+  kt = 1.4469
+  omega_b_ratio = 0.162276
+  h = 0.559677
+
+Best-fit MCMC parameters:
+  A_s = 2.082027
+  n_s = 0.971460
+  tau = 0.054941
+  H0 = 55.2405
+
+Cosmological parameters:
+  Omega_m = 0.462763
+  omegabh2 = 0.022970
+  Omega_K = -0.039983
+  Omega_lambda = 0.577219
+
+Rank 6: try_123
+--------------------------------------------------------------------------------
+Loss integer: 0.004423
+Number of MCMC points within tolerance: 149
+chi2_CMB: 2759.5730
+Mean K spacing: 4.04
+
+Model parameters (from loss_params file):
+  mt = 407.8706
+  kt = 1.4044
+  omega_b_ratio = 0.159985
+  h = 0.555199
+
+Best-fit MCMC parameters:
+  A_s = 2.094307
+  n_s = 0.974526
+  tau = 0.057081
+  H0 = 55.9241
+
+Cosmological parameters:
+  Omega_m = 0.449893
+  omegabh2 = 0.022557
+  Omega_K = -0.035900
+  Omega_lambda = 0.586008
+
+Rank 7: try_77
+--------------------------------------------------------------------------------
+Loss integer: 0.004443
+Number of MCMC points within tolerance: 54
+chi2_CMB: 2764.2590
+Mean K spacing: 4.04
+
+Model parameters (from loss_params file):
+  mt = 408.3719
+  kt = 1.4052
+  omega_b_ratio = 0.160679
+  h = 0.543100
+
+Best-fit MCMC parameters:
+  A_s = 2.068552
+  n_s = 0.969705
+  tau = 0.048548
+  H0 = 54.8889
+
+Cosmological parameters:
+  Omega_m = 0.466905
+  omegabh2 = 0.022382
+  Omega_K = -0.039788
+  Omega_lambda = 0.572883
+
+Rank 8: try_61
+--------------------------------------------------------------------------------
+Loss integer: 0.004911
+Number of MCMC points within tolerance: 1
+chi2_CMB: 2776.7610
+Mean K spacing: 4.04
+
+Model parameters (from loss_params file):
+  mt = 418.8790
+  kt = 1.4285
+  omega_b_ratio = 0.155844
+  h = 0.541564
+
+Best-fit MCMC parameters:
+  A_s = 1.975707
+  n_s = 0.964849
+  tau = 0.029001
+  H0 = 54.7815
+
+Cosmological parameters:
+  Omega_m = 0.477457
+  omegabh2 = 0.022121
+  Omega_K = -0.037109
+  Omega_lambda = 0.559652
+
+Rank 9: try_159
+--------------------------------------------------------------------------------
+Loss integer: 0.005049
+Number of MCMC points within tolerance: 670
+chi2_CMB: 2756.9390
+Mean K spacing: 4.04
+
+Model parameters (from loss_params file):
+  mt = 417.7288
+  kt = 1.4258
+  omega_b_ratio = 0.162600
+  h = 0.545518
+
+Best-fit MCMC parameters:
+  A_s = 2.107393
+  n_s = 0.968053
+  tau = 0.054310
+  H0 = 54.8816
+
+Cosmological parameters:
+  Omega_m = 0.471864
+  omegabh2 = 0.022555
+  Omega_K = -0.039124
+  Omega_lambda = 0.567260
