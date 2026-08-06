@@ -134,6 +134,13 @@ class Universe:
             plt.vlines(kc_discrete, 0, slope_discrete, colors=color_list[n], linestyles='dotted',linewidth=0.8)
             plt.hlines(slope_discrete, 0, kc_discrete, colors=color_list[n], linestyles='dotted',linewidth=0.8)
         
+        print("kc_discrete_list:", kc_discrete_list)
+        Omega_K_list = []
+        for kc in kc_discrete_list:
+            K = 2.* self.Lambda / 3. * kc
+            Omega_K = - K * c**2 / self.a0**2 / self.H0**2
+            Omega_K_list.append(Omega_K)
+        print("Omega_K_list:", Omega_K_list)
         plt.plot(kc_list, slope_list, color='r',linewidth=1.4)
         plt.xlabel(r"$\tilde\kappa$")
         plt.ylabel(r"$d\theta/dk_{\mathrm{int}}(\tilde\kappa)$")
@@ -199,11 +206,11 @@ class Universe:
             K = 2.* self.Lambda / 3. * kc
             Omega_K = - K * c**2 / self.a0**2 / self.H0**2
             if kc < 1:
-                # plt.plot(k_list, [2/np.pi*self.psi_int_curved(k, kc) for k in k_list],color=color_list[n] ,label=r'$\Omega_{\kappa,0}=$'+str(round(Omega_K.si.value,3)),linewidth=3.0)
-                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],color=color_list[n],label=r'$\tilde\kappa={%.1f}$'%kc,linewidth=1.4)
+                plt.plot(k_list, [2/np.pi*self.psi_int_curved(k, kc) for k in k_list],color=color_list[n] ,label=r'$\Omega_K=$'+str(round(Omega_K.si.value,3)),linewidth=3.0)
+                # plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],color=color_list[n],label=r'$\tilde\kappa={%.1f}$'%kc,linewidth=1.4)
             else:
-                # plt.plot(k_list, [2/np.pi*self.psi_int_curved(k, kc) for k in k_list], '-.', color=color_list[n], label=r'$\Omega_{\kappa,0}=$'+str(round(Omega_K.si.value,3)),linewidth=3.0)
-                plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],color=color_list[n],label=r'$\tilde\kappa={%.1f}$'%kc,linewidth=1.4)
+                plt.plot(k_list, [2/np.pi*self.psi_int_curved(k, kc) for k in k_list], '-.', color=color_list[n], label=r'$\Omega_K=$'+str(round(Omega_K.si.value,3)),linewidth=3.0)
+                # plt.plot(k_list, [self.psi_int_curved(k, kc) for k in k_list],color=color_list[n],label=r'$\tilde\kappa={%.1f}$'%kc,linewidth=1.4)
 
             # plot dots line for discrete theta and k
             theta_list = [self.psi_int_curved(k, kc) for k in k_list]
@@ -218,13 +225,14 @@ class Universe:
             plt.hlines(discrete_theta_list[:len(discrete_k_list)], 0, discrete_k_list, colors='k', linestyles='dotted', linewidth=0.8, alpha=0.8)
             n += 1
 
-        # plt.plot([4.3, 5.8], [10.7, 14.2],'--', linewidth=3.0, color='r')
-        # t = plt.text(4.9, 12.1, 'Slope', fontsize=8, weight='extra bold',color='r', ha='right', va='bottom')
+        plt.plot([4.3, 5.8], [10.7, 14.2],'--', linewidth=3.0, color='r')
+        t = plt.text(4.9, 12.1, 'Slope', fontsize=8, weight='extra bold',color='r', ha='right', va='bottom')
         # t.set_bbox(dict(facecolor='white', alpha=0.5, linewidth=0))
         plt.xlabel(r"$\tilde k$")
+        plt.ylabel(r"$\frac{2}{\pi}\theta(\eta_\infty)$ should $\in\mathbb{N}$")
         # plt.ylabel(r"$\frac{2}{\pi}\theta(\tilde{k})$")
         # plt.xlabel(r"$k$, should be $n\in \mathbb{N}$")
-        plt.ylabel(r"$\theta(\tilde k, a\rightarrow a_{\infty})$, should be $\in \mathbb{N}\frac{\pi}{2}$")
+        # plt.ylabel(r"$\theta(\tilde k, a\rightarrow a_{\infty})$, should be $\in \mathbb{N}\frac{\pi}{2}$")
         plt.xlim([1, 6])
         plt.ylim([0, 9])
         plt.xticks([int(ele) for ele in np.linspace(1, 6, 6)])
@@ -287,9 +295,12 @@ class Universe:
 
         plt.figure(figsize=(3.375,2.7)) 
         # make data
-        allowed_kc_list = [0.113284, 0.238231, 0.671658, 0.98607, 0.99969] 
-        slope_list = [ r"$\frac{1}{3}\frac{\pi}{2}$", r"$\frac{1}{2}\frac{\pi}{2}$", r"$1\frac{\pi}{2}$", r"$2\frac{\pi}{2}$", r"$3\frac{\pi}{2}$"]
-        k_int_list = np.logspace(0, 3, 1000) # k_int are more continuous
+        allowed_kc_list = [0.04226149,0.06525782,0.11329486, 0.23823409, 0.67165184, 0.98589979, 0.99846078]
+        slope_list = [ r"$\frac{1}{5}$", r"$\frac{1}{4}$", r"$\frac{1}{3}$", r"$\frac{1}{2}$", r"$1$", r"$2$", r"$3$"]
+        # allowed_kc_list = [0.113284, 0.238231, 0.671658, 0.98607, 0.99969] 
+        # slope_list = [ r"$\frac{1}{3}\frac{\pi}{2}$", r"$\frac{1}{2}\frac{\pi}{2}$", r"$1\frac{\pi}{2}$", r"$2\frac{\pi}{2}$", r"$3\frac{\pi}{2}$"]
+        # k_int_list = np.logspace(0, 3, 1000) # k_int are more continuous
+        k_int_list = np.linspace(0, 20, 200) # k_int are more continuous
 
         def theta(kc, k_int):
             trans_constant = np.sqrt(2*kc/3.)
@@ -302,21 +313,26 @@ class Universe:
                 theta_int  = 2* quad(psi_curved, 0, 1, args=(kc, k))[0]
             except:
                 theta_int = 0
-            return theta_int
+            # return theta_int
+            return 2/np.pi* theta_int
 
         for n in range(len(allowed_kc_list)):
             kc = allowed_kc_list[n]    
-            plt.plot(k_int_list, [theta(kc, k_int) for k_int in k_int_list], label=r"$d\theta/dk_{\mathrm{int}}=$ "+slope_list[n], color=color_list[2+n], linewidth=1.2)
+            # plt.plot(k_int_list, [theta(kc, k_int) for k_int in k_int_list], label=r"$d\theta/dk_{\mathrm{int}}=$ "+slope_list[n], color=color_list[2+n], linewidth=1.2)
+            plt.plot(k_int_list, [theta(kc, k_int) for k_int in k_int_list], label=r"$\frac{2}{\pi}d\theta/dk=$ "+slope_list[n], color=color_list[n], linewidth=1.2)
 
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlabel(r"$k_{\mathrm{int}}$")
-        plt.ylabel(r"$\theta(k_{\mathrm{int}}, a\rightarrow a_{\infty})$")
+        # plt.xscale('log')
+        # plt.yscale('log')
+        # plt.xlabel(r"$k_{\mathrm{int}}$")
+        # plt.ylabel(r"$\theta(k_{\mathrm{int}}, a\rightarrow a_{\infty})$")
+        plt.xlabel(r"$k$")
+        plt.ylabel(r"$\frac{2}{\pi}\theta(k, \eta=\eta_{\infty})$")
         plt.xlim([k_int_list[0], k_int_list[-1]])
-        plt.ylim([2.e-1, theta(allowed_kc_list[2], k_int_list[-1])])
+        # plt.ylim([2.e-1, theta(allowed_kc_list[2], k_int_list[-1])])
         # plt.xticks(k_int_list,fontsize=10)
         plt.legend()
-        plt.savefig("theta-kint_log.pdf", bbox_inches="tight")
+        # plt.savefig("theta-kint_log.pdf", bbox_inches="tight")
+        plt.savefig("theta-k.pdf", bbox_inches="tight")
 
     ########################
     # Find curvature vallue (kc) with known Lambda (DE) by making slope of theta = N^{+-1}pi/2 (Lambda is known)
@@ -476,21 +492,21 @@ class Universe:
 
 H0 = 66.86 * u.km/u.s/u.Mpc # 70
 Omega_lambda = 0.679  # 0.73
-Omega_r_h2 = 2.47e-5 
+Omega_r_h2 = 4.15e-5 
 universe = Universe(H0, Omega_lambda, Omega_r_h2)
 
 # universe = Universe(H0, Omega_lambda, Omega_r_h2)
 # universe.plot_k_theta_discrete(5, 8)
 
-# k_list = np.linspace(1, 6, 300)
-# color_list = ['darkblue', 'blueviolet', 'violet']
-# kc_list = [0.9, 0, -0.9]
-# universe.plot_k_theta(k_list, kc_list)
+k_list = np.linspace(1, 6, 300)
+color_list = ['darkblue', 'blueviolet', 'violet']
+kc_list = [0.9, 0, -0.9]
+universe.plot_k_theta(k_list, kc_list)
 
-color_list = ['aliceblue', 'lightcyan', 'lightblue', 'lightskyblue', 'deepskyblue', 'blue', 'darkblue'] # slope = [1/5, 1/4, 1/3, 1/2, 1, 2, 3] respectively 
-kc_list = np.linspace(0, 0.9999, 200)
+# color_list = ['aliceblue', 'lightcyan', 'lightblue', 'lightskyblue', 'deepskyblue', 'blue', 'darkblue'] # slope = [1/5, 1/4, 1/3, 1/2, 1, 2, 3] respectively 
+# kc_list = np.linspace(0, 0.9999, 200)
 # universe.slope_kc_eta_tot_without_matter(kc_list)
-universe.plot_kint_theta_loglog()
+# universe.plot_kint_theta_loglog()
 
 # kc, K, Omega_K = universe.Find_kc(1, n_k=110, n_range=20)
 # print('kc='+str(kc))
@@ -544,7 +560,7 @@ def plot_OmegaK_OmegaLambda_plane(H0, Omega_lambda_list, Omega_r_h2, n_k, n_rang
 # H0_list = np.linspace(44, 70, 5) * u.km/u.s/u.Mpc
 H0 = 66.86 * u.km/u.s/u.Mpc 
 Omega_lambda_list = np.linspace(0.48, 0.7, 5)
-Omega_r_h2 = 2.47e-5 
+Omega_r_h2 = 4.15e-5 # 2.47e-5 
 # Omega_lambda = 0.535  # 0.73
 
 # plot_OmegaK_OmegaLambda_plane(H0, Omega_lambda_list, Omega_r_h2, n_k=110, n_range=20)

@@ -14,6 +14,7 @@ It identifies and compares the common eigenfunctions of v_r found in both bases.
 """
 import json
 import pickle
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -442,35 +443,560 @@ def compute_coefficients(eigenvalues, eigenvectors, transformation_matrix):
         coefficients[i, :] = np.dot(np.array(eigenvectors[i]), transformation_matrix)
     return coefficients
 
-def multi_perturbation_analysis(N=23, N_t=500, folder_path='../data/', eigenvalues_threshold=0.99):
+def load_and_merge_chunked_highk_data(folder_path, eta_grid):
     """
-    Complete multi-perturbation eigenvalue analysis with adaptive time truncation
+    Load and merge high-K data from chunked files.
+
+    Parameters:
+    -----------
+    folder_path : str
+        Base path to data folders
+    eta_grid : numpy array
+        Time grid for interpolation
+
+    Returns:
+    --------
+    basis_highk_dict : dict
+        Dictionary containing merged high-K perturbation bases for each type
+        Returns None if no chunk data is found
     """
-    print(f"Starting multi-perturbation analysis with N={N}, N_t={N_t}")
-    
+    highk_base_path = folder_path + 'data_highK_integerK/'
+    highk_timeseries_base_path = folder_path + 'data_highK_integerK_timeseries/'
+
+    if not os.path.exists(highk_base_path):
+        print(f"\nHigh-K base directory not found: {highk_base_path}")
+        return None
+
+    print("\nLoading high-K chunked data...")
+
+    # Find all chunk directories
+    chunk_dirs = sorted([d for d in os.listdir(highk_base_path)
+                       if os.path.isdir(os.path.join(highk_base_path, d)) and d.startswith('chunk_')])
+
+    if len(chunk_dirs) == 0:
+        print(f"  No chunk directories found in {highk_base_path}")
+        return None
+
+    print(f"Found {len(chunk_dirs)} chunk directories: {chunk_dirs}")
+
+    # Initialize lists to accumulate data from all chunks
+    all_chunks_kvalues = []
+    all_chunks_ABC_solutions = []
+    all_chunks_DEF_solutions = []
+    all_chunks_GHI_solutions = []
+    all_chunks_ABCmatrices = []
+    all_chunks_DEFmatrices = []
+    all_chunks_GHIvectors = []
+    all_chunks_X1matrices = []
+    all_chunks_X2matrices = []
+    all_chunks_recValues = []
+    t_grid_highk = None
+
+    # Load and merge data from each chunk
+    for chunk_dir in chunk_dirs:
+        chunk_path = os.path.join(highk_base_path, chunk_dir) + '/'
+        chunk_timeseries_path = os.path.join(highk_timeseries_base_path, chunk_dir) + '/'
+
+        try:
+            print(f"  Loading chunk: {chunk_dir}")
+
+            # Load timeseries data
+            chunk_t_grid = np.load(chunk_timeseries_path + 't_grid.npy')
+            chunk_kvalues = np.load(chunk_timeseries_path + 'L70_kvalues.npy')
+            chunk_ABC_solutions = np.load(chunk_timeseries_path + 'L70_ABC_solutions.npy')
+            chunk_DEF_solutions = np.load(chunk_timeseries_path + 'L70_DEF_solutions.npy')
+            chunk_GHI_solutions = np.load(chunk_timeseries_path + 'L70_GHI_solutions.npy')
+
+            # Load static matrices
+            chunk_ABCmatrices = np.load(chunk_path + 'L70_ABCmatrices.npy')
+            chunk_DEFmatrices = np.load(chunk_path + 'L70_DEFmatrices.npy')
+            chunk_GHIvectors = np.load(chunk_path + 'L70_GHIvectors.npy')
+            chunk_X1matrices = np.load(chunk_path + 'L70_X1matrices.npy')
+            chunk_X2matrices = np.load(chunk_path + 'L70_X2matrices.npy')
+            chunk_recValues = np.load(chunk_path + 'L70_recValues.npy')
+
+            # Verify t_grid consistency across chunks
+            if t_grid_highk is None:
+                t_grid_highk = chunk_t_grid
+            else:
+                if not np.allclose(t_grid_highk, chunk_t_grid):
+                    print(f"    Warning: t_grid mismatch in {chunk_dir}, using first chunk's t_grid")
+
+            # Append to lists
+            all_chunks_kvalues.append(chunk_kvalues)
+            all_chunks_ABC_solutions.append(chunk_ABC_solutions)
+            all_chunks_DEF_solutions.append(chunk_DEF_solutions)
+            all_chunks_GHI_solutions.append(chunk_GHI_solutions)
+            all_chunks_ABCmatrices.append(chunk_ABCmatrices)
+            all_chunks_DEFmatrices.append(chunk_DEFmatrices)
+            all_chunks_GHIvectors.append(chunk_GHIvectors)
+            all_chunks_X1matrices.append(chunk_X1matrices)
+            all_chunks_X2matrices.append(chunk_X2matrices)
+            all_chunks_recValues.append(chunk_recValues)
+
+            print(f"    Loaded {len(chunk_kvalues)} k-modes from {chunk_dir}")
+
+        except FileNotFoundError as e:
+            print(f"    Warning: Could not load chunk {chunk_dir}: {e}")
+            continue
+
+    # Concatenate all chunks along the k-mode axis (axis=0)
+    if len(all_chunks_kvalues) == 0:
+        print(f"  Warning: No chunks were successfully loaded")
+        return None
+
+    print(f"\n  Merging {len(all_chunks_kvalues)} chunks...")
+
+    merged_kvalues = np.concatenate(all_chunks_kvalues, axis=0)
+    merged_ABC_solutions = np.concatenate(all_chunks_ABC_solutions, axis=0)
+    merged_DEF_solutions = np.concatenate(all_chunks_DEF_solutions, axis=0)
+    merged_GHI_solutions = np.concatenate(all_chunks_GHI_solutions, axis=0)
+    merged_ABCmatrices = np.concatenate(all_chunks_ABCmatrices, axis=0)
+    merged_DEFmatrices = np.concatenate(all_chunks_DEFmatrices, axis=0)
+    merged_GHIvectors = np.concatenate(all_chunks_GHIvectors, axis=0)
+    merged_X1matrices = np.concatenate(all_chunks_X1matrices, axis=0)
+    merged_X2matrices = np.concatenate(all_chunks_X2matrices, axis=0)
+    merged_recValues = np.concatenate(all_chunks_recValues, axis=0)
+
+    print(f"  Total merged k-modes: {len(merged_kvalues)}")
+    print(f"  K range: {merged_kvalues[0]:.6f} to {merged_kvalues[-1]:.6f}")
+
+    # Now reconstruct perturbation bases from merged chunk data
+    print(f"  Reconstructing perturbation solutions from merged chunks...")
+
+    perturbation_types = ['dr', 'dm', 'vr', 'vm']
+    basis_highk_dict = {pert_type: [] for pert_type in perturbation_types}
+
+    # Extract matrix components
+    Amatrices_highk = merged_ABCmatrices[:, 0:6, :]
+    Bmatrices_highk = merged_ABCmatrices[:, 6:8, :]
+    Cmatrices_highk = merged_ABCmatrices[:, 8:num_variables, :]
+    Dmatrices_highk = merged_DEFmatrices[:, 0:6, :]
+    Ematrices_highk = merged_DEFmatrices[:, 6:8, :]
+    Fmatrices_highk = merged_DEFmatrices[:, 8:num_variables, :]
+
+    for i in range(len(merged_kvalues)):
+        k = merged_kvalues[i]
+
+        # Get matrices for this k
+        A = Amatrices_highk[i]
+        B = Bmatrices_highk[i]
+        C = Cmatrices_highk[i]
+        D = Dmatrices_highk[i]
+        E = Ematrices_highk[i]
+        F = Fmatrices_highk[i]
+        X1 = merged_X1matrices[i]
+        X2 = merged_X2matrices[i]
+        recs_vec = merged_recValues[i]
+
+        # Calculate x^∞
+        GX3 = np.zeros((6,4))
+        GX3[:,2] = merged_GHIvectors[i][0:6]
+
+        M_matrix = (A @ X1 + D @ X2)[2:6, :]
+        x_rec = recs_vec[2:6]
+        x_inf = np.linalg.lstsq(M_matrix, x_rec, rcond=None)[0]
+
+        # Calculate x' and y' coefficients
+        x_prime_coeffs = X1 @ x_inf
+        y_prime_coeffs = X2 @ x_inf
+
+        # Reconstruct solution from basis
+        ABC_sols_k = merged_ABC_solutions[i]
+        DEF_sols_k = merged_DEF_solutions[i]
+        GHI_sols_k = merged_GHI_solutions[i]
+
+        Y_reconstructed = np.einsum('ijt,j->it', ABC_sols_k, x_prime_coeffs) + \
+                        np.einsum('ijt,j->it', DEF_sols_k, y_prime_coeffs)
+
+        # Interpolate background s
+        s_background = np.interp(t_grid_highk, sol.t, sol.y[0])
+        Y_backward = np.vstack([s_background, Y_reconstructed])
+
+        # Construct full time array
+        t_full_unsorted = np.concatenate((t_grid_highk[::-1], [fcb_time]))
+
+        # Assemble solutions
+        solutions_unsorted = {
+            'dr': np.concatenate((Y_backward[3, ::-1], [x_inf[0]])),
+            'dm': np.concatenate((Y_backward[4, ::-1], [x_inf[1]])),
+            'vr': np.concatenate((Y_backward[5, ::-1], [x_inf[2]])),
+            'vm': np.concatenate((Y_backward[6, ::-1], [(X1 @ x_inf)[3]]))
+        }
+
+        # Sort by time
+        sort_indices = np.argsort(t_full_unsorted)
+        t_sol = t_full_unsorted[sort_indices]
+        y_sol = {key: value[sort_indices] for key, value in solutions_unsorted.items()}
+
+        # Interpolate onto eta_grid
+        for pert_type in perturbation_types:
+            if pert_type in y_sol:
+                interpolator = interp1d(t_sol, y_sol[pert_type],
+                                      bounds_error=False, fill_value=0.0)
+                solution = interpolator(eta_grid)
+                basis_highk_dict[pert_type].append(solution)
+            else:
+                basis_highk_dict[pert_type].append(np.zeros_like(eta_grid))
+
+    # Convert lists to numpy arrays
+    for pert_type in perturbation_types:
+        basis_highk_dict[pert_type] = np.array(basis_highk_dict[pert_type]).T
+
+    print(f"  High-K chunk processing completed successfully!")
+    return basis_highk_dict
+
+def multi_perturbation_analysis_with_full_extension(N=23, N_t=500, folder_path='../data/', eigenvalues_threshold=0.99):
+    """
+    Complete multi-perturbation eigenvalue analysis INCLUDING extended K modes.
+
+    This is the "naive" approach that merges extended modes BEFORE eigenvalue analysis.
+    Warning: High-k perfect eigenvalues (1.0) may dominate low-k physics eigenvalues (~0.9999).
+    Use for comparison with divide-and-conquer approach.
+    """
+    print(f"Starting multi-perturbation analysis WITH FULL EXTENSION with N={N}, N_t={N_t}")
+
     # Define eta_grid from cutoff_time to fcb_time as requested
     eta_grid = np.linspace(0, fcb_time, N_t)
     print(f"Using eta_grid from cutoff to FCB: eta ∈ [0, {fcb_time:.4e}]")
 
-    # Generate multi-perturbation bases
+    # Generate bases
     print("\nGenerating basis 1 (Closed Universe)...")
     basis_1_dict = generate_multi_perturbation_bases("integerK", eta_grid, folder_path=folder_path)
-    
+
     print("\nGenerating basis 2 (Palindromic Universe)...")
     basis_2_dict = generate_multi_perturbation_bases("allowedK", eta_grid, folder_path=folder_path)
-    
-    # Perform QR decomposition for each perturbation type
-    print("\nPerforming QR decomposition for each perturbation type...")
+
+    # Merge extended basis BEFORE eigenvalue analysis
+    extend_data_path = folder_path + 'data_extend_integerK/'
+    if os.path.exists(extend_data_path):
+        print("\nMerging extended basis BEFORE eigenvalue analysis...")
+        try:
+            basis_extend_dict = generate_multi_perturbation_bases("extend_integerK", eta_grid, folder_path=folder_path)
+
+            perturbation_types = ['dr', 'dm', 'vr', 'vm']
+            for pert_type in perturbation_types:
+                if pert_type in basis_extend_dict:
+                    # Concatenate along the modes axis (axis=1)
+                    basis_1_dict[pert_type] = np.concatenate([basis_1_dict[pert_type], basis_extend_dict[pert_type]], axis=1)
+                    basis_2_dict[pert_type] = np.concatenate([basis_2_dict[pert_type], basis_extend_dict[pert_type]], axis=1)
+                    print(f"  Extended {pert_type}: basis_1 shape = {basis_1_dict[pert_type].shape}, basis_2 shape = {basis_2_dict[pert_type].shape}")
+        except FileNotFoundError as e:
+            print(f"Warning: Extended basis data files not found: {e}")
+    else:
+        print(f"\nExtended basis directory not found: {extend_data_path}")
+
+    # Merge high-K chunked data BEFORE eigenvalue analysis
+    basis_highk_dict = load_and_merge_chunked_highk_data(folder_path, eta_grid)
+    if basis_highk_dict is not None:
+        print("\nMerging high-K chunked basis to basis_1 and basis_2...")
+        perturbation_types = ['dr', 'dm', 'vr', 'vm']
+        for pert_type in perturbation_types:
+            if pert_type in basis_highk_dict:
+                # Concatenate along the modes axis (axis=1)
+                basis_1_dict[pert_type] = np.concatenate([basis_1_dict[pert_type], basis_highk_dict[pert_type]], axis=1)
+                basis_2_dict[pert_type] = np.concatenate([basis_2_dict[pert_type], basis_highk_dict[pert_type]], axis=1)
+                print(f"  High-K {pert_type}: basis_1 shape = {basis_1_dict[pert_type].shape}, basis_2 shape = {basis_2_dict[pert_type].shape}")
+
+    # Perform QR decomposition on FULL (core + extended) bases
+    print("\n--- Running Eigen-Analysis on FULL Bases (Core + Extended) ---")
+
+    perturbation_types = ['dr', 'dm', 'vr', 'vm']
     ortho_funcs_1_dict = {}
     ortho_funcs_2_dict = {}
     transform_1_dict = {}
     transform_2_dict = {}
-    
-    perturbation_types = ['dr', 'dm', 'vr', 'vm']
-    
+
     for pert_type in perturbation_types:
+        if pert_type not in basis_1_dict:
+            continue
+
+        print(f"  QR decomposition for {pert_type} (full basis)")
+
+        if np.all(basis_1_dict[pert_type] == 0):
+            print(f"    Warning: Basis 1 for {pert_type} is all zeros, skipping")
+            continue
+        if np.all(basis_2_dict[pert_type] == 0):
+            print(f"    Warning: Basis 2 for {pert_type} is all zeros, skipping")
+            continue
+
+        try:
+            ortho_funcs_1_dict[pert_type], transform_1_dict[pert_type] = qr_decomposition(basis_1_dict[pert_type])
+            ortho_funcs_2_dict[pert_type], transform_2_dict[pert_type] = qr_decomposition(basis_2_dict[pert_type])
+            print(f"    Successfully processed {pert_type}")
+        except Exception as e:
+            print(f"    Error in QR decomposition for {pert_type}: {e}")
+
+    # Compute eigenvalues on FULL basis (including extended modes)
+    print("\nComputing combined eigenvalue analysis (FULL basis)...")
+    eigenvals_1, eigenvecs_1, eigenvals_2, eigenvecs_2, M_combined = compute_multi_perturbation_A_matrix(
+        ortho_funcs_1_dict, ortho_funcs_2_dict)
+
+    # Filter valid eigenvalues
+    eigenvals_valid_1, eigenvecs_valid_1 = choose_eigenvalues(
+        eigenvals_1, eigenvecs_1, eigenvalues_threshold)
+    eigenvals_valid_2, eigenvecs_valid_2 = choose_eigenvalues(
+        eigenvals_2, eigenvecs_2, eigenvalues_threshold)
+
+    print(f"\nFull Analysis: Found {len(eigenvals_valid_1)} valid modes (core + extended).")
+
+    if len(eigenvals_valid_1) > 0:
+        print(f"Eigenvalues (basis 1): {[f'{ev:.4f}' for ev in eigenvals_valid_1[:10]]}")
+    if len(eigenvals_valid_2) > 0:
+        print(f"Eigenvalues (basis 2): {[f'{ev:.4f}' for ev in eigenvals_valid_2[:10]]}")
+
+    # Compute coefficients
+    coefficients_1_dict = {}
+    coefficients_2_dict = {}
+
+    for pert_type in perturbation_types:
+        if pert_type in transform_1_dict and len(eigenvals_valid_1) > 0:
+            coefficients_1_dict[pert_type] = compute_coefficients(
+                eigenvals_valid_1, eigenvecs_valid_1, transform_1_dict[pert_type])
+            coefficients_2_dict[pert_type] = compute_coefficients(
+                eigenvals_valid_2, eigenvecs_valid_2, transform_2_dict[pert_type])
+
+    return {
+        'eta_grid': eta_grid,
+        'eigenvals_1': eigenvals_valid_1,
+        'eigenvals_2': eigenvals_valid_2,
+        'eigenvecs_1': eigenvecs_valid_1,
+        'eigenvecs_2': eigenvecs_valid_2,
+        'coefficients_1': coefficients_1_dict,
+        'coefficients_2': coefficients_2_dict,
+        'basis_1': basis_1_dict,
+        'basis_2': basis_2_dict,
+        'M_combined': M_combined
+    }
+
+
+def multi_perturbation_extension_reverse(N=23, N_t=500, folder_path='../data/', eigenvalues_threshold=0.99):
+    """
+    Same as multi_perturbation_analysis_with_full_extension but uses
+    REVERSED column ordering before QR decomposition.
+
+    Key insight (QR = Gram-Schmidt on columns, left to right):
+      Forward ordering  [core | extend | highK_chunked]:
+        high-k QR vectors = high-k raw - projections onto core QR vectors
+        → core is different in basis_1 vs basis_2, so the projections differ
+        → M[high-k block] ≠ I  →  missing high-k modes after Varimax
+
+      Reversed ordering  [extend | highK_chunked | core]:
+        high-k columns are processed FIRST with no prior QR vectors
+        → same input in both bases → same QR output in both bases
+        → M[high-k block] = I  (guaranteed, not approximate)
+        → cross-terms M[high-k, core] = 0  (by GS orthogonality)
+
+    The returned basis_1/basis_2 and coefficient dicts use the same
+    reversed column ordering, so coefficient-based reconstruction is
+    consistent.
+    """
+    print(f"Starting multi_perturbation_extension_reverse with N={N}, N_t={N_t}")
+
+    eta_grid = np.linspace(0, fcb_time, N_t)
+    print(f"Using eta_grid from cutoff to FCB: eta ∈ [0, {fcb_time:.4e}]")
+
+    # ── Generate CORE bases (kept separate until concatenation) ───────────────
+    print("\nGenerating core basis 1 (Closed Universe / integerK)...")
+    basis_1_core = generate_multi_perturbation_bases("integerK", eta_grid, folder_path=folder_path)
+
+    print("\nGenerating core basis 2 (Palindromic Universe / allowedK)...")
+    basis_2_core = generate_multi_perturbation_bases("allowedK", eta_grid, folder_path=folder_path)
+
+    # ── Collect ALL high-k extension data into a single combined dict ─────────
+    # These columns are identical in both bases.  They must be the FIRST
+    # columns passed to QR so they are orthogonalised before any
+    # basis-specific core vectors can contaminate them.
+    perturbation_types = ['dr', 'dm', 'vr', 'vm']
+    basis_highk_combined = {pert: None for pert in perturbation_types}
+    N_highk_total = 0
+
+    # (1) extend_integerK
+    extend_data_path = folder_path + 'data_extend_integerK/'
+    if os.path.exists(extend_data_path):
+        print("\nLoading extend_integerK modes...")
+        try:
+            basis_extend_dict = generate_multi_perturbation_bases(
+                "extend_integerK", eta_grid, folder_path=folder_path)
+            for pert_type in perturbation_types:
+                if pert_type in basis_extend_dict:
+                    arr = basis_extend_dict[pert_type]
+                    if basis_highk_combined[pert_type] is None:
+                        basis_highk_combined[pert_type] = arr
+                    else:
+                        basis_highk_combined[pert_type] = np.concatenate(
+                            [basis_highk_combined[pert_type], arr], axis=1)
+            ref = next(v for v in basis_extend_dict.values() if v is not None)
+            n_ext = ref.shape[1]
+            N_highk_total += n_ext
+            print(f"  extend_integerK: {n_ext} modes per perturbation type")
+        except FileNotFoundError as e:
+            print(f"  Warning: extend_integerK data not found: {e}")
+    else:
+        print(f"\nextend_integerK directory not found: {extend_data_path}")
+
+    # (2) high-K chunked data
+    # basis_highk_dict = load_and_merge_chunked_highk_data(folder_path, eta_grid)
+    # if basis_highk_dict is not None:
+    #     print("\nLoading high-K chunked modes...")
+    #     for pert_type in perturbation_types:
+    #         if pert_type in basis_highk_dict:
+    #             arr = basis_highk_dict[pert_type]
+    #             if basis_highk_combined[pert_type] is None:
+    #                 basis_highk_combined[pert_type] = arr
+    #             else:
+    #                 basis_highk_combined[pert_type] = np.concatenate(
+    #                     [basis_highk_combined[pert_type], arr], axis=1)
+    #     ref = next(v for v in basis_highk_dict.values() if v is not None)
+    #     n_chk = ref.shape[1]
+    #     N_highk_total += n_chk
+    #     print(f"  high-K chunked: {n_chk} modes per perturbation type")
+
+    # ── Reversed-order concatenation: [highK_combined | core] ─────────────────
+    print(f"\nBuilding reversed-order bases "
+          f"[highK({N_highk_total}) | core] for QR...")
+    basis_1_dict = {}
+    basis_2_dict = {}
+    for pert_type in perturbation_types:
+        hk = basis_highk_combined.get(pert_type)
+        c1 = basis_1_core.get(pert_type)
+        c2 = basis_2_core.get(pert_type)
+        if hk is not None and c1 is not None:
+            basis_1_dict[pert_type] = np.concatenate([hk, c1], axis=1)
+            basis_2_dict[pert_type] = np.concatenate([hk, c2], axis=1)
+            print(f"  {pert_type}: [{hk.shape[1]} highK | {c1.shape[1]} core]  "
+                  f"total = {basis_1_dict[pert_type].shape[1]}")
+        elif c1 is not None:
+            basis_1_dict[pert_type] = c1
+            basis_2_dict[pert_type] = c2
+            print(f"  {pert_type}: no high-K data found, using core only  "
+                  f"shape = {c1.shape}")
+
+    # ── QR decomposition on reversed-order full bases ─────────────────────────
+    print("\n--- Running Eigen-Analysis on reversed-order full bases ---")
+    ortho_funcs_1_dict = {}
+    ortho_funcs_2_dict = {}
+    transform_1_dict = {}
+    transform_2_dict = {}
+
+    for pert_type in perturbation_types:
+        if pert_type not in basis_1_dict:
+            continue
         print(f"  QR decomposition for {pert_type}")
-        
+        if np.all(basis_1_dict[pert_type] == 0):
+            print(f"    Warning: basis_1 for {pert_type} is all zeros, skipping")
+            continue
+        if np.all(basis_2_dict[pert_type] == 0):
+            print(f"    Warning: basis_2 for {pert_type} is all zeros, skipping")
+            continue
+        try:
+            ortho_funcs_1_dict[pert_type], transform_1_dict[pert_type] = \
+                qr_decomposition(basis_1_dict[pert_type])
+            ortho_funcs_2_dict[pert_type], transform_2_dict[pert_type] = \
+                qr_decomposition(basis_2_dict[pert_type])
+            print(f"    Successfully processed {pert_type}")
+        except Exception as e:
+            print(f"    Error in QR decomposition for {pert_type}: {e}")
+
+    # ── Eigenvalue analysis ────────────────────────────────────────────────────
+    print("\nComputing combined eigenvalue analysis (reversed-order full basis)...")
+    eigenvals_1, eigenvecs_1, eigenvals_2, eigenvecs_2, M_combined = \
+        compute_multi_perturbation_A_matrix(ortho_funcs_1_dict, ortho_funcs_2_dict)
+
+    eigenvals_valid_1, eigenvecs_valid_1 = choose_eigenvalues(
+        eigenvals_1, eigenvecs_1, eigenvalues_threshold)
+    eigenvals_valid_2, eigenvecs_valid_2 = choose_eigenvalues(
+        eigenvals_2, eigenvecs_2, eigenvalues_threshold)
+
+    print(f"\nFound {len(eigenvals_valid_1)} valid modes (reversed-order full basis).")
+    if len(eigenvals_valid_1) > 0:
+        print(f"Eigenvalues (basis 1): {[f'{ev:.4f}' for ev in eigenvals_valid_1[:10]]}")
+    if len(eigenvals_valid_2) > 0:
+        print(f"Eigenvalues (basis 2): {[f'{ev:.4f}' for ev in eigenvals_valid_2[:10]]}")
+
+    # ── Coefficients ──────────────────────────────────────────────────────────
+    # Coefficient columns follow the reversed column ordering:
+    #   cols 0..N_highk_total-1  → high-K extension modes
+    #   cols N_highk_total..end  → core modes
+    # basis_1_dict / basis_2_dict use the same ordering, so reconstruction
+    #   solution = sum_j coeff[j] * basis[pert][:, j]  is consistent.
+    coefficients_1_dict = {}
+    coefficients_2_dict = {}
+    for pert_type in perturbation_types:
+        if pert_type in transform_1_dict and len(eigenvals_valid_1) > 0:
+            coefficients_1_dict[pert_type] = compute_coefficients(
+                eigenvals_valid_1, eigenvecs_valid_1, transform_1_dict[pert_type])
+            coefficients_2_dict[pert_type] = compute_coefficients(
+                eigenvals_valid_2, eigenvecs_valid_2, transform_2_dict[pert_type])
+
+    return {
+        'eta_grid': eta_grid,
+        'eigenvals_1': eigenvals_valid_1,
+        'eigenvals_2': eigenvals_valid_2,
+        'eigenvecs_1': eigenvecs_valid_1,
+        'eigenvecs_2': eigenvecs_valid_2,
+        'coefficients_1': coefficients_1_dict,
+        'coefficients_2': coefficients_2_dict,
+        'basis_1': basis_1_dict,
+        'basis_2': basis_2_dict,
+        'M_combined': M_combined,
+        'N_highk': N_highk_total,   # number of high-k columns prepended
+    }
+
+
+def multi_perturbation_analysis(N=23, N_t=500, folder_path='../data/', eigenvalues_threshold=0.99):
+    """
+    Complete multi-perturbation eigenvalue analysis with divide-and-conquer for high-k extension.
+
+    This uses the "divide and conquer" approach:
+    1. Run eigenvalue analysis ONLY on low-k (core) modes
+    2. Manually append high-k extension as block-diagonal identity matrix
+    3. This prevents artificial high-k eigenvalues (1.0) from dominating the low-k physics
+    """
+    print(f"Starting multi-perturbation analysis with N={N}, N_t={N_t}")
+
+    # Define eta_grid from cutoff_time to fcb_time as requested
+    eta_grid = np.linspace(0, fcb_time, N_t)
+    print(f"Using eta_grid from cutoff to FCB: eta ∈ [0, {fcb_time:.4e}]")
+
+    # 1. Generate ONLY the Low-K (Physics) Bases first
+    print("\nGenerating CORE basis 1 (Closed Universe)...")
+    basis_1_dict = generate_multi_perturbation_bases("integerK", eta_grid, folder_path=folder_path)
+
+    print("\nGenerating CORE basis 2 (Palindromic Universe)...")
+    basis_2_dict = generate_multi_perturbation_bases("allowedK", eta_grid, folder_path=folder_path)
+
+    # 2. Check for Extended Basis, but DO NOT merge yet
+    basis_extend_dict = None
+    extend_data_path = folder_path + 'data_extend_integerK/'
+    if os.path.exists(extend_data_path):
+        print("\nLoading extended basis (to be appended later)...")
+        try:
+            basis_extend_dict = generate_multi_perturbation_bases("extend_integerK", eta_grid, folder_path=folder_path)
+            print(f"  Extended basis loaded successfully")
+        except FileNotFoundError as e:
+            print(f"  Warning: Extended basis data files not found: {e}")
+            basis_extend_dict = None
+    else:
+        print(f"\nExtended basis directory not found: {extend_data_path}")
+        print("Continuing with core bases only...")
+
+    # 3. Perform Analysis ONLY on the Core (Low-K)
+    # This ensures the solver focuses on the mismatch region
+    print("\n--- Running Eigen-Analysis on Core Low-K Modes ---")
+
+    perturbation_types = ['dr', 'dm', 'vr', 'vm']
+    ortho_funcs_1_dict = {}
+    ortho_funcs_2_dict = {}
+    transform_1_dict = {}
+    transform_2_dict = {}
+
+    for pert_type in perturbation_types:
+        if pert_type not in basis_1_dict:
+            continue
+
+        print(f"  QR decomposition for {pert_type} (core only)")
+
         # Check for valid data
         if np.all(basis_1_dict[pert_type] == 0):
             print(f"    Warning: Basis 1 for {pert_type} is all zeros, skipping")
@@ -478,45 +1004,153 @@ def multi_perturbation_analysis(N=23, N_t=500, folder_path='../data/', eigenvalu
         if np.all(basis_2_dict[pert_type] == 0):
             print(f"    Warning: Basis 2 for {pert_type} is all zeros, skipping")
             continue
-            
+
         try:
+            # QR on core only
             ortho_funcs_1_dict[pert_type], transform_1_dict[pert_type] = qr_decomposition(basis_1_dict[pert_type])
             ortho_funcs_2_dict[pert_type], transform_2_dict[pert_type] = qr_decomposition(basis_2_dict[pert_type])
             print(f"    Successfully processed {pert_type}")
         except Exception as e:
             print(f"    Error in QR decomposition for {pert_type}: {e}")
-    
-    # Compute combined A matrix from all perturbations
-    print("\nComputing combined eigenvalue analysis...")
+
+    # Compute A matrix and Eigenvalues on CORE
+    print("\nComputing combined eigenvalue analysis (core only)...")
     eigenvals_1, eigenvecs_1, eigenvals_2, eigenvecs_2, M_combined = compute_multi_perturbation_A_matrix(
         ortho_funcs_1_dict, ortho_funcs_2_dict)
-    
-    # Select largest eigenvalues
+
+    # Filter valid eigenvalues from CORE
     eigenvals_valid_1, eigenvecs_valid_1 = choose_eigenvalues(
         eigenvals_1, eigenvecs_1, eigenvalues_threshold)
     eigenvals_valid_2, eigenvecs_valid_2 = choose_eigenvalues(
         eigenvals_2, eigenvecs_2, eigenvalues_threshold)
-    
-    print(f"\nFound {len(eigenvals_valid_1)} valid eigenvalues for basis 1")
-    print(f"Found {len(eigenvals_valid_2)} valid eigenvalues for basis 2")
-    
+
+    print(f"\nCore Analysis: Found {len(eigenvals_valid_1)} valid modes in mismatch region.")
+
     if len(eigenvals_valid_1) > 0:
-        print(f"Eigenvalues (basis 1): {[f'{ev:.4f}' for ev in eigenvals_valid_1[:5]]}")
+        print(f"Core Eigenvalues (basis 1): {[f'{ev:.4f}' for ev in eigenvals_valid_1[:5]]}")
     if len(eigenvals_valid_2) > 0:
-        print(f"Eigenvalues (basis 2): {[f'{ev:.4f}' for ev in eigenvals_valid_2[:5]]}")
-    
-    # Compute coefficients for reconstruction
+        print(f"Core Eigenvalues (basis 2): {[f'{ev:.4f}' for ev in eigenvals_valid_2[:5]]}")
+
+    # 4. Compute Coefficients for Core
     coefficients_1_dict = {}
     coefficients_2_dict = {}
-    
+
     for pert_type in perturbation_types:
         if pert_type in transform_1_dict and len(eigenvals_valid_1) > 0:
             coefficients_1_dict[pert_type] = compute_coefficients(
                 eigenvals_valid_1, eigenvecs_valid_1, transform_1_dict[pert_type])
-        if pert_type in transform_2_dict and len(eigenvals_valid_2) > 0:
             coefficients_2_dict[pert_type] = compute_coefficients(
                 eigenvals_valid_2, eigenvecs_valid_2, transform_2_dict[pert_type])
-    
+
+    # 5. MERGE: Manually append the High-K extension now
+    # The high-k modes are diagonal (Identity) because Basis 1 == Basis 2
+    if basis_extend_dict is not None:
+        print("\n--- Appending Extended High-K Modes ---")
+
+        # Number of extended modes
+        N_ext = basis_extend_dict['vr'].shape[1]
+        print(f"Appending {N_ext} high-k modes as block-diagonal identity")
+
+        # Get the dimension of the QR-orthonormal space from core analysis
+        # This is the number of rows in the M_combined matrix
+        N_core = M_combined.shape[0]
+
+        # 1. Extend Eigenvalues (Assume perfect 1.0 for extension)
+        ext_evals = np.ones(N_ext)
+        eigenvals_valid_1 = np.concatenate([eigenvals_valid_1, ext_evals])
+        eigenvals_valid_2 = np.concatenate([eigenvals_valid_2, ext_evals])
+
+        # 2. Extend Eigenvectors
+        # The QR space now has dimension N_core + N_ext
+        # We need to:
+        # a) Pad existing core eigenvectors with zeros
+        # b) Add new eigenvectors for the extended modes (standard basis vectors)
+
+        # First, extend all existing core eigenvectors by padding with zeros
+        extended_eigenvecs_1 = []
+        extended_eigenvecs_2 = []
+
+        for eigvec in eigenvecs_valid_1:
+            # Pad with zeros to extend to N_core + N_ext dimensions
+            extended = np.zeros(N_core + N_ext)
+            extended[:N_core] = eigvec
+            extended_eigenvecs_1.append(extended)
+
+        for eigvec in eigenvecs_valid_2:
+            # Pad with zeros to extend to N_core + N_ext dimensions
+            extended = np.zeros(N_core + N_ext)
+            extended[:N_core] = eigvec
+            extended_eigenvecs_2.append(extended)
+
+        # Now add the extended high-k mode eigenvectors (standard basis vectors)
+        for i in range(N_ext):
+            # Create a zero vector in the extended space
+            ext_eigenvec = np.zeros(N_core + N_ext)
+            # Set the corresponding extended dimension to 1
+            ext_eigenvec[N_core + i] = 1.0
+
+            # Append to both bases (they're identical for high-k)
+            extended_eigenvecs_1.append(ext_eigenvec)
+            extended_eigenvecs_2.append(ext_eigenvec)
+
+        # Replace the original eigenvector lists
+        eigenvecs_valid_1 = extended_eigenvecs_1
+        eigenvecs_valid_2 = extended_eigenvecs_2
+
+        print(f"Extended eigenvector lists: now {len(eigenvecs_valid_1)} eigenvectors in {N_core + N_ext}-dimensional space")
+
+        # 3. Extend M_combined matrix
+        # M_combined represents the mixing between bases
+        # For the extended high-k modes, there's no mixing (Basis 1 == Basis 2)
+        # So we create a block diagonal: [ M_core   0   ]
+        #                                 [   0     I   ]
+        M_extended = np.zeros((N_core + N_ext, N_core + N_ext))
+        M_extended[:N_core, :N_core] = M_combined
+        M_extended[N_core:, N_core:] = np.eye(N_ext)
+        M_combined = M_extended
+
+        print(f"Extended M_combined matrix from {N_core}x{N_core} to {N_core + N_ext}x{N_core + N_ext}")
+
+        # 4. Extend Coefficients
+        # For the extension, create block diagonal structure for coefficients
+
+        for pert_type in perturbation_types:
+            if pert_type in coefficients_1_dict and pert_type in basis_extend_dict:
+                core_coeffs = coefficients_1_dict[pert_type]
+
+                # Create the extended coefficient matrix
+                # Structure: [ Core_Coeffs   0 ]
+                #            [ 0             I ]
+
+                # Current shape: (K_core, N_core)
+                K_core, N_core = core_coeffs.shape
+
+                # New shape: (K_core + N_ext, N_core + N_ext)
+                new_coeffs = np.zeros((K_core + N_ext, N_core + N_ext))
+
+                # Fill top-left with core results
+                new_coeffs[:K_core, :N_core] = core_coeffs
+
+                # Fill bottom-right with Identity (high-k maps to high-k)
+                new_coeffs[K_core:, N_core:] = np.eye(N_ext)
+
+                coefficients_1_dict[pert_type] = new_coeffs
+
+                # Repeat for Basis 2 (assuming identical extension)
+                core_coeffs_2 = coefficients_2_dict[pert_type]
+                new_coeffs_2 = np.zeros((K_core + N_ext, N_core + N_ext))
+                new_coeffs_2[:K_core, :N_core] = core_coeffs_2
+                new_coeffs_2[K_core:, N_core:] = np.eye(N_ext)
+                coefficients_2_dict[pert_type] = new_coeffs_2
+
+                # Update the basis dicts for plotting later
+                basis_1_dict[pert_type] = np.concatenate([basis_1_dict[pert_type], basis_extend_dict[pert_type]], axis=1)
+                basis_2_dict[pert_type] = np.concatenate([basis_2_dict[pert_type], basis_extend_dict[pert_type]], axis=1)
+
+                print(f"  Extended {pert_type}: coeffs shape = {new_coeffs.shape}, basis shape = {basis_1_dict[pert_type].shape}")
+
+        print(f"Total modes after extension: {len(eigenvals_valid_1)} (core: {K_core}, extended: {N_ext})")
+
     # # save the coefficients
     # with open("multi_perturbation_coefficients1.pickle", 'wb') as f:
     #     pickle.dump(coefficients_1_dict, f)
@@ -598,7 +1232,7 @@ def plot_multi_perturbation_results(results, N_plot=3):
 
     plt.savefig("multi_perturbation_eigenfunctions_after_recombination.pdf", dpi=300, bbox_inches='tight')
 
-def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.99, N_plot=10):
+def plot_coefficients_by_dominant_k(results, eigenvalue_threshold=0.95, N_plot=10):
     """
     Plot coefficients of eigenfunctions sorted by dominant k mode
 
@@ -831,7 +1465,7 @@ if __name__ == "__main__":
         print("="*80)
         sorting_results = plot_coefficients_by_dominant_k(
             results,
-            eigenvalue_threshold=0.99,
+            eigenvalue_threshold=0.95,
             N_plot=6
         )
     else:

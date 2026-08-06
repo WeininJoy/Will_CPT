@@ -69,12 +69,12 @@ class Universe:
         def find_index(lst):
             idx_list = []
             for i in range(len(lst) - 1):  # Go up to len(lst) - 1 to avoid index out of range
-                if abs(lst[i+1] - lst[i]) > 1000:
-                    idx_list.append(i)
+                if lst[i+1]*lst[i] < 0:  # a switch sign
+                    idx_list.append(i+1)
             return idx_list
         idxinf = find_index(a_list)
         eta_inf = eta_list[idxinf]
-        return eta_zeros, eta_inf
+        return idxzeros, eta_zeros, idxinf, eta_inf
 
     def a_switch_mt(self, eta, kt, mt):
         a_value = self.a_anal(eta, kt, mt)
@@ -99,28 +99,35 @@ class Universe:
         return left_derivative - right_derivative
 
     def plot_a(self, kt, mt):
-        eta_list = np.linspace(-5, 15, 1000) 
+        plt.figure(figsize=(3.375, 2.7))
+        eta_list = np.linspace(-9, 21, 1000) 
         # def a_fun(eta): return self.a_anal(eta, kt, mt)
         # sol = root_scalar(a_fun, bracket=[-, 0.0])
         # eta0 = sol.root
         eta_tot = self.Eta_tot(kt, mt)
         a_list = [self.a_anal(eta, kt, mt) for eta in eta_list]
-        eta_zeros, eta_inf = self.find_a_0_inf(eta_list, a_list)
+        idxzeros, eta_zeros, idxinf, eta_inf = self.find_a_0_inf(eta_list, a_list)
+        plt.plot(eta_list[:idxinf[0]], a_list[:idxinf[0]], color='blue')
+        for i in range(len(idxinf)-1):
+            plt.plot(eta_list[idxinf[i]:idxinf[i+1]], a_list[idxinf[i]:idxinf[i+1]], color='blue')
+        plt.plot(eta_list[idxinf[-1]:], a_list[idxinf[-1]:], color='blue')
+            
         print('eta_zeros:', eta_zeros)
         print('eta_diff:', np.diff(eta_zeros))
         print('Delta_k:', [np.sqrt(3)*np.pi/2/eta_diff for eta_diff in np.diff(eta_zeros)])
-        plt.plot([eta-eta_zeros[0] for eta in eta_list], a_list)
-        plt.vlines(eta_tot, -5, 5, colors='k', linestyles='dashed')
+        # plt.plot([eta-eta_zeros[0] for eta in eta_list], a_list)
+        # plt.vlines(eta_tot, -5, 5, colors='k', linestyles='dashed')
+        plt.hlines(0, -9, 21, colors='k', linestyles='dashed')
         plt.ylim(-3, 3)
+        plt.xlim(-9, 21)
         plt.xlabel(r'$\eta$')
         plt.ylabel(r'$a(\eta)$')
-
+        plt.savefig("evolution_a-eta_nonSymmetric.pdf", bbox_inches="tight")
         
 
 lam, rt = 1., 1.
 u = Universe(lam, rt)
-kt, mt = 0.0, 1.0
+kt, mt = 0.0, 2.0
 u.plot_a(kt, mt)
 # u.plot_a_num()
-plt.show()
 # print(u.Eta_tot(kt, mt))

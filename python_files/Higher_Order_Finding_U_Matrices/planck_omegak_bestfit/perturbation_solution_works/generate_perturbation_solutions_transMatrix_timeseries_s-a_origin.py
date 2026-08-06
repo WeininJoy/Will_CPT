@@ -27,8 +27,10 @@ nu_spacing = 4
 print("--- Setting up parameters and functions ---")
 # *** NEW: Point to the time-series data directory ***
 folder_path = f'./data/'
-folder_path_matrices = folder_path + 'data_allowedK/' # For X1, X2, recValues
-folder_path_timeseries = folder_path + 'data_allowedK_timeseries/' # For solution histories
+folder_path_matrices = folder_path + 'data_extend_integerK/' # For X1, X2, recValues
+folder_path_timeseries = folder_path + 'data_extend_integerK_timeseries/' # For solution histories
+# folder_path_matrices = folder_path + 'data_allowedK/' # For X1, X2, recValues
+# folder_path_timeseries = folder_path + 'data_allowedK_timeseries/' # For solution histories
 # folder_path_matrices = folder_path + 'data_integerK/' # For X1, X2, recValues
 # folder_path_timeseries = folder_path + 'data_integerK_timeseries/' # For solution histories
 
@@ -494,5 +496,5 @@ fig.legend(loc='upper center', bbox_to_anchor=(0.5, 1.0), ncol=6, frameon=True, 
 # Adjust layout to prevent overlap and make space for top elements
 fig.tight_layout(rect=[0.02, 0.02, 0.98, 0.92])
 
-plt.savefig(folder_path + 'perturbation_solutions_transMatrix_timeseries_s-a.pdf')
+plt.savefig(folder_path + 'perturbation_solutions_transMatrix_timeseries_extendK.pdf')
 plt.show()

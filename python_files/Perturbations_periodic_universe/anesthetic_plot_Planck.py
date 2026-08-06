@@ -11,7 +11,7 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams["font.family"] = "serif"
 plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 
-omegarh2 = 2.47e-5 
+omegarh2 = 4.15e-5 
 
 ns = read_chains('/home/wnd22/Documents/Research/PlanckData_2018/base_omegak/plikHM_TTTEEE_lowl_lowE/base_omegak_plikHM_TTTEEE_lowl_lowE')
 column_names_raw = np.loadtxt('/home/wnd22/Documents/Research/PlanckData_2018/base_omegak/plikHM_TTTEEE_lowl_lowE/base_omegak_plikHM_TTTEEE_lowl_lowE.paramnames', dtype=str, usecols=[0])

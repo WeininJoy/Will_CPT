@@ -6,6 +6,7 @@ Created on Tue Apr  6 22:03:58 2021
 """
 
 from scipy.integrate import solve_ivp
+from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import root_scalar
@@ -25,7 +26,8 @@ def process_single_k(k, fcb_time, swaptime, recConformalTime,
 
     # ADAPTIVE DELTAETA: Ensure k*deltaeta < k_deltaeta_target for Taylor expansion validity
     # Use smaller deltaeta for larger k to maintain accuracy
-    deltaeta = min(k_deltaeta_target / k, deltaeta_max)
+    deltaeta = deltaeta_max 
+    # deltaeta = min(k_deltaeta_target / k, deltaeta_max)
 
     endtime = fcb_time - deltaeta
     
@@ -442,15 +444,14 @@ def process_single_k(k, fcb_time, swaptime, recConformalTime,
 
     return (ABC_matrix, DEF_matrix, GHI_vector, X1, X2)
 
-def compute_U_matrices(params, z_rec, kvalues, folder_path, n_processes=None,
-                       num_variables=200, num_variables_save=75):
+def compute_U_matrices(params, z_rec, kvalues, folder_path, num_variables=200, n_processes=None, cosmo_param_bool=False):
     """
     Compute ABC/DEF/GHI matrices and X1/X2 matrices for perturbation analysis.
 
     Parameters:
     -----------
     params : list or tuple
-        [mt, kt, omega_b_ratio, h] cosmological parameters
+        [mt, kt, omega_b_ratio, h] cosmological parameters or [OmegaM, OmegaK, omega_b_ratio, h] if cosmo_param_bool is True.
     z_rec : float
         Recombination redshift
     folder_path : str
@@ -460,45 +461,50 @@ def compute_U_matrices(params, z_rec, kvalues, folder_path, n_processes=None,
     num_variables : int, optional
         Number of perturbation variables used in the ODE solver (default: 200).
         Use larger values for higher k for better numerical accuracy.
-    num_variables_save : int, optional
-        Number of perturbation variable rows to keep when saving (default: 75).
-        Must be <= num_variables. Rows beyond this index are discarded before
-        saving so that data from different k-ranges (with different num_variables)
-        can be concatenated into a uniform array. The consumer
-        (generate_multi_perturbation_bases) only reads up to index 75.
+    cosmo_param_bool : bool, optional
+        If True, use cosmological parameters OmegaM, OmegaK, omega_b_ratio, h.
+        If False, use mt, kt, omega_b_ratio, h. Default is False.
 
     Returns:
     --------
     dict : Dictionary containing kvalues, ABCmatrices, DEFmatrices, GHIvectors, X1matrices, X2matrices
     """
-
-    # Unpack parameters
-    mt, kt, omega_b_ratio, h = params
-
     # Constants
     lam = 1
     rt = 1
     Omega_gamma_h2 = 2.47e-5  # photon density
     Neff = 3.046
+    
+    if cosmo_param_bool == True:
+        # Unpack parameters
+        OmegaM, OmegaK, omega_b_ratio, h = params
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+        OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
 
-    def cosmological_parameters(mt, kt, h):
-        Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+    else:
+        # Unpack parameters
+        mt, kt, omega_b_ratio, h = params
 
-        def solve_a0(Omega_r, rt, mt, kt):
-            def f(a0):
-                return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
-            sol = root_scalar(f, bracket=[1, 1.e3])
-            return sol.root
+        def cosmological_parameters(mt, kt, h):
+            Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
 
-        a0 = solve_a0(Omega_r, rt, mt, kt)
-        s0 = 1/a0
-        Omega_lambda = Omega_r * a0**4
-        Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
-        Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
-        return s0, Omega_lambda, Omega_m, Omega_K
+            def solve_a0(Omega_r, rt, mt, kt):
+                def f(a0):
+                    return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+                sol = root_scalar(f, bracket=[1, 1.e3])
+                return sol.root
 
-    s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
-    OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+            a0 = solve_a0(Omega_r, rt, mt, kt)
+            s0 = 1/a0
+            Omega_lambda = Omega_r * a0**4
+            Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+            Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+            return s0, Omega_lambda, Omega_m, Omega_K
+
+        s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+
+    print(f"Computed Cosmological Parameters: OmegaLambda={OmegaLambda}, OmegaM={OmegaM}, OmegaK={OmegaK}, OmegaR={OmegaR}")
     ###############################################################################
 
     #set tolerances
@@ -563,17 +569,19 @@ def compute_U_matrices(params, z_rec, kvalues, folder_path, n_processes=None,
     #RECOMBINATION CONFORMAL TIME
     #```````````````````````````````````````````````````````````````````````````````
 
-    #find conformal time at recombination
-    s_rec = 1+z_rec  #reciprocal scale factor at recombination
+    # Build continuous s -> t interpolant (s is monotonically decreasing; reverse for interp1d)
+    _s_arr = sol.y[0][::-1]
+    _t_arr = sol.t[::-1]
+    _interp_t_from_s = interp1d(_s_arr, _t_arr, kind='cubic',
+                                bounds_error=False, fill_value='extrapolate')
 
-    #take difference between s values and s_rec to find where s=s_rec i.e where recScaleFactorDifference=0
-    recScaleFactorDifference = abs(sol.y[0] - s_rec) #take difference between s values and s_rec to find where s=s_rec 
-    recConformalTime = sol.t[recScaleFactorDifference.argmin()]
+    s_rec = 1 + z_rec  # reciprocal scale factor at recombination
+    recConformalTime = float(_interp_t_from_s(s_rec))
 
     #-------------------------------------------------------------------------------
     # For each K, find ACmatrices, BDvectors and Xmatrices
     #-------------------------------------------------------------------------------
-
+    
     # Determine number of processes to use
     if n_processes is None:
         n_processes = cpu_count()
@@ -623,21 +631,12 @@ def compute_U_matrices(params, z_rec, kvalues, folder_path, n_processes=None,
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-    print("Parallel computation completed")
-
-    # Truncate the num_variables axis to num_variables_save before saving so that
-    # data from different k-ranges (computed with different num_variables for accuracy)
-    # all have a uniform shape and can be concatenated downstream.
-    # X1matrices / X2matrices have shape (N_k, 6, 4) — no truncation needed.
-    ABCmatrices_save = np.array(ABCmatrices)[:, :num_variables_save, :]
-    DEFmatrices_save = np.array(DEFmatrices)[:, :num_variables_save, :]
-    GHIvectors_save  = np.array(GHIvectors)[:, :num_variables_save]
-    print(f"Saving with num_variables_save={num_variables_save} "
-          f"(computed with num_variables={num_variables})")
-
+    print(f"Saving full arrays with num_variables={num_variables}")
     np.save(folder_path+'L70_kvalues', kvalues)
-    np.save(folder_path+'L70_ABCmatrices', ABCmatrices_save)
-    np.save(folder_path+'L70_DEFmatrices', DEFmatrices_save)
-    np.save(folder_path+'L70_GHIvectors',  GHIvectors_save)
+    np.save(folder_path+'L70_ABCmatrices', np.array(ABCmatrices))
+    np.save(folder_path+'L70_DEFmatrices', np.array(DEFmatrices))
+    np.save(folder_path+'L70_GHIvectors',  np.array(GHIvectors))
     np.save(folder_path+'L70_X1matrices',  X1matrices)
     np.save(folder_path+'L70_X2matrices',  X2matrices)
+
+

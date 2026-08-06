@@ -12,6 +12,7 @@ back to recombination and saving the full solution history for each.
 """
 
 from scipy.integrate import solve_ivp
+from scipy.interpolate import interp1d
 from scipy.optimize import root_scalar
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,7 +38,8 @@ def process_single_k_timeseries(k, s_init, t_grid_a, t_grid_s, num_time_points,
     """
 
     # ADAPTIVE DELTAETA: Compute k-specific deltaeta for boundary conditions
-    deltaeta = min(k_deltaeta_target / k, deltaeta_max)
+    # deltaeta = min(k_deltaeta_target / k, deltaeta_max)
+    deltaeta = deltaeta_max # set it as deltaeta_max for now, can be adjusted based on k if needed
 
     print(f"Processing k = {k:.6f}, deltaeta = {deltaeta:.6e}, k*deltaeta = {k*deltaeta:.6f}")
 
@@ -169,8 +171,8 @@ def process_single_k_timeseries(k, s_init, t_grid_a, t_grid_s, num_time_points,
 
 
 def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path, n_processes=None,
-                                   num_variables=200, num_variables_save=75,
-                                   k_for_endtime=None):
+                                   num_variables=200,
+                                   k_for_endtime=None, cosmo_param_bool=False):
     """
     Compute ABC/DEF/GHI time series solutions for perturbation analysis (PARALLELIZED).
 
@@ -188,49 +190,56 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path, n_process
         Number of parallel processes to use. If None, uses all available CPU cores.
     num_variables : int, optional
         Number of perturbation variables used in the ODE solver (default: 200).
-    num_variables_save : int, optional
-        Number of perturbation variable rows to keep when saving (default: 75).
-        Must be <= num_variables.  Keeping this consistent across k-range chunks
-        ensures all saved tensors have the same shape and can be concatenated.
+        Full arrays are saved; use larger values for higher k for better accuracy.
     k_for_endtime : float or None, optional
         The k value used to determine the adaptive endtime for the common time
         grid (endtime = fcb_time - k_deltaeta_target / k_for_endtime).
         Pass the global k_min across ALL k-range chunks so every chunk produces
         the same t_grid and their solutions can be concatenated without
         re-interpolation.  If None, defaults to np.min(kvalues).
+    cosmo_param_bool : bool, optional
+        If True, use cosmological parameters OmegaM, OmegaK, omega_b_ratio, h.
+        If False, use mt, kt, omega_b_ratio, h. Default is False.
 
     Returns:
     --------
     None (saves results to disk)
     """
 
-    # Unpack parameters
-    mt, kt, omega_b_ratio, h = params
-
     # Constants
     lam = 1
     rt = 1
     Omega_gamma_h2 = 2.47e-5  # photon density
     Neff = 3.046
+    
+    if cosmo_param_bool == True:
+        # Unpack parameters
+        OmegaM, OmegaK, omega_b_ratio, h = params
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+        OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
+    else:
+        # Unpack parameters
+        mt, kt, omega_b_ratio, h = params
 
-    def cosmological_parameters(mt, kt, h):
-        Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+        def cosmological_parameters(mt, kt, h):
+            Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
 
-        def solve_a0(Omega_r, rt, mt, kt):
-            def f(a0):
-                return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
-            sol = root_scalar(f, bracket=[1, 1.e3])
-            return sol.root
+            def solve_a0(Omega_r, rt, mt, kt):
+                def f(a0):
+                    return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+                sol = root_scalar(f, bracket=[1, 1.e3])
+                return sol.root
 
-        a0 = solve_a0(Omega_r, rt, mt, kt)
-        s0 = 1/a0
-        Omega_lambda = Omega_r * a0**4
-        Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
-        Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
-        return s0, Omega_lambda, Omega_m, Omega_K
+            a0 = solve_a0(Omega_r, rt, mt, kt)
+            s0 = 1/a0
+            Omega_lambda = Omega_r * a0**4
+            Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+            Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+            return s0, Omega_lambda, Omega_m, Omega_K
 
-    s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
-    OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+        s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+    ###############################################
 
     # Set tolerances
     atol = 1e-13
@@ -284,9 +293,13 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path, n_process
         return
 
     # RECOMBINATION CONFORMAL TIME
-    s_rec = 1+z_rec  # reciprocal scale factor at recombination
-    recScaleFactorDifference = abs(sol.y[0] - s_rec)
-    recConformalTime = sol.t[recScaleFactorDifference.argmin()]
+    # Build continuous s -> t interpolant (s is monotonically decreasing; reverse for interp1d)
+    _s_arr = sol.y[0][::-1]
+    _t_arr = sol.t[::-1]
+    _interp_t_from_s = interp1d(_s_arr, _t_arr, kind='cubic',
+                                bounds_error=False, fill_value='extrapolate')
+    s_rec = 1 + z_rec  # reciprocal scale factor at recombination
+    recConformalTime = float(_interp_t_from_s(s_rec))
 
     # ADAPTIVE DELTAETA: Compute endtime for the common time grid.
     # Use k_for_endtime if provided (pass the global k_min across all chunks so
@@ -352,19 +365,15 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path, n_process
         all_DEF_solutions.append(DEF_sols_k)
         all_GHI_solutions.append(GHI_sols_k)
 
-    # Convert lists of tensors to single large numpy arrays, then truncate the
-    # num_variables axis so data from different k-range chunks (computed with
-    # different num_variables for ODE accuracy) all have a uniform shape and can
-    # be concatenated downstream without re-interpolation.
-    #   Full shapes before truncation:
-    #     ABC: (num_k, num_variables,   6, num_times)
-    #     DEF: (num_k, num_variables,   2, num_times)
-    #     GHI: (num_k, num_variables,      num_times)
-    all_ABC_solutions = np.array(all_ABC_solutions)[:, :num_variables_save, :, :]
-    all_DEF_solutions = np.array(all_DEF_solutions)[:, :num_variables_save, :, :]
-    all_GHI_solutions = np.array(all_GHI_solutions)[:, :num_variables_save, :]
-    print(f"Saving with num_variables_save={num_variables_save} "
-          f"(computed with num_variables={num_variables})")
+    # Convert lists of tensors to single large numpy arrays.
+    # Full shapes:
+    #   ABC: (num_k, num_variables, 6, num_times)
+    #   DEF: (num_k, num_variables, 2, num_times)
+    #   GHI: (num_k, num_variables,    num_times)
+    all_ABC_solutions = np.array(all_ABC_solutions)
+    all_DEF_solutions = np.array(all_DEF_solutions)
+    all_GHI_solutions = np.array(all_GHI_solutions)
+    print(f"Saving full arrays with num_variables={num_variables}")
 
     import os
     if not os.path.exists(folder_path):

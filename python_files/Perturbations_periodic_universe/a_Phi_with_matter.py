@@ -100,8 +100,8 @@ sol_inf = solve_ivp(odes, [1.e-3, 10], y0, t_eval = a_list, method='RK45')
 phi_sol = sol_inf.y[0]
 
 ## Plot Phi(eta) solution
-plt.plot(sol_inf.t, phi_sol)
-plt.xlabel(r'$a$')
-plt.ylabel(r'$\Phi(a)$')
-plt.title(r'$\Phi(a)$ with mass')
-plt.savefig("Phi_with_mass.pdf")
+# plt.plot(sol_inf.t, phi_sol)
+# plt.xlabel(r'$a$')
+# plt.ylabel(r'$\Phi(a)$')
+# plt.title(r'$\Phi(a)$ with mass')
+# plt.savefig("Phi_with_mass.pdf")

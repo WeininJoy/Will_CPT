@@ -70,9 +70,16 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path):
     atol = 1e-13
     rtol = 1e-13
     stol = 1e-10
+
     num_variables = 75  # number of pert variables
     swaptime = 2  #set time when we swap from s to sigma
-    deltaeta = 6.6e-4
+
+    # ADAPTIVE DELTAETA PARAMETERS
+    # deltaeta_max: maximum value for low k (maintains current behavior for k ~ 1)
+    # k_deltaeta_target: target for k*deltaeta product (must be << 1 for Taylor expansion)
+    deltaeta_max = 6.6e-4  # Original fixed value
+    k_deltaeta_target = 0.005  # Ensures k*deltaeta < 0.005 for all k
+
     H0 = 1/np.sqrt(3*OmegaLambda)  #we are working in units of Lambda=c=1
     Hinf = H0*np.sqrt(OmegaLambda)
 
@@ -119,7 +126,7 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path):
     else:
         print(f"No fcb_time available for further processing.")
 
-    endtime = fcb_time - deltaeta
+    # Note: endtime will be computed per-k using adaptive deltaeta
 
     #``````````````````````````````````````````````````````````````````````````````
     #RECOMBINATION CONFORMAL TIME
@@ -129,7 +136,7 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path):
     s_rec = 1+z_rec  #reciprocal scale factor at recombination
 
     #take difference between s values and s_rec to find where s=s_rec i.e where recScaleFactorDifference=0
-    recScaleFactorDifference = abs(sol.y[0] - s_rec) #take difference between s values and s_rec to find where s=s_rec 
+    recScaleFactorDifference = abs(sol.y[0] - s_rec) #take difference between s values and s_rec to find where s=s_rec
     recConformalTime = sol.t[recScaleFactorDifference.argmin()]
 
     # --- Derivative Functions (Unchanged, but ensure lmax is handled correctly) ---
@@ -185,6 +192,12 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path):
 
     # --- Main Calculation Loop ---
 
+    # *** ADAPTIVE DELTAETA: Compute endtime using minimum k (most conservative) ***
+    k_min = np.min(kvalues)
+    deltaeta_for_grid = min(k_deltaeta_target / k_min, deltaeta_max)
+    endtime = fcb_time - deltaeta_for_grid
+    print(f"Using endtime = {endtime} (fcb_time - {deltaeta_for_grid}) for time grid")
+
     # *** NEW: Define a common time grid ***
     num_time_points = 500
     t_grid = np.linspace(recConformalTime, endtime, num=num_time_points)
@@ -203,7 +216,11 @@ def compute_U_matrices_timeseries(params, z_rec, kvalues, folder_path):
 
     for i in range(len(kvalues)):
         k = kvalues[i]
-        print(f"\nProcessing k = {k:.6f} ({i+1}/{len(kvalues)})")
+
+        # ADAPTIVE DELTAETA: Compute k-specific deltaeta for boundary conditions
+        deltaeta = min(k_deltaeta_target / k, deltaeta_max)
+
+        print(f"\nProcessing k = {k:.6f} ({i+1}/{len(kvalues)}), deltaeta = {deltaeta:.6e}")
         
         # *** NEW: Initialize tensors to store solutions for this k ***
         # Shape: (num_variables, num_basis_vectors, num_time_steps)

@@ -79,7 +79,7 @@ def calculate_z_rec(mt, kt, omega_b_ratio, h):
                     'tau_reio': tau, 
                     'N_ur': Neff,
                     'N_ncdm':N_ncdm})
-    LambdaCDM.set({ 'output':'tCl,pCl,lCl,mPk',
+    LambdaCDM.set({ 'output':'thermodynamics',
                     'lensing':'yes',
                     'P_k_max_1/Mpc':3.0,
                     'l_max_scalars':2508})

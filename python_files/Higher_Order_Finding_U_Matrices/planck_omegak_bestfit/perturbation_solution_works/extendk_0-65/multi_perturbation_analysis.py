@@ -203,14 +203,18 @@ def generate_multi_perturbation_bases(discreteK_type, eta_grid, folder_path='./d
         print("Please ensure you have run 'Higher_Order_Finding_U_Matrices_TimeSeries.py' first.")
         exit()
 
+    # Use the actual loaded num_variables (may differ across k-range chunks after padding)
+    loaded_nv = ABCmatrices.shape[1]
+
     # Extract all matrix components
     Amatrices = ABCmatrices[:, 0:6, :]
     Bmatrices = ABCmatrices[:, 6:8, :]
-    Cmatrices = ABCmatrices[:, 8:num_variables, :]
+    Cmatrices = ABCmatrices[:, 8:loaded_nv, :]
     Dmatrices = DEFmatrices[:, 0:6, :]
     Ematrices = DEFmatrices[:, 6:8, :]
-    Fmatrices = DEFmatrices[:, 8:num_variables, :]
+    Fmatrices = DEFmatrices[:, 8:loaded_nv, :]
 
+    print(f"Loaded num_variables={loaded_nv} (padded to largest chunk size)")
     print(f"Matrix shapes: A={Amatrices.shape}, B={Bmatrices.shape}, C={Cmatrices.shape}")
     print(f"               D={Dmatrices.shape}, E={Ematrices.shape}, F={Fmatrices.shape}")
 
@@ -456,6 +460,17 @@ def compute_coefficients(eigenvalues, eigenvectors, transformation_matrix):
         coefficients[i, :] = np.dot(np.array(eigenvectors[i]), transformation_matrix)
     return coefficients
 
+def _pad_to_max_nv(arrays, axis=1):
+    """Zero-pad arrays along `axis` so all have the same size as the largest."""
+    max_size = max(a.shape[axis] for a in arrays)
+    padded = []
+    for a in arrays:
+        pad_width = [(0, 0)] * a.ndim
+        pad_width[axis] = (0, max_size - a.shape[axis])
+        padded.append(np.pad(a, pad_width))
+    return padded
+
+
 def load_and_merge_chunked_highk_data(folder_path, eta_grid):
     """
     Load and merge high-K data from chunked files.
@@ -560,13 +575,16 @@ def load_and_merge_chunked_highk_data(folder_path, eta_grid):
 
     print(f"\n  Merging {len(all_chunks_kvalues)} chunks...")
 
+    # Chunks may have different num_variables (larger for high-k ranges).
+    # Zero-pad along axis 1 (num_variables axis) before concatenating so that
+    # the merged arrays have a uniform shape equal to the largest chunk's size.
     merged_kvalues = np.concatenate(all_chunks_kvalues, axis=0)
-    merged_ABC_solutions = np.concatenate(all_chunks_ABC_solutions, axis=0)
-    merged_DEF_solutions = np.concatenate(all_chunks_DEF_solutions, axis=0)
-    merged_GHI_solutions = np.concatenate(all_chunks_GHI_solutions, axis=0)
-    merged_ABCmatrices = np.concatenate(all_chunks_ABCmatrices, axis=0)
-    merged_DEFmatrices = np.concatenate(all_chunks_DEFmatrices, axis=0)
-    merged_GHIvectors = np.concatenate(all_chunks_GHIvectors, axis=0)
+    merged_ABC_solutions = np.concatenate(_pad_to_max_nv(all_chunks_ABC_solutions, axis=1), axis=0)
+    merged_DEF_solutions = np.concatenate(_pad_to_max_nv(all_chunks_DEF_solutions, axis=1), axis=0)
+    merged_GHI_solutions = np.concatenate(_pad_to_max_nv(all_chunks_GHI_solutions, axis=1), axis=0)
+    merged_ABCmatrices = np.concatenate(_pad_to_max_nv(all_chunks_ABCmatrices, axis=1), axis=0)
+    merged_DEFmatrices = np.concatenate(_pad_to_max_nv(all_chunks_DEFmatrices, axis=1), axis=0)
+    merged_GHIvectors = np.concatenate(_pad_to_max_nv(all_chunks_GHIvectors, axis=1), axis=0)
     merged_X1matrices = np.concatenate(all_chunks_X1matrices, axis=0)
     merged_X2matrices = np.concatenate(all_chunks_X2matrices, axis=0)
     merged_recValues = np.concatenate(all_chunks_recValues, axis=0)
@@ -580,13 +598,16 @@ def load_and_merge_chunked_highk_data(folder_path, eta_grid):
     perturbation_types = ['dr', 'dm', 'vr', 'vm']
     basis_highk_dict = {pert_type: [] for pert_type in perturbation_types}
 
+    # Use the actual num_variables from the merged (padded) arrays
+    merged_nv = merged_ABCmatrices.shape[1]
+
     # Extract matrix components
     Amatrices_highk = merged_ABCmatrices[:, 0:6, :]
     Bmatrices_highk = merged_ABCmatrices[:, 6:8, :]
-    Cmatrices_highk = merged_ABCmatrices[:, 8:num_variables, :]
+    Cmatrices_highk = merged_ABCmatrices[:, 8:merged_nv, :]
     Dmatrices_highk = merged_DEFmatrices[:, 0:6, :]
     Ematrices_highk = merged_DEFmatrices[:, 6:8, :]
-    Fmatrices_highk = merged_DEFmatrices[:, 8:num_variables, :]
+    Fmatrices_highk = merged_DEFmatrices[:, 8:merged_nv, :]
 
     for i in range(len(merged_kvalues)):
         k = merged_kvalues[i]

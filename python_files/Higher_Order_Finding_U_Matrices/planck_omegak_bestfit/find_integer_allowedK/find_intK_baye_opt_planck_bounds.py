@@ -125,34 +125,27 @@ def calculate_allowedK(params, folder_path):
         return None
 
 def calculate_integer_loss(params, folder_path, n_min_stable=12, spacing_tol_factor=8,
-                           w_slope=500.0, w_intercept=1.0, w_residual=1.0):
+                           w_slope=2.0, w_intercept=1.0, w_residual=0.2):
     """
     Calculate loss measuring how closely allowedK_integer values form a perfectly
     integer-spaced sequence with spacing exactly equal to nu_spacing (4).
 
-    The loss has three components, all derived from a weighted linear fit
-    k_i = intercept + slope * i to the stable allowedK_integer values:
+    The loss has three components:
 
-      1. slope_loss     = (slope - nu_spacing)^2
-         Penalises mean spacing != nu_spacing.  This is the root cause of the
-         linear drift in deviations that suppresses CCA correlations at high k.
+      1. slope_loss         = (fitted_slope - nu_spacing)^2
+         Penalises mean spacing != nu_spacing.
 
-      2. intercept_loss = (intercept - round(intercept))^2
-         Penalises the sequence not anchoring to an integer at i=0.
+      2. per_k_integer_loss = mean( (k_i - ideal_integer_i)^2 )
+         Directly measures how far each k value is from its target integer.
+         The ideal integer sequence has spacing nu_spacing, anchored at the
+         nearest integer to the mean offset of the data.
+         Replaces the old intercept_loss = (intercept - round(intercept))^2,
+         which only checked the extrapolated k at i=0 and missed the cumulative
+         drift across all modes.
 
       3. weighted_residual_loss = sum(w_i * residual_i^2) / sum(w_i)
          Penalises non-linearity (jitter around the best-fit line).
          w_i = i+1, so high-k modes contribute more to this term.
-
-    The linear fit itself also uses weights w_i = i+1, so the slope and
-    intercept estimates are dominated by the high-k modes — exactly where the
-    drift accumulates and where the CCA correlation drops below 1.
-
-    Weight guidance (at current best-fit, k50-65 range, 24 modes):
-      slope_loss     ≈ (0.0048)^2  = 2.3e-5   → w_slope=500  gives ~0.012
-      intercept_loss ≈ (0.069)^2   = 4.8e-3   → w_intercept=1 gives ~0.005
-      residual_loss  ≈ tiny                    → w_residual=1 gives ~0
-      Total at current best ≈ 0.017; at perfect solution → 0.
 
     Parameters:
     -----------
@@ -165,9 +158,9 @@ def calculate_integer_loss(params, folder_path, n_min_stable=12, spacing_tol_fac
     spacing_tol_factor : float
         Threshold multiplier on MAD of spacings for boundary trimming (default: 8)
     w_slope : float
-        Weight for the slope (spacing) loss term (default: 500)
+        Weight for the slope (spacing) loss term (default: 1)
     w_intercept : float
-        Weight for the intercept (integer-offset) loss term (default: 1)
+        Weight for the per-k integer closeness loss term (default: 1)
     w_residual : float
         Weight for the weighted residual loss term (default: 1)
     """
@@ -211,15 +204,16 @@ def calculate_integer_loss(params, folder_path, n_min_stable=12, spacing_tol_fac
     hk_weights = indices + 1.0   # shape (n,)
 
     # ── 1. Weighted linear fit: k_i = intercept + slope * i ─────────────────
-    # np.polyfit with w= minimises sum(w_i * (k_i - fit_i)^2), so high-k modes
-    # dominate the slope/intercept estimates.
     slope, intercept = np.polyfit(indices, stable_k, 1, w=hk_weights)
 
     # ── 2. Slope loss — penalises mean spacing != nu_spacing ─────────────────
     slope_loss = (slope - nu_spacing) ** 2
 
-    # ── 3. Intercept loss — penalises offset from nearest integer ────────────
-    intercept_loss = (intercept - np.round(intercept)) ** 2
+    # ── 3. Per-k integer closeness loss ──────────────────────────────────────
+    # Construct the nearest ideal integer sequence with spacing = nu_spacing.
+    ideal_intercept_int = np.round(np.mean(stable_k - nu_spacing * indices))
+    ideal_sequence = ideal_intercept_int + nu_spacing * indices
+    per_k_integer_loss = np.mean((stable_k - ideal_sequence) ** 2)
 
     # ── 4. Weighted residual loss — penalises non-linearity ──────────────────
     fit_values = intercept + slope * indices
@@ -229,12 +223,13 @@ def calculate_integer_loss(params, folder_path, n_min_stable=12, spacing_tol_fac
 
     # ── 5. Total loss ─────────────────────────────────────────────────────────
     total_loss = (w_slope     * slope_loss +
-                  w_intercept * intercept_loss +
+                  w_intercept * per_k_integer_loss +
                   w_residual  * weighted_residual_loss)
 
-    print(f"  Fitted slope={slope:.6f} (target {nu_spacing}), intercept={intercept:.5f}")
+    print(f"  Fitted slope={slope:.6f} (target {nu_spacing}), "
+          f"ideal_intercept={ideal_intercept_int:.0f}")
     print(f"  slope_loss={slope_loss:.3e} (×{w_slope:.0f} → {w_slope*slope_loss:.4f}), "
-          f"intercept_loss={intercept_loss:.3e} (×{w_intercept:.0f} → {w_intercept*intercept_loss:.4f}), "
+          f"per_k_integer_loss={per_k_integer_loss:.3e} (×{w_intercept:.0f} → {w_intercept*per_k_integer_loss:.4f}), "
           f"residual_loss={weighted_residual_loss:.3e} (×{w_residual:.0f} → {w_residual*weighted_residual_loss:.4f})")
     print(f"  Total loss={total_loss:.6e}")
 

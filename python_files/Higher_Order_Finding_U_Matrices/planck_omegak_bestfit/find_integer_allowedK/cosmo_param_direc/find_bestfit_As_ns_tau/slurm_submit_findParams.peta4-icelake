@@ -1,0 +1,41 @@
+#!/bin/bash
+#SBATCH -J find_params
+#SBATCH -A DIRAC-DP192-CPU
+#SBATCH -p icelake
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16       # <--- Reduced to 16 for optimal CLASS speed
+#SBATCH --time=36:00:00
+#SBATCH --mail-type=NONE
+
+echo "Job started on $(hostname) at $(date)"
+
+# 1. Load Modules
+. /etc/profile.d/modules.sh
+module purge
+module load rhel8/default-icl
+
+# 2. Activate Python Environment
+source /home/wnd22/rds/hpc-work/Polychord_solveb/env_Polychord_solveb/bin/activate
+
+# 3. Source Planck Likelihood Profile
+cd /home/wnd22/rds/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/
+./waf configure --install_all_deps
+./waf install
+source ./bin/clik_profile.sh
+
+# 4. Move to the Working Directory
+workdir="/home/wnd22/rds/hpc-work/Will_CPT/Higher_Order_Finding_U_Matrices/find_integer_allowedK/cosmo_param_direc/find_bestfit_As_ns_tau/"
+cd $workdir
+echo -e "Changed directory to $(pwd).\n"
+
+# 5. Set OpenMP threads for CLASS
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+
+# 6. Run the script exactly like interactive mode!
+echo "Running Python script..."
+python find_bestfit_As_ns_tau.py
+
+echo "Job finished!"

@@ -7,6 +7,7 @@ Created on Tue Apr  6 22:21:56 2021
 
 
 from scipy.integrate import solve_ivp
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from scipy.optimize import root_scalar
@@ -14,58 +15,68 @@ import numpy as np
 from math import *
 
 #working in units 8piG = Lambda = c = hbar = kB = 1 throughout
-def compute_X_recs(params, z_rec, folder_path):
+def compute_X_recs(params, z_rec, folder_path, num_variables=200, cosmo_param_bool=False):
     """
     Compute perturbation values at recombination for perturbation analysis.
 
     Parameters:
     -----------
     params : list or tuple
-        [mt, kt, omega_b_ratio, h] cosmological parameters
+        [mt, kt, omega_b_ratio, h] cosmological parameters, or [OmegaM, OmegaK, omega_b_ratio, h] if cosmo_param_bool is True.
     z_rec : float
         Recombination redshift
     folder_path : str
         Path to save output files
-    nu_spacing : int, optional
-        Spacing for allowed K values (default: 4)
+    num_variables : int, optional
+        Number of perturbation variables to use (default: 200)
+    cosmo_param_bool : bool, optional
+        If True, use cosmological parameters OmegaM, OmegaK, omega_b_ratio, h.
+        If False, use mt, kt, omega_b_ratio, h. Default is False.
 
     Returns:
     --------
     list : list containing recombination values for each k in kvalues
     """
     ###############################################################################
-    # Unpack parameters
-    mt, kt, omega_b_ratio, h = params
+    # Constants
     lam = 1
     rt = 1
-    Omega_gamma_h2 = 2.47e-5 # photon density 
+    Omega_gamma_h2 = 2.47e-5  # photon density
     Neff = 3.046
+    
+    if cosmo_param_bool == True:
+        # Unpack parameters
+        OmegaM, OmegaK, omega_b_ratio, h = params
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+        OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
 
-    def cosmological_parameters(mt, kt, h): 
+    else:
+        # Unpack parameters
+        mt, kt, omega_b_ratio, h = params
 
-        Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+        def cosmological_parameters(mt, kt, h):
+            Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
 
-        def solve_a0(Omega_r, rt, mt, kt):
-            def f(a0):
-                return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
-            sol = root_scalar(f, bracket=[1, 1.e3])
-            return sol.root
+            def solve_a0(Omega_r, rt, mt, kt):
+                def f(a0):
+                    return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+                sol = root_scalar(f, bracket=[1, 1.e3])
+                return sol.root
 
-        a0 = solve_a0(Omega_r, rt, mt, kt)
-        Omega_lambda = Omega_r * a0**4
-        Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
-        Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
-        return Omega_lambda, Omega_m, Omega_K
+            a0 = solve_a0(Omega_r, rt, mt, kt)
+            s0 = 1/a0
+            Omega_lambda = Omega_r * a0**4
+            Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+            Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+            return s0, Omega_lambda, Omega_m, Omega_K
 
-    OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
-    OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
-    ###############################################################################
+        s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
 
     #set tolerances
     atol = 1e-13;
     rtol = 1e-13;
     stol = 1e-10;
-    num_variables = 200; #number of pert variables
     swaptime = 2; #set time when we swap from s to sigma
     H0 = 1/np.sqrt(3*OmegaLambda); #we are working in units of Lambda=c=1
     Hinf = H0*np.sqrt(OmegaLambda);
@@ -129,12 +140,12 @@ def compute_X_recs(params, z_rec, folder_path):
     #RECOMBINATION CONFORMAL TIME
     #```````````````````````````````````````````````````````````````````````````````
 
-    #find conformal time at recombination
-    a_rec = 1./(1+z_rec)  #reciprocal scale factor at recombination
+    # Build continuous a -> t interpolant (a is monotonically increasing)
+    _interp_t_from_a = interp1d(sol_a.y[0], sol_a.t, kind='cubic',
+                                bounds_error=False, fill_value='extrapolate')
 
-    #take difference between s values and s_rec to find where s=s_rec i.e where recScaleFactorDifference=0
-    recScaleFactorDifference = abs(sol_a.y[0] - a_rec) #take difference between s values and s_rec to find where s=s_rec
-    recConformalTime = sol_a.t[recScaleFactorDifference.argmin()]
+    a_rec = 1. / (1 + z_rec)  # scale factor at recombination
+    recConformalTime = float(_interp_t_from_a(a_rec))
     print(f"Recombination conformal time: {recConformalTime}")
 
     #-------------------------------------------------------------------------------

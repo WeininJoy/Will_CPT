@@ -8,10 +8,7 @@ Extension of cca_sparse_2D_reg_analysis.py.  Replaces the hard
 identity/rCCA partition with a single continuous k-proportional
 regularised CCA applied to all modes simultaneously.
 
-1. k_max filtering
-   Restrict both bases to k <= k_max (default 22) before any computation.
-
-2. k-Proportional Diagonal Penalty  (Step 4)
+1. k-Proportional Diagonal Penalty  (Step 4)
    Instead of splitting modes into I_degen / I_mixed, we regularise the
    Gram matrices with a diagonal penalty proportional to k:
 
@@ -24,7 +21,7 @@ regularised CCA applied to all modes simultaneously.
 
    See smooth_dk_penalty_implementation.md for the full derivation.
 
-3. Sparse rotation
+2. Sparse rotation
    Promax oblique rotation applied to the full set of valid CCA modes.
 
 Outputs go to ./figures_2D_dk_penalty/
@@ -40,13 +37,17 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.dirname(__file__))
-sys.path.append('../multi_pert_sparse_ortho')
 
-from multi_perturbation_analysis import generate_multi_perturbation_bases, fcb_time
+from multi_perturbation_analysis import (
+    generate_multi_perturbation_bases,
+    fcb_time,
+    OmegaLambda,
+    OmegaK,
+)
 from cca_sparse_analysis import (
     matrix_sqrt_inv,
     solve_cca,
-    apply_sparse_rotation,
+    apply_joint_sparse_rotation,
     gini,
     normalize_columns,
     plot_gram_spectrum,
@@ -55,12 +56,13 @@ from cca_sparse_analysis import (
     plot_heatmap,
     plot_reconstructed_timeseries,
     PERTURBATION_TYPES,
-    FOLDER_PATH,
 )
 
 # ---------------------------------------------------------------------------
-OUTPUT_DIR    = './figures_2D_dk_penalty/'
-RESULTS_CACHE = 'cca_2D_dk_penalty_results.pickle'
+name_str = 'cosmo_param_direc'
+OUTPUT_DIR    = f'./figures_2D_dk_penalty_{name_str}/'
+RESULTS_CACHE = f'cca_2D_dk_penalty_results_{name_str}.pickle'
+FOLDER_PATH = f'./data_{name_str}/'
 # ---------------------------------------------------------------------------
 
 
@@ -95,7 +97,7 @@ def load_kvalues(dataset_name, folder_path=FOLDER_PATH):
                         'L70_kvalues.npy')
     k_values = np.load(path)
     print(f"  Loaded {len(k_values)} k-values for {dataset_name}  "
-          f"(k_min={k_values.min():.4f}, k_max={k_values.max():.4f})")
+          f"(k_min={k_values.min():.4f})")
     return k_values
 
 
@@ -115,32 +117,7 @@ def k_to_beta(k_values):
 
 
 # ============================================================================
-# STEP 1c — Filter to k <= k_max  (NEW)
-# ============================================================================
-
-def filter_by_kmax(basis_dict, k_values, k_max):
-    """
-    Keep only k-modes with k <= k_max.
-
-    Parameters
-    ----------
-    basis_dict : dict {p: (N_t, N_k) array}
-    k_values   : (N_k,) array
-    k_max      : scalar upper bound on k
-
-    Returns
-    -------
-    filtered_basis : dict with columns restricted to k <= k_max
-    k_filtered     : (N_keep,) array of remaining k-values
-    mask           : (N_k,) boolean mask used for filtering
-    """
-    mask = k_values <= k_max
-    filtered = {p: basis_dict[p][:, mask] for p in PERTURBATION_TYPES}
-    return filtered, k_values[mask], mask
-
-
-# ============================================================================
-# STEP 2 — Frobenius normalise
+# STEP 1 — Frobenius normalise
 # ============================================================================
 
 def frobenius_normalize(basis_dict):
@@ -162,7 +139,7 @@ def frobenius_normalize(basis_dict):
 
 
 # ============================================================================
-# STEP 3a — Time-only Gram matrices
+# STEP 2a — Time-only Gram matrices
 # ============================================================================
 
 def compute_time_gram_matrices(Xn1, Xn2, weights=None):
@@ -194,7 +171,7 @@ def compute_time_gram_matrices(Xn1, Xn2, weights=None):
 
 
 # ============================================================================
-# STEP 3b — Spatial overlap matrix
+# STEP 2b — Spatial overlap matrix
 # ============================================================================
 
 def compute_spatial_overlap(beta1, beta2):
@@ -228,7 +205,7 @@ def compute_spatial_overlap(beta1, beta2):
 
 
 # ============================================================================
-# STEP 3c — 2D (space-time) Gram matrices via Hadamard product
+# STEP 2c — 2D (space-time) Gram matrices via Hadamard product
 # ============================================================================
 
 def compute_2d_gram_matrices(G1_t, G2_t, G12_t, S11, S22, S12,
@@ -261,7 +238,7 @@ def compute_2d_gram_matrices(G1_t, G2_t, G12_t, S11, S22, S12,
 
 
 # ============================================================================
-# k-PROPORTIONAL REGULARISED CCA  (Step 4)
+# k-PROPORTIONAL REGULARISED CCA  (Step 3)
 # ============================================================================
 
 def solve_rcca_k_scaled(G1, G2, G12, k_array_1, k_array_2,
@@ -350,6 +327,118 @@ def plot_spatial_overlap(S12, beta1, beta2, output_dir=OUTPUT_DIR):
     plt.close()
 
 
+def plot_integer_heatmap_with_k_difference(
+        A_sparse, k_values_integer, k_values_allowed,
+        output_dir=OUTPUT_DIR):
+    """Align the integerK sparse heatmap with allowedK - integerK below it."""
+    _ensure_dir(output_dir)
+    if len(k_values_integer) != len(k_values_allowed):
+        raise ValueError(
+            "The combined index plot requires equal integerK and allowedK "
+            f"lengths; got {len(k_values_integer)} and {len(k_values_allowed)}"
+        )
+    if A_sparse.shape[0] != len(k_values_integer):
+        raise ValueError(
+            f"A_sparse has {A_sparse.shape[0]} k rows but the k arrays have "
+            f"length {len(k_values_integer)}"
+        )
+
+    A_norm = normalize_columns(A_sparse)
+    dominant = np.argmax(np.abs(A_norm), axis=0)
+    order = np.argsort(dominant)
+    heatmap = np.abs(A_norm[:, order].T)
+    H0 = 1.0 / np.sqrt(3.0 * OmegaLambda)
+    a0 = 1.0
+    K = -OmegaK * a0**2 * H0**2
+    curvature_scale = np.sqrt(np.abs(K))
+    if curvature_scale < 1e-30:
+        raise ValueError("Cannot express k in curvature units when K is zero")
+    delta_k = (
+        k_values_allowed / curvature_scale
+        - k_values_integer / curvature_scale
+    )
+    index = np.arange(len(delta_k))
+
+    fig = plt.figure(figsize=(6, 6))
+    grid = fig.add_gridspec(
+        2, 2, height_ratios=[3.2, 1.2], width_ratios=[1.0, 0.035],
+        hspace=0.08, wspace=0.04,
+    )
+    ax_heat = fig.add_subplot(grid[0, 0])
+    ax_delta = fig.add_subplot(grid[1, 0], sharex=ax_heat)
+    ax_colorbar = fig.add_subplot(grid[0, 1])
+    # Reserve exactly the same right-hand width on the lower row. This keeps
+    # the physical left/right edges of the two data axes perfectly aligned.
+    ax_spacer = fig.add_subplot(grid[1, 1])
+    ax_spacer.set_axis_off()
+    image = ax_heat.imshow(
+        heatmap, aspect='auto', cmap='Blues', interpolation='nearest',
+        vmin=0, vmax=1, origin='upper',
+        extent=(-0.5, len(delta_k) - 0.5, heatmap.shape[0] - 0.5, -0.5),
+    )
+    ax_heat.set_ylabel('CCA mode\n(sorted by dominant integerK index)')
+    ax_heat.set_title(
+        'IntegerK sparse coefficients and matched wavenumber difference')
+    colorbar = fig.colorbar(image, cax=ax_colorbar)
+    colorbar.set_label(r'$|A_{ij}|$ (column-normalised)')
+    ax_heat.tick_params(axis='x', labelbottom=False)
+
+    ax_delta.axhline(0.0, color='black', lw=0.8)
+    ax_delta.plot(index, delta_k, color='tab:red', lw=1.2)
+    ax_delta.fill_between(index, 0.0, delta_k, color='tab:red', alpha=0.18)
+    ax_delta.set_xlim(-0.5, len(delta_k) - 0.5)
+    ax_delta.set_xlabel('k array index')
+    ax_delta.set_ylabel(
+        r'$k_{allowed}/\sqrt{|K|}-k_{integer}/\sqrt{|K|}$')
+    ax_delta.grid(True, alpha=0.25)
+
+    # Classify sign changes of delta_k:
+    #   dashed  — monotonic continuous crossing through 0
+    #   dotted  — huge jump from negative to positive
+    # Filters:
+    #   Low-k wiggles  → short backward run-length → excluded.
+    #   High-k near-0  → nothing large remains after the crossing → excluded.
+    #     Forward max rather than local amplitude lets a crossing like index ~16
+    #     (small local value, but large jumps still ahead) pass through.
+    sign_changes = np.where(np.diff(np.sign(delta_k)))[0]
+    abs_max        = np.max(np.abs(delta_k))
+    jump_threshold = 0.3 * abs_max
+    amp_min        = 0.1 * abs_max
+    min_run        = 4               # minimum same-sign run before a smooth crossing
+
+    smooth_crossings = []
+    jump_crossings   = []
+    for sc in sign_changes:
+        y0, y1 = delta_k[sc], delta_k[sc + 1]
+        x_cross = float(sc) - y0 / (y1 - y0)
+        step = abs(y1 - y0)
+        if step >= jump_threshold and y0 < 0 and y1 > 0:
+            jump_crossings.append(x_cross)
+        elif step < jump_threshold:
+            # Filter 1 — high-k approaching-0: skip if nothing large remains
+            # after this crossing (delta_k has settled to ~0 for good).
+            future_max = np.max(np.abs(delta_k[sc + 1:])) if sc + 1 < len(delta_k) else 0.0
+            if future_max < amp_min:
+                continue
+            # Filter 2 — low-k wiggles: require a minimum backward run-length.
+            prev = sign_changes[sign_changes < sc]
+            run_before = sc - prev[-1] if len(prev) > 0 else sc
+            if run_before >= min_run:
+                smooth_crossings.append(x_cross)
+
+    for xc in smooth_crossings:
+        ax_heat.axvline(xc, color='gray', lw=0.9, ls='--')
+        ax_delta.axvline(xc, color='gray', lw=0.9, ls='--')
+    for xc in jump_crossings:
+        ax_heat.axvline(xc, color='gray', lw=0.9, ls=':')
+        ax_delta.axvline(xc, color='gray', lw=0.9, ls=':')
+
+    out = output_dir + 'cca_integerK_heatmap_with_delta_k.pdf'
+    plt.savefig(out, bbox_inches='tight')
+    print(f"Saved: {out}")
+    plt.close(fig)
+
+
 def plot_gram_comparison(G1_t, G2_t, G12_t, G1_2D, G2_2D, G12_2D,
                          output_dir=OUTPUT_DIR):
     """Compare eigenvalue spectra before and after applying spatial overlap."""
@@ -389,7 +478,6 @@ def plot_gram_comparison(G1_t, G2_t, G12_t, G1_2D, G2_2D, G12_2D,
 
 def cca_sparse_2D_reg_analysis(
         N_t               = 1000,
-        k_max             = 22,        # exclude k > k_max (buggy identical modes)
         alpha             = 1e-6,      # k-proportional penalty strength
         weights           = None,
         normalise_spatial = True,
@@ -407,7 +495,6 @@ def cca_sparse_2D_reg_analysis(
     Parameters
     ----------
     N_t               : number of time-grid points
-    k_max             : upper bound on k; modes with k > k_max are excluded
     alpha             : k-proportional penalty strength (G_reg = G + alpha*diag(k))
     weights           : per-perturbation-type weights {p: float}; None = unit
     normalise_spatial : if True, normalise S matrices so diagonal = 1
@@ -422,7 +509,7 @@ def cca_sparse_2D_reg_analysis(
     Returns
     -------
     dict with all results:
-        A, B, A_sparse, B_sparse, rho, rho_all, alpha, k_max, ...
+        A, B, A_sparse, B_sparse, rho, rho_all, alpha, ...
     """
 
     if not force_recompute and os.path.exists(results_cache):
@@ -437,8 +524,6 @@ def cca_sparse_2D_reg_analysis(
     print("\n--- Step 1b: Loading k-values ---")
     k_values_1 = load_kvalues('integerK', folder_path)
     k_values_2 = load_kvalues('allowedK', folder_path)
-
-    print(f"\n--- Step 1c: Using all modes (k_max filtering disabled) ---")
     print(f"  integerK: {len(k_values_1)} modes")
     print(f"  allowedK: {len(k_values_2)} modes")
 
@@ -490,7 +575,10 @@ def cca_sparse_2D_reg_analysis(
     # ── Step 5: Sparse rotation ───────────────────────────────────────────────
     if A.shape[1] > 0:
         print("\n--- Step 5: Sparse rotation ---")
-        A_sparse, B_sparse = apply_sparse_rotation(A, B, method=rotation_method)
+        # Fit one balanced rotation to both bases, rather than choosing the
+        # sparse orientation from integerK alone.
+        A_sparse, B_sparse = apply_joint_sparse_rotation(
+            A, B, method=rotation_method)
 
         g1 = np.mean([gini(A_sparse[:, i]) for i in range(A_sparse.shape[1])])
         g2 = np.mean([gini(B_sparse[:, i]) for i in range(B_sparse.shape[1])])
@@ -514,13 +602,15 @@ def cca_sparse_2D_reg_analysis(
                           N_plot=min(20, A.shape[1]), output_dir=output_dir)
 
     plot_heatmap(A_sparse, B_sparse, output_dir)
+    plot_integer_heatmap_with_k_difference(
+        A_sparse, k_values_1, k_values_2, output_dir)
 
     if A_sparse.shape[1] > 0:
         plot_reconstructed_timeseries(
             basis_1, basis_2,
             A_sparse, B_sparse, rho,
             eta_grid, norms_1, norms_2,
-            N_plot=5, output_dir=output_dir,
+            N_plot=4, output_dir=output_dir,
         )
 
     # ── Save ──────────────────────────────────────────────────────────────────
@@ -543,7 +633,6 @@ def cca_sparse_2D_reg_analysis(
         k_values_2        = k_values_2,
         beta1             = beta1,
         beta2             = beta2,
-        k_max             = k_max,
         alpha             = alpha,
         weights           = weights,
         rotation_method   = rotation_method,
@@ -571,19 +660,18 @@ if __name__ == "__main__":
 
     results = cca_sparse_2D_reg_analysis(
         N_t               = 1000,
-        k_max             = 22,
-        alpha             = 1e-6,
+        alpha             = 1e-8,
         weights           = weights,
         normalise_spatial = True,
         ev_threshold      = 1e-10,
         rho_min           = 0.99,
         rotation_method   = 'promax',
+        folder_path       = FOLDER_PATH,
         force_recompute   = True,
     )
 
     print("\n" + "=" * 60)
     print("DONE")
-    print(f"  k_max             : {results['k_max']}")
     print(f"  alpha             : {results['alpha']}")
     print(f"  Total valid modes : {results['A_sparse'].shape[1]}")
     print(f"  N_k (integerK)    : {results['G1_2D'].shape[0]}")

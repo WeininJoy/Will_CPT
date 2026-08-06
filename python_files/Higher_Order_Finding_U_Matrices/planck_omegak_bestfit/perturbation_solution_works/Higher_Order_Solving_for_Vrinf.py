@@ -27,7 +27,7 @@ def compute_allowedK(params, folder_path):
     array : allowedK values
     """
 
-    num_variables = 75;
+    num_variables = 200  # number of pert variables
     k_min = 1.5
 
     kvalues = np.load(folder_path+'L70_kvalues.npy');

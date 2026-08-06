@@ -223,7 +223,7 @@ try:
     X1matrices = np.load(folder_path + 'L70_X1matrices.npy')
     X2matrices = np.load(folder_path + 'L70_X2matrices.npy')
     recValues = np.load(folder_path + 'L70_recValues.npy')
-    allowedK = np.load(folder_path + 'allowedK.npy')
+    # allowedK = np.load(folder_path + 'allowedK.npy')
     print("All data files loaded successfully.")
 except FileNotFoundError as e:
     print(f"Error loading data: {e}")
@@ -266,7 +266,7 @@ solutions = []
 num_modes_to_plot = 3
 
 for i in range(num_modes_to_plot):
-    k = allowedK[i+2]
+    k = allowedK[i+10]
     print(f"\nProcessing mode n={i+1} with k={k:.4f}")
 
     # --- a) Get interpolated matrices for this k ---

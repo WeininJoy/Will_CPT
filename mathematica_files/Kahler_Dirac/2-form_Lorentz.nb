@@ -1,0 +1,934 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     37436,        926]
+NotebookOptionsPosition[     35131,        880]
+NotebookOutlinePosition[     35525,        896]
+CellTagsIndexPosition[     35482,        893]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"Needs", "[", "\"\<OGRe`\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.955595793409968*^9, 3.955595794628524*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"dab9da96-5e41-451a-9728-ea0232f6096a"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     StyleBox[
+      TemplateBox[{"\"OGRe: An \"", 
+        StyleBox["\"O\"", Underlined, StripOnInput -> False], 
+        "\"bject-Oriented \"", 
+        StyleBox["\"G\"", Underlined, StripOnInput -> False], "\"eneral \"", 
+        StyleBox["\"Re\"", Underlined, StripOnInput -> False], 
+        "\"lativity Package for Mathematica\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontSize->Larger,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"By Barak Shoshany (\"", 
+        TemplateBox[{"\"baraksh@gmail.com\"", "mailto:baraksh@gmail.com"}, 
+         "HyperlinkURL"], "\") (\"", 
+        TemplateBox[{"\"baraksh.com\"", "https://baraksh.com/"}, 
+         "HyperlinkURL"], "\")\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"v1.7.0 (2021-09-17)\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"GitHub repository: \"", 
+        TemplateBox[{
+         "\"https://github.com/bshoshany/OGRe\"", 
+          "https://github.com/bshoshany/OGRe"}, "HyperlinkURL"]},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     TemplateBox[{
+      "\"\[Bullet] To view the full documentation for the package, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"TDocs[]\"", "Hyperlink", StripOnInput -> False], True -> 
+           StyleBox["\"TDocs[]\"", "HyperlinkActive", StripOnInput -> False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> OGRe`TDocs[], 
+        Appearance -> "Frameless", BaseStyle -> "Hyperlink", Evaluator -> 
+        Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To list all available modules, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"?OGRe`*\"", "Hyperlink", StripOnInput -> False], True -> 
+           StyleBox["\"?OGRe`*\"", "HyperlinkActive", StripOnInput -> False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+        OGRe`Private`OGRePrint[
+          Information["OGRe`*"]], Appearance -> "Frameless", BaseStyle -> 
+        "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To get help on a particular module, type \"", 
+       StyleBox["\"?\"", "Input", StripOnInput -> False], 
+       "\" followed by the module name.\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To enable parallelization, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"TSetParallelization[True]\"", "Hyperlink", StripOnInput -> 
+             False], True -> 
+           StyleBox[
+            "\"TSetParallelization[True]\"", "HyperlinkActive", StripOnInput -> 
+             False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+        OGRe`TSetParallelization[True], Appearance -> "Frameless", BaseStyle -> 
+        "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] \"", 
+       TemplateBox[{
+         DynamicBox[
+          ToBoxes[OGRe`Private`UpdateMessage, StandardForm], 
+          ImageSizeCache -> {328.546875, {3.48046875, 12.55078125}}], 
+         "\" To disable automatic checks for updates at startup, type \"", 
+         ButtonBox[
+          TagBox[
+           
+           PaneSelectorBox[{
+            False -> StyleBox[
+              "\"TSetAutoUpdates[False]\"", "Hyperlink", StripOnInput -> 
+               False], True -> 
+             StyleBox[
+              "\"TSetAutoUpdates[False]\"", "HyperlinkActive", StripOnInput -> 
+               False]}, 
+            Dynamic[
+             CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+            0], 
+           MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+          OGRe`TSetAutoUpdates[False], Appearance -> "Frameless", BaseStyle -> 
+          "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], 
+         "\".\""}, "RowDefault"]},
+      "RowDefault"]}
+   },
+   DefaultBaseStyle->"Column",
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Column"]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.955596309112825*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"cd0166c6-cc48-407b-a115-d6bfeb4a5cd7"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TNewCoordinates", "[", 
+  RowBox[{"\"\<Cartesian\>\"", ",", 
+   RowBox[{"{", 
+    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.955595807368866*^9, 3.955595809229357*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"181d7ae5-b1be-4694-a5ca-ac53192426bd"],
+
+Cell[BoxData["\<\"Cartesian\"\>"], "Output",
+ CellChangeTimes->{3.955595811597763*^9, 3.9555963153784246`*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"60b7aa98-e456-4cf7-a796-7ee2a6fca9e0"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TShow", "@", 
+  RowBox[{"TNewMetric", "[", 
+   RowBox[{"\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", ",", 
+    RowBox[{"DiagonalMatrix", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], " ", "}"}], 
+     "]"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.955595827804698*^9, 3.955595853331131*^9}},
+ CellLabel->"In[3]:=",ExpressionUUID->"5578d816-fc94-4adc-a102-72c8130ab1fc"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"Minkowski\"", "\":   \"", 
+    TemplateBox[{"\"g\"", 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{
+          RowBox[{"-", "1"}], "0", "0", "0"}, {"0", "1", "0", "0"}, {
+         "0", "0", "1", "0"}, {"0", "0", "0", "1"}}, RowSpacings -> 1, 
+        ColumnSpacings -> 1, RowAlignments -> Baseline, ColumnAlignments -> 
+        Center], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.955596321685163*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"9f5dbe8f-f132-42d5-9ac9-df3862963d1a"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"Assume", " ", "aniosotropy"}], ",", " ", 
+    RowBox[{
+     RowBox[{"choose", " ", "x"}], "-", 
+     RowBox[{
+     "axis", " ", "without", " ", "loss", " ", "of", " ", 
+      "generalization"}]}]}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"TNewTensor", "[", 
+    RowBox[{
+    "\"\<Phi\>\"", ",", "\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", ",", 
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"\[CurlyPhi]", "[", 
+       RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "}"}], ",", 
+     "\"\<\[CurlyPhi]\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"TShow", "@", 
+    RowBox[{"TNewTensor", "[", 
+     RowBox[{
+     "\"\<PhiVec\>\"", ",", "\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", 
+      ",", 
+      RowBox[{"{", 
+       RowBox[{"-", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\[CurlyPhi]t", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+        RowBox[{"\[CurlyPhi]x", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+        RowBox[{"\[CurlyPhi]y", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+        RowBox[{"\[CurlyPhi]z", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "}"}], ",", 
+      "\"\<\[CurlyPhi]\>\""}], "]"}]}], "\[IndentingNewLine]", 
+   RowBox[{"TShow", "@", 
+    RowBox[{"TNewTensor", "[", 
+     RowBox[{
+     "\"\<PhiMat\>\"", ",", "\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", 
+      ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", "1"}], ",", 
+        RowBox[{"-", "1"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"0", ",", 
+          RowBox[{"\[CurlyPhi]tx", "[", 
+           RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+          RowBox[{"\[CurlyPhi]ty", "[", 
+           RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+          RowBox[{"\[CurlyPhi]tz", "[", 
+           RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "}"}], ",", 
+        " ", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"\[CurlyPhi]tx", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], ",", "0", 
+          ",", 
+          RowBox[{"\[CurlyPhi]xy", "[", 
+           RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+          RowBox[{"\[CurlyPhi]xz", "[", 
+           RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"\[CurlyPhi]ty", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], ",", 
+          RowBox[{"-", 
+           RowBox[{"\[CurlyPhi]xy", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], ",", "0", 
+          ",", 
+          RowBox[{"\[CurlyPhi]yz", "[", 
+           RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"\[CurlyPhi]tz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], ",", 
+          RowBox[{"-", 
+           RowBox[{"\[CurlyPhi]xz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], ",", 
+          RowBox[{"-", 
+           RowBox[{"\[CurlyPhi]yz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], ",", "0"}], 
+         "}"}]}], "}"}], ",", "\"\<\[CurlyPhi]\>\""}], "]"}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"TNewTensor", "[", 
+    RowBox[{
+    "\"\<Psi\>\"", ",", "\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", ",", 
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"\[Psi]", "[", 
+       RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "}"}], ",", 
+     "\"\<\[Psi]\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"TShow", "@", 
+    RowBox[{"TNewTensor", "[", 
+     RowBox[{
+     "\"\<PsiVec\>\"", ",", "\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", 
+      ",", 
+      RowBox[{"{", 
+       RowBox[{"-", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\[Psi]t", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+        RowBox[{"\[Psi]x", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+        RowBox[{"\[Psi]y", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], ",", 
+        RowBox[{"\[Psi]z", "[", 
+         RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "}"}], ",", 
+      "\"\<\[Psi]\>\""}], "]"}]}], "\[IndentingNewLine]", 
+   RowBox[{"TNewTensor", "[", 
+    RowBox[{
+    "\"\<Eps4D\>\"", ",", "\"\<Minkowski\>\"", ",", "\"\<Cartesian\>\"", ",", 
+     
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1", ",", "1", ",", "1"}], "}"}], ",", 
+     RowBox[{"Normal", "[", 
+      RowBox[{"LeviCivitaTensor", "[", "4", "]"}], "]"}]}], 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.955595872388193*^9, 3.95559590584862*^9}},
+ CellLabel->"In[4]:=",ExpressionUUID->"38d46061-1547-4b63-a58e-d8ab44444b3b"],
+
+Cell[BoxData["\<\"Phi\"\>"], "Output",
+ CellChangeTimes->{3.955595918955065*^9, 3.9555963247195063`*^9},
+ CellLabel->"Out[4]=",ExpressionUUID->"9ae9dc92-2010-47f7-9b09-fba4cc0bfff5"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"PhiVec\"", "\":   \"", 
+    TemplateBox[{"\"\[CurlyPhi]\"", 
+      TemplateBox[{"\"\[Mu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       TagBox[
+        GridBox[{{
+           RowBox[{"\[CurlyPhi]t", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+           RowBox[{"\[CurlyPhi]x", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+           RowBox[{"\[CurlyPhi]y", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+           RowBox[{"\[CurlyPhi]z", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}}, 
+         RowSpacings -> 1, ColumnAlignments -> Center, ColumnAlignments -> 
+         Left], Column], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.955596324733883*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"18a14407-8eae-4777-8e76-d08e12fd1bfd"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"PhiMat\"", "\":   \"", 
+    TemplateBox[{"\"\[CurlyPhi]\"", 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{"0", 
+          RowBox[{"\[CurlyPhi]tx", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"\[CurlyPhi]ty", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"\[CurlyPhi]tz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]tx", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "0", 
+          RowBox[{"\[CurlyPhi]xy", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"\[CurlyPhi]xz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]ty", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]xy", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "0", 
+          RowBox[{"\[CurlyPhi]yz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]tz", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]xz", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]yz", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "0"}}, 
+        RowSpacings -> 1, ColumnSpacings -> 1, RowAlignments -> Baseline, 
+        ColumnAlignments -> Center], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.95559632533561*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"8881a159-1fb4-4ae7-a6df-b3960fc40841"],
+
+Cell[BoxData["\<\"Psi\"\>"], "Output",
+ CellChangeTimes->{3.955595918955065*^9, 3.955596325480179*^9},
+ CellLabel->"Out[7]=",ExpressionUUID->"585f377a-0c4f-4eec-a568-9c38337fac88"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"PsiVec\"", "\":   \"", 
+    TemplateBox[{"\"\[Psi]\"", 
+      TemplateBox[{"\"\[Mu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       TagBox[
+        GridBox[{{
+           RowBox[{"\[Psi]t", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+           RowBox[{"\[Psi]x", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+           RowBox[{"\[Psi]y", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+           RowBox[{"\[Psi]z", "[", 
+             RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}}, 
+         RowSpacings -> 1, ColumnAlignments -> Center, ColumnAlignments -> 
+         Left], Column], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.955596325619245*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"9ec09397-2af9-4f89-8a32-c5b308280c89"],
+
+Cell[BoxData["\<\"Eps4D\"\>"], "Output",
+ CellChangeTimes->{3.955595918955065*^9, 3.955596325775935*^9},
+ CellLabel->"Out[9]=",ExpressionUUID->"605ae1cc-9b48-4e4b-8e19-0ac6a7e0d72f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TShow", "@", 
+  RowBox[{"TCalc", "[", 
+   RowBox[{"\"\<DualPhiMat\>\"", ",", 
+    RowBox[{
+     RowBox[{"1", "/", "2"}], "  ", 
+     RowBox[{
+      RowBox[{
+      "\"\<Eps4D\>\"", "[", "\"\<\[Mu]\[Nu]\[Alpha]\[Beta]\>\"", "]"}], ".", 
+      RowBox[{"\"\<PhiMat\>\"", "[", "\"\<\[Alpha]\[Beta]\>\"", "]"}]}]}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.95559593327535*^9, 3.955595934289989*^9}, 
+   3.9555959775639668`*^9, {3.955596032876581*^9, 3.955596081449142*^9}, {
+   3.9555962457935257`*^9, 3.955596259582882*^9}},
+ CellLabel->"In[10]:=",ExpressionUUID->"f21d8369-c198-4423-aa50-0685cdf35d00"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"DualPhiMat\"", "\":   \"", 
+    TemplateBox[{"\"\[DottedSquare]\"", 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"], 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"]}, 
+     "Subsuperscript", SyntaxForm -> SubsuperscriptBox], "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{"0", 
+          RowBox[{"\[CurlyPhi]yz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]xz", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+          RowBox[{"\[CurlyPhi]xy", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]yz", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "0", 
+          RowBox[{"\[CurlyPhi]tz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]ty", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}]}, {
+          RowBox[{"\[CurlyPhi]xz", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]tz", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "0", 
+          RowBox[{"\[CurlyPhi]tx", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}, {
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]xy", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+          RowBox[{"\[CurlyPhi]ty", "[", 
+            RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], 
+          RowBox[{"-", 
+            RowBox[{"\[CurlyPhi]tx", "[", 
+              RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "0"}}, 
+        RowSpacings -> 1, ColumnSpacings -> 1, RowAlignments -> Baseline, 
+        ColumnAlignments -> Center], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.9555963323638783`*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"65eb7f81-a436-4fa0-aac7-8d8260f8a8de"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TShow", "@", 
+  RowBox[{"TCalc", "[", 
+   RowBox[{"\"\<PhiMatPlus\>\"", ",", 
+    RowBox[{
+     RowBox[{"1", "/", "2"}], "  ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"\"\<PhiMat\>\"", "[", "\"\<\[Alpha]\[Beta]\>\"", "]"}], "+", 
+       RowBox[{"\"\<DualPhiMat\>\"", "[", "\"\<\[Alpha]\[Beta]\>\"", "]"}]}], 
+      ")"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.9555963454443073`*^9, 3.9555963883557367`*^9}},
+ CellLabel->"In[11]:=",ExpressionUUID->"53f88bba-308c-468b-b8b7-9264970ebcb2"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"PhiMatPlus\"", "\":   \"", 
+    TemplateBox[{"\"\[DottedSquare]\"", 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"], 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"]}, 
+     "Subsuperscript", SyntaxForm -> SubsuperscriptBox], "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{"0", 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tx", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "+", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]ty", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "-", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tz", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "+", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}]}, {
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tx", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "-", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], "0", 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "+", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]ty", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "+", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}]}, {
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]ty", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "+", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tz", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "-", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], "0", 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tx", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "+", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}]}, {
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "-", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]ty", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "-", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tx", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "-", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], "0"}}, RowSpacings -> 1, ColumnSpacings -> 1, 
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+       ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.95559639030897*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"b8c8faf2-c4d7-4822-b4c8-138b6ac34aa8"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TShow", "@", 
+  RowBox[{"TCalc", "[", 
+   RowBox[{"\"\<PhiMatMinus\>\"", ",", 
+    RowBox[{
+     RowBox[{"1", "/", "2"}], "  ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"\"\<PhiMat\>\"", "[", "\"\<\[Alpha]\[Beta]\>\"", "]"}], "-", 
+       RowBox[{"\"\<DualPhiMat\>\"", "[", "\"\<\[Alpha]\[Beta]\>\"", "]"}]}], 
+      ")"}]}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.9555963987519073`*^9, 3.955596411731576*^9}},
+ CellLabel->"In[13]:=",ExpressionUUID->"b3067030-b65c-46c4-8eea-8785e846770b"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"PhiMatMinus\"", "\":   \"", 
+    TemplateBox[{"\"\[DottedSquare]\"", 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "t", "x", "y", "z"}, "RowWithSeparators"], 
+    "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{"0", 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tx", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "+", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]ty", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "-", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "+", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}]}, {
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tx", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "-", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], "0", 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tz", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "+", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]ty", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "+", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}]}, {
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]ty", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "+", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "-", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], "0", 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tx", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "+", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}]}, {
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]tz", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "-", 
+                RowBox[{"\[CurlyPhi]xy", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"-", 
+                  RowBox[{"\[CurlyPhi]ty", "[", 
+                    RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "-", 
+                RowBox[{"\[CurlyPhi]xz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], 
+          RowBox[{
+            FractionBox["1", "2"], " ", 
+            RowBox[{"(", 
+              RowBox[{
+                RowBox[{"\[CurlyPhi]tx", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}], "-", 
+                RowBox[{"\[CurlyPhi]yz", "[", 
+                  RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], 
+              ")"}]}], "0"}}, RowSpacings -> 1, ColumnSpacings -> 1, 
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+       ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.955596413717169*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"ddc8706e-e6fd-45d0-96c1-d0fdf1a3e165"]
+}, Open  ]]
+},
+WindowSize->{1112.25, 601.5},
+WindowMargins->{{Automatic, 0}, {Automatic, 0}},
+FrontEndVersion->"14.1 for Linux x86 (64-bit) (July 16, 2024)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"dc43c40d-98ad-428b-bbf9-aa3c24eaadab"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[576, 22, 214, 3, 29, "Input",ExpressionUUID->"dab9da96-5e41-451a-9728-ea0232f6096a"],
+Cell[793, 27, 5035, 128, 204, "Output",ExpressionUUID->"cd0166c6-cc48-407b-a115-d6bfeb4a5cd7"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5865, 160, 320, 6, 29, "Input",ExpressionUUID->"181d7ae5-b1be-4694-a5ca-ac53192426bd"],
+Cell[6188, 168, 188, 2, 33, "Output",ExpressionUUID->"60b7aa98-e456-4cf7-a796-7ee2a6fca9e0"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6413, 175, 450, 10, 30, "Input",ExpressionUUID->"5578d816-fc94-4adc-a102-72c8130ab1fc"],
+Cell[6866, 187, 1186, 27, 86, "Output",ExpressionUUID->"9f5dbe8f-f132-42d5-9ac9-df3862963d1a"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8089, 219, 5077, 127, 196, "Input",ExpressionUUID->"38d46061-1547-4b63-a58e-d8ab44444b3b"],
+Cell[13169, 348, 182, 2, 33, "Output",ExpressionUUID->"9ae9dc92-2010-47f7-9b09-fba4cc0bfff5"],
+Cell[13354, 352, 1419, 33, 86, "Output",ExpressionUUID->"18a14407-8eae-4777-8e76-d08e12fd1bfd"],
+Cell[14776, 387, 2548, 55, 86, "Output",ExpressionUUID->"8881a159-1fb4-4ae7-a6df-b3960fc40841"],
+Cell[17327, 444, 180, 2, 33, "Output",ExpressionUUID->"585f377a-0c4f-4eec-a568-9c38337fac88"],
+Cell[17510, 448, 1394, 33, 86, "Output",ExpressionUUID->"9ec09397-2af9-4f89-8a32-c5b308280c89"],
+Cell[18907, 483, 182, 2, 33, "Output",ExpressionUUID->"605ae1cc-9b48-4e4b-8e19-0ac6a7e0d72f"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19126, 490, 628, 14, 30, "Input",ExpressionUUID->"f21d8369-c198-4423-aa50-0685cdf35d00"],
+Cell[19757, 506, 2560, 55, 86, "Output",ExpressionUUID->"65eb7f81-a436-4fa0-aac7-8d8260f8a8de"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22354, 566, 527, 12, 30, "Input",ExpressionUUID->"53f88bba-308c-468b-b8b7-9264970ebcb2"],
+Cell[22884, 580, 5832, 139, 119, "Output",ExpressionUUID->"b8c8faf2-c4d7-4822-b4c8-138b6ac34aa8"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[28753, 724, 526, 12, 30, "Input",ExpressionUUID->"b3067030-b65c-46c4-8eea-8785e846770b"],
+Cell[29282, 738, 5833, 139, 119, "Output",ExpressionUUID->"ddc8706e-e6fd-45d0-96c1-d0fdf1a3e165"]
+}, Open  ]]
+}
+]
+*)
+

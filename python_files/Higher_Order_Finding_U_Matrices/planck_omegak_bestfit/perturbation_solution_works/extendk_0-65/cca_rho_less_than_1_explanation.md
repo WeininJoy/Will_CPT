@@ -220,3 +220,59 @@ To quantify the mismatch directly, print `x_inf[2]` (= vr^∞) for matched allow
 The magnitude of `x_inf[2]` for the integerK modes gives a direct measure of how far each integerK mode is from being a valid palindromic solution, which in turn sets the floor on (1 − ρ). The zero-crossing of `vr^∞(k)` for the integerK basis directly predicts the location of the ρ → 1 block and the PPS enhancement scale.
 
 Script: `plot_vrfcb_integerK.py` — produces `./figures/vrfcb_integerK.pdf` and `./figures/xfcb_all_integerK.pdf`.
+
+---
+
+## Numerical Verification: k-convergence and Solution Comparison (`compare_perturbations_soln.py`)
+
+Script: `compare_perturbations_soln.py` — produces four figures in `./figures/`.
+
+### Part 1 — k-values do converge at high k (`compare_k_convergence.pdf`)
+
+Both bases were generated from the same ordered integer-n sequence, so k_allowedK[i] and k_integerK[i] correspond to the same mode number n. The absolute and relative k-differences across all 105 modes are:
+
+| k range | Δk/k (typical) |
+|---------|----------------|
+| Low k (first 5 modes) | 7–27% |
+| High k (last 5 modes) | ~0.25% |
+
+The relative difference shrinks by a factor of ~52 from the lowest to the highest modes, confirming that k_allowedK → k_integerK at high k.
+
+Numerical output for the last 10 modes:
+
+```
+ idx       k_aK       k_iK       |Δk|     |Δk|/k       vr∞_aK       vr∞_iK
+  95   59.06506   59.21757    0.15251    0.2579%  -9.03e-05   2.7355e+00
+  96   59.67489   59.82806    0.15317    0.2564%  -3.53e-05  -2.7585e+00
+  97   60.28465   60.43855    0.15390    0.2550%   5.66e-04   2.7816e+00
+  98   60.89447   61.04904    0.15457    0.2535%  -3.67e-04  -2.8026e+00
+  99   61.50422   61.65953    0.15531    0.2522%   7.61e-04   2.8235e+00
+ 100   62.11402   62.27002    0.15600    0.2508%  -2.43e-04  -2.8425e+00
+ 101   62.72377   62.88051    0.15675    0.2496%   3.71e-04   2.8614e+00
+ 102   63.33354   63.49100    0.15747    0.2483%  -1.64e-04  -2.8783e+00
+ 103   63.94326   64.10149    0.15823    0.2472%   4.54e-04   2.8952e+00
+ 104   64.55301   64.71198    0.15898    0.2460%  -5.92e-04  -2.9101e+00
+```
+
+Despite Δk/k < 0.26%, the vr^∞ values differ by a factor of ~10,000:
+
+| Basis | |vr^∞| (high-k modes) |
+|-------|------------------------|
+| allowedK | max ≈ 5.25×10⁻² , mean ≈ 8.3×10⁻⁴ (≈ 0 by construction) |
+| integerK | max ≈ 6.29, mean ≈ 1.54 (large, oscillating with alternating sign) |
+
+### Part 2 — Even a 0.25% k-shift is enough to break the palindrome (`compare_perturbations_soln_highk.pdf`, `compare_vr_near_FCB.pdf`, `compare_perturbations_overlay.pdf`)
+
+The full perturbation solutions (dr, dm, vr, vm) were reconstructed from recombination to the FCB for the last 5 high-k modes of each basis using:
+
+```
+x_inf  = lstsq( (A@X1 + D@X2 + GX3)[2:6, :],  recs[2:6] )
+Y(η)   = einsum('ijt,j->it', U_ABC(η), X1@x_inf)
+       + einsum('ijt,j->it', U_DEF(η), X2@x_inf)
+```
+
+**Key observation**: at high k, both bases oscillate with nearly identical frequency (Δk/k ≈ 0.25%), but the accumulation of many oscillation cycles between recombination and the FCB amplifies the tiny k-difference into a large phase error at the FCB. For allowedK modes, vr → 0 at the FCB (palindrome condition satisfied). For integerK modes at the same mode index, vr arrives at the FCB with amplitude |vr^∞| ≈ 2.9 — comparable to the mid-evolution oscillation amplitude.
+
+This is visible in the near-FCB zoom (`compare_vr_near_FCB.pdf`): allowedK curves (solid blue) converge smoothly to zero at the FCB, while integerK curves (dashed red) oscillate with full amplitude right up to the bounce. The integerK solutions are **not** symmetric or anti-symmetric at the end of the universe — the CPT palindrome condition is violated.
+
+**Why the factor of ~10,000 in vr^∞?** At high k, the mode completes many oscillations between recombination and the FCB. The phase accumulated is φ ≈ k·(η_FCB − η_rec). A shift of Δk shifts the final phase by Δφ ≈ Δk·(η_FCB − η_rec). Because Δk is small but (η_FCB − η_rec) is large, Δφ can be an arbitrary fraction of 2π, placing the integerK solution at a completely different phase at the FCB relative to the allowedK solution — hence vr^∞ ≠ 0 for integerK despite Δk/k being tiny.

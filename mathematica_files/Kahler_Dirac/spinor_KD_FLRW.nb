@@ -1,0 +1,1256 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     50969,       1248]
+NotebookOptionsPosition[     48690,       1199]
+NotebookOutlinePosition[     49084,       1215]
+CellTagsIndexPosition[     49041,       1212]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"Needs", "[", "\"\<OGRe`\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.961735984558651*^9, 3.961735985406592*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"416c7045-e7c0-46b6-a0e6-0199b900f167"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     StyleBox[
+      TemplateBox[{"\"OGRe: An \"", 
+        StyleBox["\"O\"", Underlined, StripOnInput -> False], 
+        "\"bject-Oriented \"", 
+        StyleBox["\"G\"", Underlined, StripOnInput -> False], "\"eneral \"", 
+        StyleBox["\"Re\"", Underlined, StripOnInput -> False], 
+        "\"lativity Package for Mathematica\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontSize->Larger,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"By Barak Shoshany (\"", 
+        TemplateBox[{"\"baraksh@gmail.com\"", "mailto:baraksh@gmail.com"}, 
+         "HyperlinkURL"], "\") (\"", 
+        TemplateBox[{"\"baraksh.com\"", "https://baraksh.com/"}, 
+         "HyperlinkURL"], "\")\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"v1.7.0 (2021-09-17)\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"GitHub repository: \"", 
+        TemplateBox[{
+         "\"https://github.com/bshoshany/OGRe\"", 
+          "https://github.com/bshoshany/OGRe"}, "HyperlinkURL"]},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     TemplateBox[{
+      "\"\[Bullet] To view the full documentation for the package, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"TDocs[]\"", "Hyperlink", StripOnInput -> False], True -> 
+           StyleBox["\"TDocs[]\"", "HyperlinkActive", StripOnInput -> False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> OGRe`TDocs[], 
+        Appearance -> "Frameless", BaseStyle -> "Hyperlink", Evaluator -> 
+        Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To list all available modules, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"?OGRe`*\"", "Hyperlink", StripOnInput -> False], True -> 
+           StyleBox["\"?OGRe`*\"", "HyperlinkActive", StripOnInput -> False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+        OGRe`Private`OGRePrint[
+          Information["OGRe`*"]], Appearance -> "Frameless", BaseStyle -> 
+        "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To get help on a particular module, type \"", 
+       StyleBox["\"?\"", "Input", StripOnInput -> False], 
+       "\" followed by the module name.\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To enable parallelization, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"TSetParallelization[True]\"", "Hyperlink", StripOnInput -> 
+             False], True -> 
+           StyleBox[
+            "\"TSetParallelization[True]\"", "HyperlinkActive", StripOnInput -> 
+             False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+        OGRe`TSetParallelization[True], Appearance -> "Frameless", BaseStyle -> 
+        "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] \"", 
+       TemplateBox[{
+         DynamicBox[
+          ToBoxes[OGRe`Private`UpdateMessage, StandardForm], 
+          ImageSizeCache -> {328.546875, {3.48046875, 12.55078125}}], 
+         "\" To disable automatic checks for updates at startup, type \"", 
+         ButtonBox[
+          TagBox[
+           
+           PaneSelectorBox[{
+            False -> StyleBox[
+              "\"TSetAutoUpdates[False]\"", "Hyperlink", StripOnInput -> 
+               False], True -> 
+             StyleBox[
+              "\"TSetAutoUpdates[False]\"", "HyperlinkActive", StripOnInput -> 
+               False]}, 
+            Dynamic[
+             CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+            0], 
+           MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+          OGRe`TSetAutoUpdates[False], Appearance -> "Frameless", BaseStyle -> 
+          "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], 
+         "\".\""}, "RowDefault"]},
+      "RowDefault"]}
+   },
+   DefaultBaseStyle->"Column",
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Column"]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.961739505413199*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"9471b16b-c268-49f1-bbee-46f149bd5164"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"?", "OGRe`*"}]], "Input",
+ CellChangeTimes->{{3.961735995303653*^9, 3.961735996033839*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"2586f8cf-193f-4af9-b098-27f04352f8bf"],
+
+Cell[BoxData[
+ StyleBox[
+  FrameBox[GridBox[{
+     {
+      DynamicModuleBox[{Typeset`open$$ = True}, 
+       PaneSelectorBox[{False->
+        ButtonBox[
+         RowBox[{
+          
+          DynamicBox[FEPrivate`FrontEndResource[
+           "FEBitmaps", "RightPointerOpener"]], " ", 
+          StyleBox["OGRe`", "InformationGridGroupHeader"]}],
+         Appearance->None,
+         BaseStyle->"InformationGridLink",
+         ButtonFunction:>FEPrivate`Set[Typeset`open$$, True],
+         Evaluator->Automatic,
+         Method->"Preemptive"], True->
+        PaneBox[GridBox[{
+           {
+            ButtonBox[
+             RowBox[{
+              
+              DynamicBox[FEPrivate`FrontEndResource[
+               "FEBitmaps", "DownPointerOpener"],
+               ImageSizeCache->{10., {2.1875, 7.8125}}], " ", 
+              StyleBox["OGRe`", "InformationGridGroupHeader"]}],
+             Appearance->None,
+             BaseStyle->"InformationGridLink",
+             ButtonFunction:>FEPrivate`Set[Typeset`open$$, False],
+             Evaluator->Automatic,
+             Method->"Preemptive"]},
+           {
+            PaneBox[GridBox[{
+               {
+                ButtonBox[
+                 StyleBox["TAddCoordTransformation", "InformationGridButton"],
+                 
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TAddCoordTransformation", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TCalcRiemannTensor", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcRiemannTensor", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TExportAll", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TExportAll", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TPartialD", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TPartialD", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalc", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalc", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TChangeDefaultCoords", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TChangeDefaultCoords", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TGetComponents", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TGetComponents", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetAllowOverwrite", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetAllowOverwrite", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalcChristoffel", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcChristoffel", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TChangeDefaultIndices", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TChangeDefaultIndices", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TImport", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TImport", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetAssumptions", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetAssumptions", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalcEinsteinTensor", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcEinsteinTensor", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TChangeID", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TChangeID", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TImportAll", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TImportAll", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetAutoUpdates", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetAutoUpdates", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 
+                 StyleBox["TCalcGeodesicFromChristoffel", 
+                  "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcGeodesicFromChristoffel", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TChangeSymbol", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TChangeSymbol", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TInfo", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TInfo", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetCurveParameter", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetCurveParameter", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 
+                 StyleBox["TCalcGeodesicFromLagrangian", 
+                  "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcGeodesicFromLagrangian", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TCheckForUpdates", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCheckForUpdates", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TLineElement", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TLineElement", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetIndexLetters", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetIndexLetters", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 
+                 StyleBox["TCalcGeodesicWithTimeParameter", 
+                  "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcGeodesicWithTimeParameter", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TCite", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCite", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TList", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TList", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetParallelization", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetParallelization", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalcLagrangian", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcLagrangian", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TCovariantD", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCovariantD", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TMessage", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TMessage", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSetReservedSymbols", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSetReservedSymbols", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalcNormSquared", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcNormSquared", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TDelete", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TDelete", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TNewCoordinates", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TNewCoordinates", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TShow", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TShow", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalcRicciScalar", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcRicciScalar", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TDocs", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TDocs", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TNewMetric", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TNewMetric", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TSimplify", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TSimplify", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]},
+               {
+                ButtonBox[
+                 StyleBox["TCalcRicciTensor", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TCalcRicciTensor", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TExport", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TExport", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TNewTensor", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TNewTensor", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic], 
+                ButtonBox[
+                 StyleBox["TVolumeElementSquared", "InformationGridButton"],
+                 Appearance->None,
+                 BaseStyle->"InformationGridLink",
+                 
+                 ButtonData:>{
+                  "Info-fbf2899d-0e0b-4e06-a819-8e9a254d2bdf", {
+                   "TVolumeElementSquared", "OGRe`"}, False},
+                 ButtonNote->"OGRe`",
+                 Evaluator->Automatic]}
+              },
+              DefaultBaseStyle->"Text",
+              
+              GridBoxAlignment->{
+               "Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+              GridBoxItemSize->{"Columns" -> {{
+                   Scaled[0.2375]}}}],
+             ImageMargins->{{10, 0}, {0, 2}}]}
+          },
+          GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}}],
+         FrameMargins->{{0, 0}, {8, 0}}]}, Dynamic[Typeset`open$$],
+        ImageSize->Automatic]]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+    GridBoxDividers->{"ColumnsIndexed" -> {{False}}, "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.5599999999999999]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.8]}, 
+        Offset[0.2]}}],
+   BaseStyle->"InformationTitleFrame"], "InformationGridPlain"]], "Output",
+ CellChangeTimes->{3.9617359971730013`*^9, 3.961739508823612*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"3f10d553-0bbe-49dd-be8c-d273dddc6ada"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TNewCoordinates", "[", 
+  RowBox[{"\"\<Cartesian\>\"", ",", 
+   RowBox[{"{", 
+    RowBox[{"\[Eta]", ",", "x", ",", "y", ",", "z"}], "}"}]}], "]"}]], "Input",\
+
+ CellChangeTimes->{{3.961736007548332*^9, 3.9617360135896883`*^9}},
+ CellLabel->"In[3]:=",ExpressionUUID->"c8305ef1-4529-414d-aa48-481286841276"],
+
+Cell[BoxData["\<\"Cartesian\"\>"], "Output",
+ CellChangeTimes->{3.9617360159491053`*^9, 3.9617395124353437`*^9},
+ CellLabel->"Out[3]=",ExpressionUUID->"01d9fe47-9edc-4fc0-a1cb-49f72002d955"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"TSetReservedSymbols", "[", 
+   RowBox[{"{", "a", "}"}], "]"}], ";"}], "\n", 
+ RowBox[{"TShow", "@", 
+  RowBox[{"TNewMetric", "[", 
+   RowBox[{"\"\<flatFLRW\>\"", ",", "\"\<Cartesian\>\"", ",", 
+    RowBox[{"DiagonalMatrix", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       SuperscriptBox[
+        RowBox[{"a", "[", "\[Eta]", "]"}], "2"], ",", 
+       RowBox[{"-", 
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"]}], ",", 
+       RowBox[{"-", 
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"]}], " ", ",", 
+       RowBox[{"-", 
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"]}]}], " ", "}"}], "]"}]}], 
+   "]"}]}]}], "Input",
+ CellChangeTimes->{{3.96173602783615*^9, 3.961736057839601*^9}},
+ CellLabel->"In[4]:=",ExpressionUUID->"fa2a4d49-fa3b-41f6-a213-5b40dacd9d58"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"flatFLRW\"", "\":   \"", 
+    TemplateBox[{"\"g\"", 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "x", "y", "z"}, "RowWithSeparators"],
+     "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{
+          SuperscriptBox["a", "2"], "0", "0", "0"}, {"0", 
+          RowBox[{"-", 
+            SuperscriptBox["a", "2"]}], "0", "0"}, {"0", "0", 
+          RowBox[{"-", 
+            SuperscriptBox["a", "2"]}], "0"}, {"0", "0", "0", 
+          RowBox[{"-", 
+            SuperscriptBox["a", "2"]}]}}, RowSpacings -> 1, ColumnSpacings -> 
+        1, RowAlignments -> Baseline, ColumnAlignments -> Center], 
+       "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.96173951841468*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"f2b4f269-af36-4271-9f5f-5cb596defde7"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TShow", "@", 
+  RowBox[{"TNewTensor", "[", 
+   RowBox[{
+   "\"\<Vielbein1\>\"", ",", "\"\<flatFLRW\>\"", ",", "\"\<Cartesian\>\"", 
+    ",", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", 
+      RowBox[{"-", "1"}]}], "}"}], ",", 
+    RowBox[{"DiagonalMatrix", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"a", "[", "\[Eta]", "]"}], ",", 
+       RowBox[{"a", "[", "\[Eta]", "]"}], ",", 
+       RowBox[{"a", "[", "\[Eta]", "]"}], " ", ",", 
+       RowBox[{"a", "[", "\[Eta]", "]"}]}], " ", "}"}], "]"}], ",", 
+    "\"\<e\>\""}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.961736317990357*^9, 3.961736319642206*^9}, {
+  3.961736404149021*^9, 3.96173640635419*^9}, {3.9617364789309807`*^9, 
+  3.961736523486816*^9}, {3.961736560545349*^9, 3.961736570736252*^9}, {
+  3.9617383994922237`*^9, 3.961738423519314*^9}, {3.961738477356501*^9, 
+  3.961738483497164*^9}, {3.961739521310617*^9, 3.9617395246564283`*^9}},
+ CellLabel->"In[6]:=",ExpressionUUID->"84ce4b7b-2487-4b81-a31d-c44f252b985d"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"Vielbein1\"", "\":   \"", 
+    TemplateBox[{"\"e\"", 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{"\"\[Mu]\"", 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "x", "y", "z"}, "RowWithSeparators"],
+     "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{"a", "0", "0", "0"}, {"0", "a", "0", "0"}, {
+         "0", "0", "a", "0"}, {"0", "0", "0", "a"}}, RowSpacings -> 1, 
+        ColumnSpacings -> 1, RowAlignments -> Baseline, ColumnAlignments -> 
+        Center], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.961739525751731*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"ef3fa553-4ecc-4962-a9a9-13ae5366cc40"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TShow", "@", 
+  RowBox[{"TNewTensor", "[", 
+   RowBox[{
+   "\"\<Vielbein-1\>\"", ",", "\"\<flatFLRW\>\"", ",", "\"\<Cartesian\>\"", 
+    ",", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", 
+      RowBox[{"-", "1"}]}], "}"}], ",", 
+    RowBox[{"DiagonalMatrix", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"1", "/", 
+        RowBox[{"a", "[", "\[Eta]", "]"}]}], ",", 
+       RowBox[{"1", "/", 
+        RowBox[{"a", "[", "\[Eta]", "]"}]}], ",", 
+       RowBox[{"1", "/", 
+        RowBox[{"a", "[", "\[Eta]", "]"}]}], " ", ",", 
+       RowBox[{"1", "/", 
+        RowBox[{"a", "[", "\[Eta]", "]"}]}]}], " ", " ", "}"}], "]"}], ",", 
+    "\"\<e\>\""}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.96173843320608*^9, 3.961738436906116*^9}, {
+  3.9617384935812387`*^9, 3.961738500404437*^9}},
+ CellLabel->"In[7]:=",ExpressionUUID->"fa1126a6-6301-478c-87d7-efd894d3d52f"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"Vielbein-1\"", "\":   \"", 
+    TemplateBox[{"\"e\"", 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{"\"\[Mu]\"", 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "x", "y", "z"}, "RowWithSeparators"],
+     "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{
+          FractionBox["1", "a"], "0", "0", "0"}, {"0", 
+          FractionBox["1", "a"], "0", "0"}, {"0", "0", 
+          FractionBox["1", "a"], "0"}, {"0", "0", "0", 
+          FractionBox["1", "a"]}}, RowSpacings -> 1, ColumnSpacings -> 1, 
+        RowAlignments -> Baseline, ColumnAlignments -> Center], "\[NoBreak]", 
+       ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.961739528559507*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"833597d7-202b-4eb1-a228-853d9d01e1ac"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TList", "@", 
+  RowBox[{"TCalcChristoffel", "[", "\"\<flatFLRW\>\"", "]"}]}]], "Input",
+ CellChangeTimes->{{3.96173768055721*^9, 3.961737689235421*^9}},
+ CellLabel->"In[8]:=",ExpressionUUID->"15e17726-fa1a-413d-bc90-29ef66e5d56c"],
+
+Cell[BoxData[
+ StyleBox[
+  TagBox[GridBox[{
+     {
+      TemplateBox[{"\"flatFLRWChristoffel\"", "\":\""},
+       "RowDefault"]},
+     {
+      TagBox[GridBox[{
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"\[Eta]\"", "\"\[Eta]\""}, "RowDefault"], 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"x\"", "\"x\""}, "RowDefault"], 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"y\"", "\"y\""}, "RowDefault"], 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"z\"", "\"z\""}, "RowDefault"], 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                "\"\[Eta]\"", "\"x\""}, "RowDefault"], 
+              TemplateBox[{"\"x\"", 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                "\"x\"", "\"\[Eta]\""}, "RowDefault"], 
+              TemplateBox[{"\"x\"", 
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                "\"\[Eta]\"", "\"y\""}, "RowDefault"], 
+              TemplateBox[{"\"y\"", 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                "\"y\"", "\"\[Eta]\""}, "RowDefault"], 
+              TemplateBox[{"\"y\"", 
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                "\"\[Eta]\"", "\"z\""}, "RowDefault"], 
+              TemplateBox[{"\"z\"", 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"\[CapitalGamma]\"", 
+              TemplateBox[{
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                "\"z\"", "\"\[Eta]\""}, "RowDefault"], 
+              TemplateBox[{"\"z\"", 
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           TemplateBox[{"Inactive", "a", "\[Eta]"},
+            "InactiveD"], "a"]}
+        },
+        AutoDelete->False,
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxItemSize->{
+         "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+       "Grid"]}
+    },
+    DefaultBaseStyle->"Column",
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+   "Column"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.9617395313081408`*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"d9aa0546-9f91-4e92-9561-81623725b9c4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TCalc", "[", 
+  RowBox[{"\"\<Wcomponents\>\"", ",", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"\"\<Vielbein-1\>\"", "[", "\"\<\[Nu]b\>\"", "]"}], ".", 
+     RowBox[{
+     "\"\<flatFLRWChristoffel\>\"", "[", "\"\<\[Lambda]\[Mu]\[Nu]\>\"", "]"}],
+      ".", 
+     RowBox[{"\"\<Vielbein1\>\"", "[", "\"\<a\[Lambda]\>\"", "]"}]}], "-", 
+    RowBox[{
+     RowBox[{"\"\<Vielbein-1\>\"", "[", "\"\<\[Nu]b\>\"", "]"}], ".", 
+     RowBox[{"TPartialD", "[", "\"\<\[Mu]\>\"", "]"}], ".", 
+     RowBox[{"\"\<Vielbein1\>\"", "[", "\"\<a\[Nu]\>\"", "]"}]}]}], ",", 
+   "\"\<w\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.961736594972484*^9, 3.961736595567884*^9}, {
+   3.961736693603643*^9, 3.961736724452118*^9}, {3.9617373827235622`*^9, 
+   3.961737383502739*^9}, {3.961737423868039*^9, 3.9617374607946177`*^9}, {
+   3.961737521280678*^9, 3.9617375928809967`*^9}, {3.961737732595747*^9, 
+   3.961737793814386*^9}, {3.961737827254002*^9, 3.961737844777322*^9}, {
+   3.9617379109641438`*^9, 3.961737929245619*^9}, {3.9617379766445103`*^9, 
+   3.961737999240966*^9}, {3.961738041747363*^9, 3.9617380461194077`*^9}, {
+   3.9617382111979513`*^9, 3.961738214661211*^9}, 3.961738589562463*^9, {
+   3.9617387826497087`*^9, 3.96173879562332*^9}, {3.961738825802906*^9, 
+   3.9617388690492563`*^9}, {3.9617394384392567`*^9, 3.961739451638047*^9}, {
+   3.961739605030336*^9, 3.961739631683251*^9}, {3.961739698079445*^9, 
+   3.961739703462607*^9}},
+ CellLabel->"In[9]:=",ExpressionUUID->"3d8a0aad-ce03-459f-879d-0142d2967223"],
+
+Cell[BoxData["\<\"Wcomponents\"\>"], "Output",
+ CellChangeTimes->{3.961739706854846*^9},
+ CellLabel->"Out[9]=",ExpressionUUID->"0f9c3b10-8843-4a2e-8779-abbb89acb792"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TList", "[", 
+  RowBox[{"\"\<Wcomponents\>\"", ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "1"}], ",", "1", ",", 
+     RowBox[{"-", "1"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.9617397084942007`*^9, 3.961739744053968*^9}},
+ CellLabel->"In[10]:=",ExpressionUUID->"85fa5d62-b915-4c77-b59e-c084b03b0a7f"],
+
+Cell[BoxData[
+ StyleBox[
+  TagBox[GridBox[{
+     {
+      TemplateBox[{"\"Wcomponents\"", "\":\""},
+       "RowDefault"]},
+     {
+      TagBox[GridBox[{
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"w\"", 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                "\"x\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"x\"", 
+                StyleBox[
+                "\"x\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"w\"", 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                "\"y\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"y\"", 
+                StyleBox[
+                "\"y\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            TemplateBox[{"\"w\"", 
+              TemplateBox[{"\"\[Eta]\"", 
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                "\"z\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                "\"z\"", 
+                StyleBox[
+                "\"z\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox], 
+            RowBox[{"-", 
+              TemplateBox[{"\"w\"", 
+                TemplateBox[{"\"x\"", 
+                  StyleBox[
+                  "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                  "\"\[Eta]\""}, "RowDefault"], 
+                TemplateBox[{
+                  StyleBox[
+                  "\"x\"", ShowContents -> False, StripOnInput -> False], 
+                  "\"x\"", 
+                  StyleBox[
+                  "\"\[Eta]\"", ShowContents -> False, StripOnInput -> 
+                   False]}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+               SubsuperscriptBox]}], 
+            RowBox[{"-", 
+              TemplateBox[{"\"w\"", 
+                TemplateBox[{"\"y\"", 
+                  StyleBox[
+                  "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                  "\"\[Eta]\""}, "RowDefault"], 
+                TemplateBox[{
+                  StyleBox[
+                  "\"y\"", ShowContents -> False, StripOnInput -> False], 
+                  "\"y\"", 
+                  StyleBox[
+                  "\"\[Eta]\"", ShowContents -> False, StripOnInput -> 
+                   False]}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+               SubsuperscriptBox]}], 
+            RowBox[{"-", 
+              TemplateBox[{"\"w\"", 
+                TemplateBox[{"\"z\"", 
+                  StyleBox[
+                  "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                  "\"\[Eta]\""}, "RowDefault"], 
+                TemplateBox[{
+                  StyleBox[
+                  "\"z\"", ShowContents -> False, StripOnInput -> False], 
+                  "\"z\"", 
+                  StyleBox[
+                  "\"\[Eta]\"", ShowContents -> False, StripOnInput -> 
+                   False]}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+               SubsuperscriptBox]}]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           TemplateBox[{"Inactive", "a", "\[Eta]"},
+            "InactiveD"], "a"]}
+        },
+        AutoDelete->False,
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxItemSize->{
+         "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+       "Grid"]}
+    },
+    DefaultBaseStyle->"Column",
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+   "Column"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.961739745597659*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"b364fcdb-fd46-4942-9420-eb49c8e9e2e1"]
+}, Open  ]]
+},
+WindowSize->{1112.25, 601.5},
+WindowMargins->{{Automatic, 0}, {Automatic, 0}},
+FrontEndVersion->"14.1 for Linux x86 (64-bit) (July 16, 2024)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"13727e86-34d2-46eb-b958-461f0fe9ac9a"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[576, 22, 214, 3, 29, "Input",ExpressionUUID->"416c7045-e7c0-46b6-a0e6-0199b900f167"],
+Cell[793, 27, 5035, 128, 204, "Output",ExpressionUUID->"9471b16b-c268-49f1-bbee-46f149bd5164"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5865, 160, 193, 3, 29, "Input",ExpressionUUID->"2586f8cf-193f-4af9-b098-27f04352f8bf"],
+Cell[6061, 165, 21497, 514, 296, "Output",ExpressionUUID->"3f10d553-0bbe-49dd-be8c-d273dddc6ada"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27595, 684, 329, 7, 29, "Input",ExpressionUUID->"c8305ef1-4529-414d-aa48-481286841276"],
+Cell[27927, 693, 190, 2, 33, "Output",ExpressionUUID->"01d9fe47-9edc-4fc0-a1cb-49f72002d955"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[28154, 700, 875, 23, 51, "Input",ExpressionUUID->"fa2a4d49-fa3b-41f6-a213-5b40dacd9d58"],
+Cell[29032, 725, 1364, 32, 93, "Output",ExpressionUUID->"f2b4f269-af36-4271-9f5f-5cb596defde7"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30433, 762, 1011, 22, 30, "Input",ExpressionUUID->"84ce4b7b-2487-4b81-a31d-c44f252b985d"],
+Cell[31447, 786, 1174, 27, 86, "Output",ExpressionUUID->"ef3fa553-4ecc-4962-a9a9-13ae5366cc40"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[32658, 818, 890, 23, 30, "Input",ExpressionUUID->"fa1126a6-6301-478c-87d7-efd894d3d52f"],
+Cell[33551, 843, 1280, 30, 113, "Output",ExpressionUUID->"833597d7-202b-4eb1-a228-853d9d01e1ac"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[34868, 878, 254, 4, 29, "Input",ExpressionUUID->"15e17726-fa1a-413d-bc90-29ef66e5d56c"],
+Cell[35125, 884, 6779, 150, 57, "Output",ExpressionUUID->"d9aa0546-9f91-4e92-9561-81623725b9c4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[41941, 1039, 1526, 27, 49, "Input",ExpressionUUID->"3d8a0aad-ce03-459f-879d-0142d2967223"],
+Cell[43470, 1068, 166, 2, 33, "Output",ExpressionUUID->"0f9c3b10-8843-4a2e-8779-abbb89acb792"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[43673, 1075, 347, 8, 29, "Input",ExpressionUUID->"85fa5d62-b915-4c77-b59e-c084b03b0a7f"],
+Cell[44023, 1085, 4651, 111, 57, "Output",ExpressionUUID->"b364fcdb-fd46-4942-9420-eb49c8e9e2e1"]
+}, Open  ]]
+}
+]
+*)
+

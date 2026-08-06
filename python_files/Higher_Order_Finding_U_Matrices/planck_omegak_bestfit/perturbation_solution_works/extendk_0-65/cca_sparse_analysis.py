@@ -288,6 +288,41 @@ def apply_sparse_rotation(A, B, method='promax'):
     return A_sparse, B_sparse
 
 
+def apply_joint_sparse_rotation(A, B, method='promax'):
+    """Sparsify both CCA bases using one jointly fitted rotation.
+
+    The rotation is fitted to a vertically stacked, Frobenius-balanced copy
+    of ``A`` and ``B`` and then applied to the original coefficients. This
+    treats the two matched bases symmetrically while preserving mode pairing.
+    """
+    if A.ndim != 2 or B.ndim != 2 or A.shape != B.shape:
+        raise ValueError(
+            f"A and B must be two-dimensional arrays with equal shape; "
+            f"got {A.shape} and {B.shape}"
+        )
+    if A.shape[1] == 0:
+        return A.copy(), B.copy()
+
+    norm_A = np.linalg.norm(A, 'fro')
+    norm_B = np.linalg.norm(B, 'fro')
+    if norm_A < 1e-30 or norm_B < 1e-30:
+        raise ValueError("Cannot fit a joint rotation to a zero-norm basis")
+
+    joint = np.vstack((A / norm_A, B / norm_B))
+    print(f"\nApplying joint {method} rotation to both bases...")
+    if method == 'promax':
+        _, R_v, L_norm = promax_rotation(joint)
+        transform = R_v @ L_norm
+    elif method == 'varimax':
+        _, transform = varimax_rotation(joint)
+    else:
+        raise ValueError(
+            "Joint sparse rotation supports 'varimax' and 'promax'; "
+            f"got {method!r}"
+        )
+    return A @ transform, B @ transform
+
+
 # ============================================================================
 # Utilities
 # ============================================================================
@@ -439,13 +474,27 @@ def plot_reconstructed_timeseries(basis_1, basis_2,
     Divides by Frobenius norms so the reconstruction corresponds to
     Xn^p @ coeff (the normalised space in which the CCA was solved),
     avoiding spurious per-field scale factors.
+
+    The final eta sample is omitted only for ``vm``, whose numerical velocity
+    reconstruction can contain a non-physical spike exactly at the FCB.
     """
     _ensure_dir(output_dir)
     dom1   = np.argmax(np.abs(A_sparse), axis=0)
     order  = np.argsort(dom1)
     N_plot = min(N_plot, A_sparse.shape[1])
 
-    fig, axes = plt.subplots(N_plot, 4, figsize=(14, 2.2 * N_plot),
+    if len(eta_grid) < 2:
+        raise ValueError("eta_grid must contain at least two samples")
+    perturbation_labels = {
+        'dr': r'$\delta_r$',
+        'dm': r'$\delta_m$',
+        'vr': r'$v_r$',
+        'vm': r'$v_m$',
+    }
+
+    # Keep the PDF narrower than the original 14-inch layout so it scales
+    # reliably inside both one- and two-column LaTeX figures.
+    fig, axes = plt.subplots(N_plot, 4, figsize=(9, 1.5 * N_plot),
                              constrained_layout=True)
     if N_plot == 1:
         axes = axes.reshape(1, -1)
@@ -456,13 +505,19 @@ def plot_reconstructed_timeseries(basis_1, basis_2,
         dom_k = dom1[idx]
         for col, p in enumerate(PERTURBATION_TYPES):
             ax = axes[row, col]
-            s1 = basis_1[p] @ A_sparse[:, idx] / norms_1[p]
-            s2 = basis_2[p] @ B_sparse[:, idx] / norms_2[p]
+            plot_slice = slice(None, -1) if p == 'vm' else slice(None)
+            eta_plot = eta_grid[plot_slice]
+            s1 = (basis_1[p] @ A_sparse[:, idx] / norms_1[p])[plot_slice]
+            s2 = (basis_2[p] @ B_sparse[:, idx] / norms_2[p])[plot_slice]
             if np.dot(s1, s2) < 0:
                 s2 = -s2
-            ax.plot(eta_grid, s1, 'r-',  lw=2,   alpha=0.85, label='B1')
-            ax.plot(eta_grid, s2, 'g--', lw=1.5, alpha=0.85, label='B2')
-            ax.set_title(f"{p}  k={dom_k+1}  ρ={rho[idx]:.4f}", fontsize=8)
+            ax.plot(eta_plot, s1, 'r-',  lw=2,   alpha=0.85, label='B1')
+            ax.plot(eta_plot, s2, 'g--', lw=1.5, alpha=0.85, label='B2')
+            ax.set_title(
+                f"{perturbation_labels.get(p, p)}  "
+                rf"$k_\text{{dom}}$ idx={dom_k + 1}  ρ={rho[idx]:.4f}",
+                fontsize=8,
+            )
             ax.grid(True, alpha=0.3)
             if row == 0 and col == 0:
                 ax.legend(fontsize=7)
@@ -470,7 +525,7 @@ def plot_reconstructed_timeseries(basis_1, basis_2,
                 ax.set_xlabel("η", fontsize=9)
 
     out = output_dir + 'cca_timeseries.pdf'
-    plt.savefig(out, bbox_inches='tight')
+    plt.savefig(out, bbox_inches='tight', pad_inches=0.05)
     print(f"Saved: {out}")
     plt.close()
 

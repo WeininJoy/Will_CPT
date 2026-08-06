@@ -1,0 +1,780 @@
+Job started on cpu-q-145 at Fri 24 Jul 14:44:49 BST 2026
+Loading rhel8/default-icl
+  Loading requirement: rhel8/slurm singularity/current rhel8/global cuda/11.4
+    vgl/2.5.1/64 intel-oneapi-compilers/2022.1.0/gcc/b6zld2mz ucx/1.15.0
+    intel-oneapi-mpi/2021.6.0/intel/guxuvcpm
+Setting top to                           : /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1 
+Setting out to                           : /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/build 
+Checking for program 'gcc, cc'           : /usr/bin/gcc 
+Checking for program 'ar'                : /usr/bin/ar 
+Check gcc version                        : 8.5.0 
+Compile a test code with gcc             : yes 
+Setting architecture flag to             : ['-m64'] 
+Checking for program 'ifort'             : /usr/local/software/spack/spack-views/rocky8-icelake-20220710/intel-oneapi-compilers-2022.1.0/gcc-11.3.0/b6zld2mz7cid27yloxznoidymd7vywwz/compiler/2022.1.0/linux/bin/intel64/ifort 
+Checking for program 'xiar'              : /usr/bin/ar 
+Checking for program 'ar'                : /usr/bin/ar 
+Check ifort version                      : 2021.6.0 
+Compile a test code with ifort           : yes 
+retrieve ifort link line                 : ok 
+ifort link line                          : -L/usr/local/software/spack/spack-views/._rocky8-icelake-20220710/vdcqmdfi2lxsqy6qm3npptgktlrkt37k/intel-oneapi-compilers-2022.1.0/gcc-11.3.0/b6zld2mz7cid27yloxznoidymd7vywwz/compiler/2022.1.0/linux/bin/intel64/../../compiler/lib/intel64_lin -L/usr/local/software/spack/spack-views/rocky8-icelake-20220710/intel-oneapi-compilers-2022.1.0/gcc-11.3.0/b6zld2mz7cid27yloxznoidymd7vywwz/compiler/2022.1.0/linux/compiler/lib/intel64_lin/ -L/usr/local/software/spack/spack-views/rocky8-icelake-20220710/intel-oneapi-compilers-2022.1.0/gcc-11.3.0/b6zld2mz7cid27yloxznoidymd7vywwz/compiler/2022.1.0/linux/compiler/lib/intel64_lin -L/lib -L/lib64 -limf -lifport -lifcoremt -lsvml -liomp5 -lintlc -lirc -lpthread 
+Setting install root to                  : /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1 
+Setting install bin directory to         : /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin 
+Setting install lib directory to         : /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib 
+Setting install include directory to     : /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/include 
+check compatibility of ifort and gcc versions : ok 
+Checking for program 'python'                 : /rds/user/wnd22/hpc-work/Polychord_solveb/env_Polychord_solveb/bin/python 
+Checking for python version                   : 3.8.2 
+python-config                                 : /usr/bin/python3.8-config 
+Asking python-config for pyembed '--cflags --libs --ldflags --embed' flags : yes 
+Testing pyembed configuration                                              : yes 
+Checking for library dl                                                    : yes 
+checking for RTLD_DEFAULT in dl                                            : no 
+compile with debug option                                                  : OFF 
+Checking for program 'pmc-config'                                          : not found 
+Checking for library pmc                                                   : not found 
+Checking for library ['lapack', 'blas']                                    : yes 
+checking for function 'dposv'                                              : yes 
+checking for function 'dtrsv'                                              : yes 
+checking for function 'dpotrf'                                             : yes 
+checking for function 'dpotrs'                                             : yes 
+checking for function 'dpotri'                                             : yes 
+checking for function 'dtrtri'                                             : yes 
+checking for function 'dtrmm'                                              : yes 
+checking for function 'dtrmv'                                              : yes 
+checking for function 'dgeqrf'                                             : yes 
+checking for function 'dormqr'                                             : yes 
+checking for function 'dsyev'                                              : yes 
+checking for function 'dgesvd'                                             : yes 
+checking for function 'dsymv'                                              : yes 
+checking for function 'dgemv'                                              : yes 
+checking for function 'dgemm'                                              : yes 
+checking for function 'dsyrk'                                              : yes 
+checking for function 'dsyr2k'                                             : yes 
+checking for function 'daxpy'                                              : yes 
+checking for function 'dtrsm'                                              : yes 
+checking for function 'dsymm'                                              : yes 
+checking for function 'dsyr'                                               : yes 
+checking for function 'ddot'                                               : yes 
+checking for function 'dsyevd'                                             : yes 
+checking for function 'dlamch'                                             : yes 
+checking for function 'dsyevr'                                             : yes 
+Checking for library ['cfitsio']                                           : yes 
+checking for function 'fits_init_cfitsio'                                  : yes 
+Python version allows for automatic install                                : yes (3.8.2) 
+Checking for program 'python'                                              : /rds/user/wnd22/hpc-work/Polychord_solveb/env_Polychord_solveb/bin/python 
+Checking python module 'numpy'                                             : ok 
+Checking python module 'astropy'                                           : ok 
+Checking for program 'python'                                              : /rds/user/wnd22/hpc-work/Polychord_solveb/env_Polychord_solveb/bin/python 
+Checking python module 'cython'                                            : ok 
+Checking python module 'cython'                                            : ok 
+Checking cython version (>0.28)                                            : 3.2.9 
+Checking for program 'cython'                                              : /rds/user/wnd22/hpc-work/Polychord_solveb/env_Polychord_solveb/bin/cython 
+Add plugin : 'rel2015'                                                     : ok 
+
+*----------------------------------------------------*
+|                                                    |
+|   Configure step ok.                               |
+|                                                    |
+|   run './waf install' now !                        |
+|                                                    |
+*----------------------------------------------------*
+
+'configure' finished successfully (13.076s)
+Waf: Entering directory `/rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/build'
+add plik/component_plugin/rel2015/fg2015.c
+add plik/component_plugin/rel2015/corrnoise.c
+add plik/component_plugin/rel2015/leakage.c
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/include/clik_lensing.h (from src/clik_lensing.h)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/include/clik.h (from src/clik.h)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/include/errorlist.h (from src/minipmc/errorlist.h)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/cldf.cpython-38.pyo (from build/src/python/clik/__pycache__/cldf.cpython-38.pyo)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/cldf.py (from src/python/clik/cldf.py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/parobject.py (from src/python/clik/parobject.py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/parobject.cpython-38.pyo (from build/src/python/clik/__pycache__/parobject.cpython-38.pyo)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/hpy.cpython-38.pyo (from build/src/python/clik/__pycache__/hpy.cpython-38.pyo)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/smicahlp.py (from src/python/clik/smicahlp.py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/__init__.cpython-38.pyo (from build/src/python/clik/__pycache__/__init__.cpython-38.pyo)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__init__.py (from src/python/clik/__init__.py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/miniparse.py (from src/python/clik/miniparse.py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/__init__.cpython-38.pyc (from build/src/python/clik/__pycache__/__init__.cpython-38.pyc)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/cldf.cpython-38.pyc (from build/src/python/clik/__pycache__/cldf.cpython-38.pyc)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/hpy.py (from src/python/clik/hpy.py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/smicahlp.cpython-38.pyc (from build/src/python/clik/__pycache__/smicahlp.cpython-38.pyc)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/parobject.cpython-38.pyc (from build/src/python/clik/__pycache__/parobject.cpython-38.pyc)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/miniparse.cpython-38.pyc (from build/src/python/clik/__pycache__/miniparse.cpython-38.pyc)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/hpy.cpython-38.pyc (from build/src/python/clik/__pycache__/hpy.cpython-38.pyc)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/smicahlp.cpython-38.pyo (from build/src/python/clik/__pycache__/smicahlp.cpython-38.pyo)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/__pycache__/miniparse.cpython-38.pyo (from build/src/python/clik/__pycache__/miniparse.cpython-38.pyo)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/tsz_143_eps0.50.dat (from src/plik/component_plugin/rel2015/tsz_143_eps0.50.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_example_py (from build/src/python/clik_example_py)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/sz_x_cib_template.dat (from src/plik/component_plugin/rel2015/sz_x_cib_template.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_change_lrange (from build/src/python/clik_change_lrange)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_print (from build/src/python/clik_print)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/ksz_fromcamspec.dat (from src/plik/component_plugin/rel2015/ksz_fromcamspec.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/cib_1h_2h_100_353_Jsr-1_PS_2014_09.dat (from src/plik/component_plugin/rel2015/cib_1h_2h_100_353_Jsr-1_PS_2014_09.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/sky_template_v15_F100_143_217_353.dat (from src/plik/component_plugin/rel2015/sky_template_v15_F100_143_217_353.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_get_selfcheck (from build/src/python/clik_get_selfcheck)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/cnoise_F100_143_217_353_v17.dat (from src/plik/component_plugin/rel2015/cnoise_F100_143_217_353_v17.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/prepare_wmap (from build/src/python/prepare_wmap)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_explore_1d (from build/src/python/clik_explore_1d)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_change_lrange_bychannel_pol (from build/src/python/clik_change_lrange_bychannel_pol)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/cleak_eh_rd12rc3_v1.dat (from src/plik/component_plugin/rel2015/cleak_eh_rd12rc3_v1.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/cnoise_e2e_v2.dat (from src/plik/component_plugin/rel2015/cnoise_e2e_v2.dat)
+- install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/share/clik/rel2015/sbpx_tmpl_v4_hm.dat (from src/plik/component_plugin/rel2015/sbpx_tmpl_v4_hm.dat)
+[126/141] Linking build/src/libclik.so
+[127/141] Linking build/src/libclik_f90.so
+[128/141] Linking build/src/clik_example_C
+[129/141] Linking build/src/python/lkl.cpython-38-x86_64-linux-gnu.so
+[130/141] Linking build/src/python/lkl_lensing.cpython-38-x86_64-linux-gnu.so
+[131/141] Linking build/src/python/parametric.cpython-38-x86_64-linux-gnu.so
+[132/141] Linking build/src/python/rel2015.cpython-38-x86_64-linux-gnu.so
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/libclik.so (from build/src/libclik.so)
+[134/141] Linking build/src/clik_example_f90
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/lkl_lensing.cpython-38-x86_64-linux-gnu.so (from build/src/python/lkl_lensing.cpython-38-x86_64-linux-gnu.so)
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/libclik_f90.so (from build/src/libclik_f90.so)
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/lkl.cpython-38-x86_64-linux-gnu.so (from build/src/python/lkl.cpython-38-x86_64-linux-gnu.so)
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_example_C (from build/src/clik_example_C)
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/rel2015.cpython-38-x86_64-linux-gnu.so (from build/src/python/rel2015.cpython-38-x86_64-linux-gnu.so)
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/lib/python/site-packages/clik/parametric.cpython-38-x86_64-linux-gnu.so (from build/src/python/parametric.cpython-38-x86_64-linux-gnu.so)
++ install /rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/bin/clik_example_f90 (from build/src/clik_example_f90)
+Waf: Leaving directory `/rds/user/wnd22/hpc-work/Polychord_solveb/clik_installs/code/planck/code/plc_3.0/plc-3.1/build'
+
+*----------------------------------------------------*
+|                                                    |
+|   Source clik_profile.sh (or clik_profile.csh)     |
+|   to set the environment variables needed by clik  |
+|                                                    |
+*----------------------------------------------------*
+
+'install' finished successfully (7.761s)
+Changed directory to /home/wnd22/rds/hpc-work/Will_CPT/Higher_Order_Finding_U_Matrices/find_integer_allowedK/cosmo_param_direc/find_bestfit_As_ns_tau.
+
+Running Python script...
+[I 2026-07-24 14:45:39,844] A new study created in memory with name: no-name-c94f6c54-ccad-4422-9493-2602613099dc
+[I 2026-07-24 14:45:59,135] Trial 0 finished with value: 10255.263926602587 and parameters: {'As': 1.9235288740656886, 'ns': 0.9288933679259694, 'tau': 0.03681281895297551}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:46:18,180] Trial 1 finished with value: 185804.31304960683 and parameters: {'As': 2.85073263342647, 'ns': 1.0629542323410912, 'tau': 0.031048209527992233}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:46:37,298] Trial 2 finished with value: 2e+30 and parameters: {'As': 1.5181294660403182, 'ns': 0.9881295293826285, 'tau': 0.05503840642443715}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:46:56,313] Trial 3 finished with value: 2e+30 and parameters: {'As': 2.0187703172971014, 'ns': 1.0916293625544706, 'tau': 0.07794395101955812}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:47:15,187] Trial 4 finished with value: 2e+30 and parameters: {'As': 1.7989830916901453, 'ns': 1.00715095469212, 'tau': 0.04701986111385392}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:47:34,157] Trial 5 finished with value: 2e+30 and parameters: {'As': 2.0612574742264744, 'ns': 1.05897947305625, 'tau': 0.07246141761961314}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:47:53,017] Trial 6 finished with value: 2e+30 and parameters: {'As': 2.289417347506284, 'ns': 1.060339532583332, 'tau': 0.03410017312261311}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:48:11,890] Trial 7 finished with value: 2e+30 and parameters: {'As': 1.601650681610719, 'ns': 0.9856040431288118, 'tau': 0.03768943301358096}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:48:30,827] Trial 8 finished with value: 2e+30 and parameters: {'As': 2.0049791114751163, 'ns': 0.9970137160970427, 'tau': 0.06513895169390166}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:48:49,696] Trial 9 finished with value: 67792.46204573802 and parameters: {'As': 2.786837417671893, 'ns': 0.9772851558967104, 'tau': 0.06735097103503138}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:49:08,817] Trial 10 finished with value: 317928.7816315753 and parameters: {'As': 3.4922553938168246, 'ns': 0.9025972470250628, 'tau': 0.04584305682394012}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:49:27,765] Trial 11 finished with value: 50290.35984444658 and parameters: {'As': 2.73344828625463, 'ns': 0.93075454860898, 'tau': 0.06354052731367521}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:49:46,712] Trial 12 finished with value: 36025.081013749215 and parameters: {'As': 2.636477207699589, 'ns': 0.9101014678269688, 'tau': 0.05787736592743355}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:50:05,988] Trial 13 finished with value: 174945.46388058935 and parameters: {'As': 3.1604040409401484, 'ns': 0.9313404839551027, 'tau': 0.05474182844938708}. Best is trial 0 with value: 10255.263926602587.
+[I 2026-07-24 14:50:25,253] Trial 14 finished with value: 9454.117524189784 and parameters: {'As': 2.3083026747946866, 'ns': 0.9024864209076886, 'tau': 0.0429929597812414}. Best is trial 14 with value: 9454.117524189784.
+[I 2026-07-24 14:50:44,417] Trial 15 finished with value: 16051.42237716186 and parameters: {'As': 2.348723205049209, 'ns': 0.9518954917430861, 'tau': 0.04138930382499888}. Best is trial 14 with value: 9454.117524189784.
+[I 2026-07-24 14:51:03,747] Trial 16 finished with value: 14939.728840151558 and parameters: {'As': 2.362002774382275, 'ns': 0.9536057190468177, 'tau': 0.0472093171733565}. Best is trial 14 with value: 9454.117524189784.
+[I 2026-07-24 14:51:22,754] Trial 17 finished with value: 15808.708452420819 and parameters: {'As': 1.8685524371820312, 'ns': 0.9268339512428312, 'tau': 0.04036381818383316}. Best is trial 14 with value: 9454.117524189784.
+[I 2026-07-24 14:51:41,788] Trial 18 finished with value: 9171.096635288952 and parameters: {'As': 2.2307144721141428, 'ns': 0.9524617902711112, 'tau': 0.03482892794380133}. Best is trial 18 with value: 9171.096635288952.
+[I 2026-07-24 14:52:00,765] Trial 19 finished with value: 32395.738103195148 and parameters: {'As': 2.486506701996168, 'ns': 0.9607892900997176, 'tau': 0.04377224809483233}. Best is trial 18 with value: 9171.096635288952.
+[I 2026-07-24 14:52:19,647] Trial 20 finished with value: 2e+30 and parameters: {'As': 2.1834492595657413, 'ns': 1.01649797986175, 'tau': 0.030246755031107353}. Best is trial 18 with value: 9171.096635288952.
+[I 2026-07-24 14:52:38,598] Trial 21 finished with value: 23314.66791953608 and parameters: {'As': 1.7975855609831397, 'ns': 0.9152003742950436, 'tau': 0.03747385470643473}. Best is trial 18 with value: 9171.096635288952.
+[I 2026-07-24 14:52:57,610] Trial 22 finished with value: 4236.353627337322 and parameters: {'As': 2.142163282981223, 'ns': 0.9437020008401147, 'tau': 0.05123251275174018}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:53:16,584] Trial 23 finished with value: 29736.841177441198 and parameters: {'As': 2.49355315487289, 'ns': 0.965185592797634, 'tau': 0.0500427896493959}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:53:35,534] Trial 24 finished with value: 5663.49403704386 and parameters: {'As': 2.232695230932788, 'ns': 0.9463205548165416, 'tau': 0.05095357984356801}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:53:54,523] Trial 25 finished with value: 4804.866412878342 and parameters: {'As': 2.121332827807542, 'ns': 0.9432725307241488, 'tau': 0.058548796414795}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:54:13,497] Trial 26 finished with value: 4896.848974176586 and parameters: {'As': 2.119308026785039, 'ns': 0.9407741142446883, 'tau': 0.0582590557193282}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:54:32,480] Trial 27 finished with value: 2e+30 and parameters: {'As': 1.7299183485213285, 'ns': 1.0355021135667557, 'tau': 0.060139403240682315}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:54:51,426] Trial 28 finished with value: 4659.629607151639 and parameters: {'As': 2.1038095225533033, 'ns': 0.968863380780506, 'tau': 0.06014888758202051}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:55:10,502] Trial 29 finished with value: 104195.62835475412 and parameters: {'As': 2.9627160666244827, 'ns': 0.9714715678918058, 'tau': 0.06977774021639069}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:55:29,363] Trial 30 finished with value: 2e+30 and parameters: {'As': 1.9411784783533361, 'ns': 1.0241741068390864, 'tau': 0.061171027960277735}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:55:48,293] Trial 31 finished with value: 5378.708158324483 and parameters: {'As': 2.085166058391163, 'ns': 0.9437762723517735, 'tau': 0.05576773409402646}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:56:07,372] Trial 32 finished with value: 5057.164767665556 and parameters: {'As': 2.089805212430381, 'ns': 0.9365047952806025, 'tau': 0.05143518657458817}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:56:26,399] Trial 33 finished with value: 53622.21056388876 and parameters: {'As': 1.6616702436165356, 'ns': 0.9205765023845394, 'tau': 0.05785524264590532}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:56:45,293] Trial 34 finished with value: 16338.889329369047 and parameters: {'As': 2.4223238284107467, 'ns': 0.976922911814523, 'tau': 0.06220600074003839}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:57:04,173] Trial 35 finished with value: 47006.17955100472 and parameters: {'As': 2.589440088464413, 'ns': 0.9914754416707983, 'tau': 0.053862738523131594}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:57:23,267] Trial 36 finished with value: 4742.9854255850605 and parameters: {'As': 2.129511951755282, 'ns': 0.9419699691803758, 'tau': 0.05924910010200855}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:57:42,431] Trial 37 finished with value: 2e+30 and parameters: {'As': 1.8869872034158934, 'ns': 0.9601883452845084, 'tau': 0.0724659146149444}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:58:01,598] Trial 38 finished with value: 2e+30 and parameters: {'As': 1.954209740107562, 'ns': 0.9829050305444774, 'tau': 0.06869151263818057}. Best is trial 22 with value: 4236.353627337322.
+[I 2026-07-24 14:58:20,681] Trial 39 finished with value: 4181.263925161037 and parameters: {'As': 2.165368975550711, 'ns': 0.9666392336561875, 'tau': 0.06549173513547091}. Best is trial 39 with value: 4181.263925161037.
+[I 2026-07-24 14:58:39,710] Trial 40 finished with value: 2e+30 and parameters: {'As': 1.566730370843843, 'ns': 1.0903648456533046, 'tau': 0.0760976503513088}. Best is trial 39 with value: 4181.263925161037.
+[I 2026-07-24 14:58:58,754] Trial 41 finished with value: 4163.726419141586 and parameters: {'As': 2.163905024997431, 'ns': 0.9672699797050934, 'tau': 0.06467794498745524}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 14:59:17,852] Trial 42 finished with value: 2e+30 and parameters: {'As': 2.167412145575568, 'ns': 1.0054168096191247, 'tau': 0.06452817626409874}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 14:59:36,996] Trial 43 finished with value: 4686.891357045985 and parameters: {'As': 2.2473271899911875, 'ns': 0.9670373928340549, 'tau': 0.06681727766430849}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 14:59:56,029] Trial 44 finished with value: 5333.743054807336 and parameters: {'As': 2.270195921950409, 'ns': 0.9692347534878387, 'tau': 0.0665214862351778}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:00:14,922] Trial 45 finished with value: 2e+30 and parameters: {'As': 2.0044975050969898, 'ns': 0.9962150140328688, 'tau': 0.07142062846564501}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:00:33,790] Trial 46 finished with value: 12197.187061498094 and parameters: {'As': 2.43162519675291, 'ns': 0.9806182972663395, 'tau': 0.07546524668284149}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:00:52,801] Trial 47 finished with value: 9139.835021889648 and parameters: {'As': 2.0093667245863207, 'ns': 0.9598956103864285, 'tau': 0.06262511765452446}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:01:11,782] Trial 48 finished with value: 2e+30 and parameters: {'As': 1.8021918163958766, 'ns': 0.9719342263501932, 'tau': 0.06663361845982055}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:01:30,833] Trial 49 finished with value: 10685.372742108002 and parameters: {'As': 2.367280819293352, 'ns': 0.9935139066389816, 'tau': 0.0698595700002258}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:01:49,874] Trial 50 finished with value: 36548.50712394253 and parameters: {'As': 2.5596541767573893, 'ns': 1.0065315747109653, 'tau': 0.06440204242348434}. Best is trial 41 with value: 4163.726419141586.
+[I 2026-07-24 15:02:08,907] Trial 51 finished with value: 4160.775618891815 and parameters: {'As': 2.1796013417208906, 'ns': 0.9533752004752618, 'tau': 0.060823358104965676}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:02:27,932] Trial 52 finished with value: 5312.364754977161 and parameters: {'As': 2.233373068326539, 'ns': 0.9576644497847867, 'tau': 0.05580954658926919}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:02:46,963] Trial 53 finished with value: 6695.998852716191 and parameters: {'As': 2.0284417023061474, 'ns': 0.9519573794391567, 'tau': 0.053335629327050854}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:03:05,997] Trial 54 finished with value: 5612.441977032117 and parameters: {'As': 2.3122699084204155, 'ns': 0.9258730485834916, 'tau': 0.06652373837662044}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:03:25,034] Trial 55 finished with value: 15878.48576327865 and parameters: {'As': 2.402069899134789, 'ns': 0.9864259080073245, 'tau': 0.06143714256180026}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:03:44,084] Trial 56 finished with value: 4173.823377197457 and parameters: {'As': 2.20022868385125, 'ns': 0.9663312307593569, 'tau': 0.06487685986794159}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:04:03,107] Trial 57 finished with value: 4609.960010964561 and parameters: {'As': 2.183665140458982, 'ns': 0.9345005422001406, 'tau': 0.04877483906523328}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:04:22,131] Trial 58 finished with value: 22994.045574669555 and parameters: {'As': 1.8216261756911982, 'ns': 0.9341750426508283, 'tau': 0.048431845185243814}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:04:41,191] Trial 59 finished with value: 10870.884581220615 and parameters: {'As': 1.9671518058090125, 'ns': 0.9133423091742793, 'tau': 0.04592481159739059}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:05:00,223] Trial 60 finished with value: 4308.137115148342 and parameters: {'As': 2.1717626557107277, 'ns': 0.9496935869812224, 'tau': 0.05230063683905202}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:05:19,278] Trial 61 finished with value: 4416.423419202124 and parameters: {'As': 2.1713635738713792, 'ns': 0.9498206973158813, 'tau': 0.049979877926125786}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:05:38,333] Trial 62 finished with value: 8853.709717459877 and parameters: {'As': 2.3049973233887076, 'ns': 0.9528420057043092, 'tau': 0.052631192901239944}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:05:57,399] Trial 63 finished with value: 298808.84785438183 and parameters: {'As': 3.4604493428012035, 'ns': 0.94703244570101, 'tau': 0.056910870783165174}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:06:16,429] Trial 64 finished with value: 6592.025333698094 and parameters: {'As': 2.199571030759109, 'ns': 0.9748387335443711, 'tau': 0.044022089549466153}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:06:35,508] Trial 65 finished with value: 6269.686497355904 and parameters: {'As': 2.0651173080905414, 'ns': 0.9639594254680637, 'tau': 0.06290699435290475}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:06:54,599] Trial 66 finished with value: 18816.918373024375 and parameters: {'As': 1.8828048886007824, 'ns': 0.9222414775699675, 'tau': 0.05139165038178048}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:07:13,721] Trial 67 finished with value: 4327.910708911749 and parameters: {'As': 2.16125846646781, 'ns': 0.9470868540137343, 'tau': 0.04924724960742296}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:07:32,841] Trial 68 finished with value: 7880.544717899711 and parameters: {'As': 2.3079507644002493, 'ns': 0.9397544285087991, 'tau': 0.05466004649812998}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:07:51,931] Trial 69 finished with value: 16172.642682443948 and parameters: {'As': 2.459216678185184, 'ns': 0.9560540905290752, 'tau': 0.06528781994707217}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:08:11,025] Trial 70 finished with value: 10217.606830829998 and parameters: {'As': 2.3667518187291248, 'ns': 0.9302004027673878, 'tau': 0.0568328152420032}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:08:30,101] Trial 71 finished with value: 4237.109548348962 and parameters: {'As': 2.15164169063605, 'ns': 0.94932041852924, 'tau': 0.049667698521510206}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:08:49,139] Trial 72 finished with value: 5184.949123968948 and parameters: {'As': 2.0512828444941347, 'ns': 0.9463086948193767, 'tau': 0.04659869902932021}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:09:08,171] Trial 73 finished with value: 4315.933836857011 and parameters: {'As': 2.1463474291120486, 'ns': 0.9646570032661277, 'tau': 0.04826280340045513}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:09:27,280] Trial 74 finished with value: 75182.79526848643 and parameters: {'As': 2.700912510615711, 'ns': 0.9635800716934705, 'tau': 0.04206487945641987}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:09:46,388] Trial 75 finished with value: 4371.850374700609 and parameters: {'As': 2.118449512440057, 'ns': 0.9797151006422506, 'tau': 0.0447017720231547}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:10:05,433] Trial 76 finished with value: 6098.129433418458 and parameters: {'As': 2.2566587067576545, 'ns': 0.9380574290688115, 'tau': 0.05216679592670542}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:10:24,498] Trial 77 finished with value: 23528.313224273497 and parameters: {'As': 2.54593683239321, 'ns': 0.9561992840603235, 'tau': 0.06838973406468148}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:10:43,530] Trial 78 finished with value: 2e+30 and parameters: {'As': 1.9357795822137782, 'ns': 0.9750816751662614, 'tau': 0.048022924394488666}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:11:02,667] Trial 79 finished with value: 9398.124824880313 and parameters: {'As': 1.990111852882601, 'ns': 0.9651006055843832, 'tau': 0.060134182961131565}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:11:21,719] Trial 80 finished with value: 2e+30 and parameters: {'As': 2.0640687522595056, 'ns': 1.0402668657135488, 'tau': 0.05013740288409995}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:11:40,791] Trial 81 finished with value: 4219.602473464169 and parameters: {'As': 2.1479466472793716, 'ns': 0.9480050479628576, 'tau': 0.04972745447491128}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:11:59,876] Trial 82 finished with value: 4287.683336374614 and parameters: {'As': 2.1421192117062513, 'ns': 0.9615597219209353, 'tau': 0.047223439147616286}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:12:18,883] Trial 83 finished with value: 6583.86805329353 and parameters: {'As': 2.2009223195494427, 'ns': 0.9578064657203369, 'tau': 0.04037329204408446}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:12:37,908] Trial 84 finished with value: 4937.82453143686 and parameters: {'As': 2.098753298752732, 'ns': 0.9411348326339185, 'tau': 0.05395086556822295}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:12:56,908] Trial 85 finished with value: 7917.940481862241 and parameters: {'As': 2.256165924030399, 'ns': 0.9504587978013425, 'tau': 0.04505755392119128}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:13:15,934] Trial 86 finished with value: 8308.29360874411 and parameters: {'As': 2.327153615646087, 'ns': 0.9710801624282264, 'tau': 0.06374720806112706}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:13:34,912] Trial 87 finished with value: 7259.776901375328 and parameters: {'As': 2.2129592199759838, 'ns': 0.9872447034737901, 'tau': 0.04710024624214515}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:13:53,994] Trial 88 finished with value: 7416.1031168193995 and parameters: {'As': 2.0344048748892742, 'ns': 0.9260941422040204, 'tau': 0.05123836971595367}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:14:13,266] Trial 89 finished with value: 15367.438663642934 and parameters: {'As': 2.3848094789494745, 'ns': 0.9607711742787898, 'tau': 0.052662058015841666}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:14:32,564] Trial 90 finished with value: 4431.56999867123 and parameters: {'As': 2.1295028257330775, 'ns': 0.9440650101565304, 'tau': 0.05523062095795569}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:14:51,794] Trial 91 finished with value: 4411.838683058762 and parameters: {'As': 2.14816343532717, 'ns': 0.9676469647941192, 'tau': 0.047700338279246794}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:15:11,092] Trial 92 finished with value: 4895.059490475377 and parameters: {'As': 2.262553063884845, 'ns': 0.9544229191753562, 'tau': 0.06545473567635497}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:15:30,292] Trial 93 finished with value: 4485.232387876723 and parameters: {'As': 2.0782760452870206, 'ns': 0.9622849208695184, 'tau': 0.050016238662279895}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:15:49,491] Trial 94 finished with value: 5012.151185487846 and parameters: {'As': 2.1510560742727343, 'ns': 0.9834182657804387, 'tau': 0.04575677891566467}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:16:08,702] Trial 95 finished with value: 118595.78497993395 and parameters: {'As': 2.890568065925528, 'ns': 0.9492887567998263, 'tau': 0.0431205097747438}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:16:27,959] Trial 96 finished with value: 9368.461531228968 and parameters: {'As': 1.9137430788902345, 'ns': 0.9364791553336383, 'tau': 0.032760197535319925}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:16:47,362] Trial 97 finished with value: 2e+30 and parameters: {'As': 1.9816679668011226, 'ns': 0.9736349353196031, 'tau': 0.06814165344892115}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:17:06,697] Trial 98 finished with value: 5739.947486036035 and parameters: {'As': 2.197528354829753, 'ns': 0.9786093315930122, 'tau': 0.04956519018955708}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:17:25,905] Trial 99 finished with value: 5372.044958487962 and parameters: {'As': 2.2872344597771357, 'ns': 0.9695408925890381, 'tau': 0.07010240615211827}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:17:45,237] Trial 100 finished with value: 2e+30 and parameters: {'As': 2.0310697818587204, 'ns': 1.001540691080331, 'tau': 0.06076787129030193}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:18:04,560] Trial 101 finished with value: 4415.087517218878 and parameters: {'As': 2.167634530211178, 'ns': 0.9489787722078284, 'tau': 0.04904602775257343}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:18:23,919] Trial 102 finished with value: 4541.641598814551 and parameters: {'As': 2.100486531186421, 'ns': 0.9443355076138836, 'tau': 0.05040114403949807}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:18:43,275] Trial 103 finished with value: 6512.309597207334 and parameters: {'As': 2.2361465710366817, 'ns': 0.9560012988633798, 'tau': 0.04839575735109769}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:19:02,542] Trial 104 finished with value: 10606.68063759253 and parameters: {'As': 2.3480921603205296, 'ns': 0.9336611920197811, 'tau': 0.052149391996122056}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:19:21,787] Trial 105 finished with value: 4370.181623370085 and parameters: {'As': 2.1462974716377063, 'ns': 0.961736240366802, 'tau': 0.04667122067681011}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:19:41,096] Trial 106 finished with value: 7738.417239367169 and parameters: {'As': 2.28775272107955, 'ns': 0.9534655899170112, 'tau': 0.0534820857736061}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:20:00,467] Trial 107 finished with value: 5202.45289523866 and parameters: {'As': 2.2180123606027267, 'ns': 0.9463333548073983, 'tau': 0.05116341941691844}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:20:20,091] Trial 108 finished with value: 2e+30 and parameters: {'As': 2.0553112187515987, 'ns': 1.0808425053013824, 'tau': 0.06570314920416773}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:20:39,647] Trial 109 finished with value: 5559.902759744527 and parameters: {'As': 2.115115263258866, 'ns': 0.9405561964722863, 'tau': 0.06340957447069237}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:20:58,927] Trial 110 finished with value: 2e+30 and parameters: {'As': 1.735002383225829, 'ns': 0.9673577460851882, 'tau': 0.0617173312922279}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:21:18,264] Trial 111 finished with value: 4349.769994931381 and parameters: {'As': 2.1488352499325836, 'ns': 0.9608464397363784, 'tau': 0.047461277671835465}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:21:37,790] Trial 112 finished with value: 4687.005101320272 and parameters: {'As': 2.1759189409097823, 'ns': 0.9600614592041867, 'tau': 0.04891654885394008}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:21:57,228] Trial 113 finished with value: 6635.250543638979 and parameters: {'As': 2.000104709403284, 'ns': 0.9520311720110077, 'tau': 0.045898962031971}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:22:16,632] Trial 114 finished with value: 4238.23347306347 and parameters: {'As': 2.082684325466083, 'ns': 0.9658578914713782, 'tau': 0.04745677948657683}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:22:35,987] Trial 115 finished with value: 5353.557620162433 and parameters: {'As': 2.074391723499305, 'ns': 0.9656140202938386, 'tau': 0.0590578389646471}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:22:55,127] Trial 116 finished with value: 2e+30 and parameters: {'As': 1.9489738053168786, 'ns': 1.013776464631823, 'tau': 0.04435388566660674}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:23:14,684] Trial 117 finished with value: 6081.427166978125 and parameters: {'As': 2.2231193960998055, 'ns': 0.9745569994698678, 'tau': 0.052199521518095635}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:23:34,169] Trial 118 finished with value: 4524.7158246116 and parameters: {'As': 2.1091276604857607, 'ns': 0.9578572959848636, 'tau': 0.05675483060069974}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:23:53,433] Trial 119 finished with value: 4426.275711733611 and parameters: {'As': 2.176267114484477, 'ns': 0.947845808905794, 'tau': 0.05076450409148303}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:24:12,712] Trial 120 finished with value: 2e+30 and parameters: {'As': 2.020144890105057, 'ns': 0.990639246274745, 'tau': 0.04929703728352394}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:24:31,817] Trial 121 finished with value: 4732.140793435241 and parameters: {'As': 2.1717177241333165, 'ns': 0.9638015730583059, 'tau': 0.04821664369159741}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:24:51,275] Trial 122 finished with value: 8371.367608156112 and parameters: {'As': 2.2689142042799952, 'ns': 0.9545791340136642, 'tau': 0.0468896623357236}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:25:10,676] Trial 123 finished with value: 4319.056392978033 and parameters: {'As': 2.1382839054479446, 'ns': 0.9696414139142923, 'tau': 0.047453459963455305}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:25:30,016] Trial 124 finished with value: 193664.6067614801 and parameters: {'As': 3.097688768801352, 'ns': 0.970889238809869, 'tau': 0.045340272028431286}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:25:49,266] Trial 125 finished with value: 4431.80510728729 and parameters: {'As': 2.0835265294450203, 'ns': 0.9779805412959892, 'tau': 0.054046318135905165}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:26:08,675] Trial 126 finished with value: 4471.097939582627 and parameters: {'As': 2.2100985362190033, 'ns': 0.930790179897341, 'tau': 0.06737894383658988}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:26:27,910] Trial 127 finished with value: 4885.086382314141 and parameters: {'As': 2.0523747213054655, 'ns': 0.9414210731709172, 'tau': 0.04221294077161836}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:26:47,113] Trial 128 finished with value: 4538.36613164022 and parameters: {'As': 2.1169540879187694, 'ns': 0.9812975366661938, 'tau': 0.06426227704036656}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:27:06,617] Trial 129 finished with value: 12036.618497052115 and parameters: {'As': 1.9107195519980442, 'ns': 0.9577418139488095, 'tau': 0.0477260074508807}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:27:25,901] Trial 130 finished with value: 11488.020863470907 and parameters: {'As': 2.3155335832111104, 'ns': 0.9677636954789138, 'tau': 0.04956345785355929}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:27:45,211] Trial 131 finished with value: 4268.159889114019 and parameters: {'As': 2.139627296955397, 'ns': 0.9620163874574084, 'tau': 0.04714064383815574}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:28:04,305] Trial 132 finished with value: 4241.809787300107 and parameters: {'As': 2.1389004541206185, 'ns': 0.9527868400808155, 'tau': 0.04649586611187547}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:28:23,618] Trial 133 finished with value: 16352.901323325179 and parameters: {'As': 1.850005727586217, 'ns': 0.9516577770476218, 'tau': 0.04341318229571651}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:28:42,956] Trial 134 finished with value: 7970.151663790907 and parameters: {'As': 2.2401273632768772, 'ns': 0.9732192780990889, 'tau': 0.04639163996895417}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:29:02,170] Trial 135 finished with value: 4310.588352002801 and parameters: {'As': 2.130369797154895, 'ns': 0.9659752952945356, 'tau': 0.04488146762178157}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:29:21,455] Trial 136 finished with value: 6321.466320309545 and parameters: {'As': 1.9856483706404264, 'ns': 0.9649956737887216, 'tau': 0.043691616315229054}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:29:40,821] Trial 137 finished with value: 4532.403644311254 and parameters: {'As': 2.037002870616692, 'ns': 0.9571642623364521, 'tau': 0.03912052877626648}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:30:00,181] Trial 138 finished with value: 5034.366858495764 and parameters: {'As': 2.190871537364091, 'ns': 0.9376202749310618, 'tau': 0.04532271350278397}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:30:19,322] Trial 139 finished with value: 4231.70516880212 and parameters: {'As': 2.1035196819683972, 'ns': 0.9612997505061247, 'tau': 0.051005218708098626}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:30:38,589] Trial 140 finished with value: 4546.157141141519 and parameters: {'As': 2.1094962171508636, 'ns': 0.945316476899731, 'tau': 0.05298640953916302}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:30:57,770] Trial 141 finished with value: 4239.811712453523 and parameters: {'As': 2.1545545808226305, 'ns': 0.9628345397303767, 'tau': 0.05148800553709493}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:31:17,111] Trial 142 finished with value: 4766.784687227616 and parameters: {'As': 2.081248601424454, 'ns': 0.9510827090873082, 'tau': 0.051107814516957034}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:31:36,433] Trial 143 finished with value: 5220.984036005439 and parameters: {'As': 2.210852947788042, 'ns': 0.9605007984382977, 'tau': 0.05199551201398744}. Best is trial 51 with value: 4160.775618891815.
+[I 2026-07-24 15:31:55,719] Trial 144 finished with value: 4146.040335068819 and parameters: {'As': 2.136255338538116, 'ns': 0.9563017045577576, 'tau': 0.05036473955443109}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:32:14,781] Trial 145 finished with value: 7138.939617179915 and parameters: {'As': 2.261152744000713, 'ns': 0.9546422160880569, 'tau': 0.05054951670406292}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:32:34,028] Trial 146 finished with value: 5737.9918387204525 and parameters: {'As': 2.0640938760024072, 'ns': 0.9485808596626093, 'tau': 0.05493532069027214}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:32:53,297] Trial 147 finished with value: 4781.146332617562 and parameters: {'As': 2.186012505542757, 'ns': 0.9596285212661526, 'tau': 0.05013605182451654}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:33:12,555] Trial 148 finished with value: 6937.473396722923 and parameters: {'As': 2.02979047633533, 'ns': 0.9447375436826639, 'tau': 0.05305257065048403}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:33:31,823] Trial 149 finished with value: 4489.3884429699965 and parameters: {'As': 2.096202931218321, 'ns': 0.9537202079265584, 'tau': 0.05186473671707471}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:33:51,111] Trial 150 finished with value: 4731.214103569946 and parameters: {'As': 2.236449214438526, 'ns': 0.9613888031920077, 'tau': 0.06260869480440137}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:34:10,343] Trial 151 finished with value: 4198.685506267835 and parameters: {'As': 2.134523816608745, 'ns': 0.9662030914453275, 'tau': 0.0485343479215507}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:34:29,585] Trial 152 finished with value: 4400.23106511261 and parameters: {'As': 2.149275487782558, 'ns': 0.9711890990855708, 'tau': 0.049028636223052376}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:34:48,851] Trial 153 finished with value: 4833.237183190208 and parameters: {'As': 2.182854556449078, 'ns': 0.956982931007456, 'tau': 0.048345737009019556}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:35:07,881] Trial 154 finished with value: 4159.666124043648 and parameters: {'As': 2.123525796603766, 'ns': 0.9766255891074582, 'tau': 0.05034035890074128}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:35:26,872] Trial 155 finished with value: 2e+30 and parameters: {'As': 1.9748747845425119, 'ns': 0.9749847024262129, 'tau': 0.07971335893958462}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:35:45,962] Trial 156 finished with value: 4150.846809971463 and parameters: {'As': 2.0916633277139747, 'ns': 0.965335315781675, 'tau': 0.04666768070834232}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:36:05,159] Trial 157 finished with value: 4313.706910788804 and parameters: {'As': 2.0839872807650006, 'ns': 0.9676463819119203, 'tau': 0.049888705657152074}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:36:24,323] Trial 158 finished with value: 9623.689735520078 and parameters: {'As': 2.0081040854672456, 'ns': 0.963871930945111, 'tau': 0.06530380045394159}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:36:43,349] Trial 159 finished with value: 4196.757888880048 and parameters: {'As': 2.1126782988753874, 'ns': 0.9769533688094997, 'tau': 0.04645193750957794}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:37:02,511] Trial 160 finished with value: 4405.370968356486 and parameters: {'As': 2.068907043917992, 'ns': 0.9838582825047535, 'tau': 0.05097634668756831}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:37:21,645] Trial 161 finished with value: 4284.822131734857 and parameters: {'As': 2.12143254661845, 'ns': 0.9774594829095581, 'tau': 0.04639022342537653}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:37:40,778] Trial 162 finished with value: 4178.81699761348 and parameters: {'As': 2.1269010783444773, 'ns': 0.9701253996558281, 'tau': 0.04829358567947824}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:37:59,857] Trial 163 finished with value: 6205.044596135 and parameters: {'As': 2.2127886365489196, 'ns': 0.972828724896294, 'tau': 0.04867793938622032}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:38:18,972] Trial 164 finished with value: 4971.247361520388 and parameters: {'As': 2.036255341834016, 'ns': 0.9800514792241198, 'tau': 0.049510388292998656}. Best is trial 144 with value: 4146.040335068819.
+[I 2026-07-24 15:38:38,164] Trial 165 finished with value: 4134.024251020278 and parameters: {'As': 2.096316162034806, 'ns': 0.9688755529567449, 'tau': 0.047847410106139465}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:38:57,184] Trial 166 finished with value: 4192.952844649965 and parameters: {'As': 2.0966840071421102, 'ns': 0.9689209994876615, 'tau': 0.05033803440028731}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:39:16,189] Trial 167 finished with value: 4279.642594149745 and parameters: {'As': 2.0761612039737543, 'ns': 0.97008578064525, 'tau': 0.04785556488305285}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:39:35,295] Trial 168 finished with value: 2e+30 and parameters: {'As': 1.9538907382101764, 'ns': 0.9887408331988558, 'tau': 0.05036339649982726}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:39:54,324] Trial 169 finished with value: 5117.509464459553 and parameters: {'As': 2.1021609828056276, 'ns': 0.9763782630233059, 'tau': 0.06620239841184145}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:40:13,274] Trial 170 finished with value: 6256.992954513847 and parameters: {'As': 2.003969713923578, 'ns': 0.9684812252188736, 'tau': 0.04877415009378303}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:40:32,312] Trial 171 finished with value: 4621.478863934596 and parameters: {'As': 2.1769988000697116, 'ns': 0.9657509410289108, 'tau': 0.05114833481173329}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:40:51,311] Trial 172 finished with value: 4820.895876341375 and parameters: {'As': 2.0497550496632515, 'ns': 0.9723677436619642, 'tau': 0.04968354761133281}. Best is trial 165 with value: 4134.024251020278.
+[I 2026-07-24 15:41:10,313] Trial 173 finished with value: 4133.00884882359 and parameters: {'As': 2.1150734612911295, 'ns': 0.9662731940394166, 'tau': 0.051604539538697806}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:41:29,424] Trial 174 finished with value: 5425.177575432218 and parameters: {'As': 2.09684390865244, 'ns': 0.9757129964885991, 'tau': 0.0674020527354206}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:41:48,394] Trial 175 finished with value: 4626.566333423603 and parameters: {'As': 2.1103679876506676, 'ns': 0.9826427919881093, 'tau': 0.06413207286182901}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:42:07,366] Trial 176 finished with value: 6270.381606776132 and parameters: {'As': 2.2136394698225916, 'ns': 0.9695082895389815, 'tau': 0.04767401589933704}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:42:26,327] Trial 177 finished with value: 7993.62877314038 and parameters: {'As': 2.2809920519665, 'ns': 0.9656074693553489, 'tau': 0.05358559367597489}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:42:45,320] Trial 178 finished with value: 309061.6871413156 and parameters: {'As': 3.411207281164112, 'ns': 0.9581691440687834, 'tau': 0.04899375009659057}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:43:04,260] Trial 179 finished with value: 4768.266203339782 and parameters: {'As': 2.0547937283058384, 'ns': 0.9721304515490744, 'tau': 0.05029176582498626}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:43:23,223] Trial 180 finished with value: 5385.4156056505535 and parameters: {'As': 2.170685234826055, 'ns': 0.9788743972946604, 'tau': 0.04593793121442194}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:43:42,176] Trial 181 finished with value: 4159.756940651063 and parameters: {'As': 2.1444467572354684, 'ns': 0.9632512358936758, 'tau': 0.0516874050178964}. Best is trial 173 with value: 4133.00884882359.
+[I 2026-07-24 15:44:01,128] Trial 182 finished with value: 4118.575621471674 and parameters: {'As': 2.121892530939504, 'ns': 0.9677795868550815, 'tau': 0.0525054630901859}. Best is trial 182 with value: 4118.575621471674.
+[I 2026-07-24 15:44:20,133] Trial 183 finished with value: 4116.167562957555 and parameters: {'As': 2.1320674996134676, 'ns': 0.9682656314025392, 'tau': 0.05242838309703062}. Best is trial 183 with value: 4116.167562957555.
+[I 2026-07-24 15:44:39,108] Trial 184 finished with value: 4112.340474947141 and parameters: {'As': 2.1259161237019573, 'ns': 0.9684295926650386, 'tau': 0.052581245881857024}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:44:58,064] Trial 185 finished with value: 2e+30 and parameters: {'As': 1.5073005977312237, 'ns': 0.9698505500805368, 'tau': 0.05432929819554683}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:45:17,077] Trial 186 finished with value: 4120.829462151206 and parameters: {'As': 2.124292560615879, 'ns': 0.9749521184503973, 'tau': 0.05314695760175088}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:45:36,081] Trial 187 finished with value: 4123.947592409589 and parameters: {'As': 2.1269731404918493, 'ns': 0.9748228758636681, 'tau': 0.05290805481004094}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:45:55,054] Trial 188 finished with value: 4205.350818066004 and parameters: {'As': 2.128334169039909, 'ns': 0.9843377718885393, 'tau': 0.05298452854530095}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:46:14,029] Trial 189 finished with value: 4740.318388842614 and parameters: {'As': 2.19049550556665, 'ns': 0.9757475886543057, 'tau': 0.055430321894962525}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:46:33,024] Trial 190 finished with value: 6887.926808830603 and parameters: {'As': 2.013980058750281, 'ns': 0.9739459736897581, 'tau': 0.05630625004268391}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:46:51,995] Trial 191 finished with value: 4246.914036381603 and parameters: {'As': 2.1349320634239968, 'ns': 0.983699876123893, 'tau': 0.05281663612478309}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:47:11,026] Trial 192 finished with value: 4178.982821136847 and parameters: {'As': 2.1199098148598643, 'ns': 0.9863172522421648, 'tau': 0.054065282927879946}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:47:30,047] Trial 193 finished with value: 6854.275188265735 and parameters: {'As': 2.224972940739008, 'ns': 0.9971071792509023, 'tau': 0.05472504183099541}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:47:49,049] Trial 194 finished with value: 4800.65943749367 and parameters: {'As': 2.0570968350587804, 'ns': 0.9777600329916757, 'tau': 0.052412115346859016}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:48:08,016] Trial 195 finished with value: 4255.639823258429 and parameters: {'As': 2.1602795594797435, 'ns': 0.969426367089621, 'tau': 0.05389846069641853}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:48:27,057] Trial 196 finished with value: 4162.837705422251 and parameters: {'As': 2.122789639594438, 'ns': 0.9804780217170338, 'tau': 0.05175690728253404}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:48:46,095] Trial 197 finished with value: 2e+30 and parameters: {'As': 2.0944743879193854, 'ns': 0.991309699456985, 'tau': 0.0580373672959165}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:49:05,132] Trial 198 finished with value: 5229.613849762967 and parameters: {'As': 2.1889916193435197, 'ns': 0.9810427185458245, 'tau': 0.05200739597979398}. Best is trial 184 with value: 4112.340474947141.
+[I 2026-07-24 15:49:24,183] Trial 199 finished with value: 5473.804612648104 and parameters: {'As': 2.036245907010351, 'ns': 0.9787400125190794, 'tau': 0.05366542342632127}. Best is trial 184 with value: 4112.340474947141.
+/rds/user/wnd22/hpc-work/Polychord_solveb/env_Polychord_solveb/lib/python3.8/site-packages/classy.cpython-38-x86_64-linux-gnu.so
+Use start_params from ./data/find_bestfit_0.txt
+Initializing Planck Likelihood...
+Planck Likelihood Initialized!
+Loaded A_sparse (column-normalised): shape (107, 92)  (N_k_int=107, m_cca=92)
+N_k_int=107, m_cca=92
+eigenvecs shape: (107, 92)
+Starting sequential Optuna optimization in SLURM...
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=10255.263926602587
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=185804.31304960683
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=67792.46204573802
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=317928.7816315753
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=50290.35984444658
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=36025.081013749215
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=174945.46388058935
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=9454.117524189784
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=16051.42237716186
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=14939.728840151558
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=15808.708452420819
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=9171.096635288952
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=32395.738103195148
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=23314.66791953608
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4236.353627337322
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=29736.841177441198
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5663.49403704386
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4804.866412878342
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4896.848974176586
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4659.629607151639
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=104195.62835475412
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5378.708158324483
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5057.164767665556
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=53622.21056388876
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=16338.889329369047
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=47006.17955100472
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4742.9854255850605
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4181.263925161037
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4163.726419141586
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4686.891357045985
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5333.743054807336
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=12197.187061498094
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=9139.835021889648
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=10685.372742108002
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=36548.50712394253
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4160.775618891815
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5312.364754977161
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6695.998852716191
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5612.441977032117
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=15878.48576327865
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4173.823377197457
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4609.960010964561
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=22994.045574669555
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=10870.884581220615
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4308.137115148342
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4416.423419202124
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=8853.709717459877
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=298808.84785438183
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6592.025333698094
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6269.686497355904
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=18816.918373024375
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4327.910708911749
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7880.544717899711
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=16172.642682443948
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=10217.606830829998
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4237.109548348962
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5184.949123968948
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4315.933836857011
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=75182.79526848643
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4371.850374700609
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6098.129433418458
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=23528.313224273497
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=9398.124824880313
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4219.602473464169
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4287.683336374614
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6583.86805329353
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4937.82453143686
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7917.940481862241
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=8308.29360874411
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7259.776901375328
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7416.1031168193995
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=15367.438663642934
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4431.56999867123
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4411.838683058762
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4895.059490475377
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4485.232387876723
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5012.151185487846
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=118595.78497993395
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=9368.461531228968
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5739.947486036035
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5372.044958487962
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4415.087517218878
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4541.641598814551
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6512.309597207334
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=10606.68063759253
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4370.181623370085
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7738.417239367169
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5202.45289523866
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5559.902759744527
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4349.769994931381
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4687.005101320272
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6635.250543638979
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4238.23347306347
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5353.557620162433
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6081.427166978125
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4524.7158246116
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4426.275711733611
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4732.140793435241
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=8371.367608156112
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4319.056392978033
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=193664.6067614801
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4431.80510728729
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4471.097939582627
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4885.086382314141
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4538.36613164022
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=12036.618497052115
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=11488.020863470907
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4268.159889114019
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4241.809787300107
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=16352.901323325179
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7970.151663790907
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4310.588352002801
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6321.466320309545
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4532.403644311254
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5034.366858495764
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4231.70516880212
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4546.157141141519
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4239.811712453523
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4766.784687227616
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5220.984036005439
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4146.040335068819
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7138.939617179915
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5737.9918387204525
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4781.146332617562
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6937.473396722923
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4489.3884429699965
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4731.214103569946
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4198.685506267835
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4400.23106511261
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4833.237183190208
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4159.666124043648
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4150.846809971463
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4313.706910788804
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=9623.689735520078
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4196.757888880048
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4405.370968356486
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4284.822131734857
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4178.81699761348
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6205.044596135
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4971.247361520388
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4134.024251020278
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4192.952844649965
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4279.642594149745
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5117.509464459553
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6256.992954513847
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4621.478863934596
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4820.895876341375
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4133.00884882359
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5425.177575432218
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4626.566333423603
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6270.381606776132
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=7993.62877314038
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=309061.6871413156
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4768.266203339782
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5385.4156056505535
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4159.756940651063
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4118.575621471674
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4116.167562957555
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4112.340474947141
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4120.829462151206
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4123.947592409589
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4205.350818066004
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4740.318388842614
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6887.926808830603
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4246.914036381603
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4178.982821136847
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=6854.275188265735
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4800.65943749367
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4255.639823258429
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=4162.837705422251
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=2e+30
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5229.613849762967
+Truncating right after the physical dip at index 57, k = 8.8301e-03
+chi_eff_sq=5473.804612648104
+Optimization finished! Best chi_eff_sq: 4112.340474947141
+----
+clik version plc_3.1
+  smica
+Checking likelihood '/home/wnd22/rds/hpc-work/Polychord_solveb/clik_installs/data/planck_2018/baseline/plc_3.0/hi_l/plik/plik_rd12_HM_v22b_TTTEEE.clik' on test data. got -1172.47 expected -1172.47 (diff -4.34054e-07)
+----
+----
+clik version plc_3.1
+  gibbs_gauss b13c8fda-1837-41b5-ae2d-78d6b723fcf1
+Checking likelihood '/home/wnd22/rds/hpc-work/Polychord_solveb/clik_installs/data/planck_2018/baseline/plc_3.0/low_l/commander/commander_dx12_v3_2_29.clik' on test data. got -11.6257 expected -11.6257 (diff -1.07424e-09)
+----
+Initializing SimAll
+----
+clik version plc_3.1
+  simall simall_EE_BB_TE
+Checking likelihood '/home/wnd22/rds/hpc-work/Polychord_solveb/clik_installs/data/planck_2018/baseline/plc_3.0/low_l/simall/simall_100x143_offlike5_EE_Aplanck_B.clik' on test data. got -197.99 expected -197.99 (diff -4.1778e-08)
+----
+Checking lensing likelihood '/home/wnd22/rds/hpc-work/Polychord_solveb/clik_installs/data/planck_2018/baseline/plc_3.0/lensing/smicadx12_Dec5_ftl_mv2_ndclpp_p_teb_consext8.clik_lensing' on test data. got -4.42102
+Job finished!

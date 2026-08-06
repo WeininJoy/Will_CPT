@@ -63,7 +63,7 @@
 
 \preprint{APS/123-QED}
 
-\title{Predicting spatial curvature \(\Omega_K\) in globally $CPT$-symmetric universes}% Force line breaks with \\
+\title{Predicting spatial curvature $\Omega_K$ in globally $CPT$-symmetric universes}% Force line breaks with \\
 %\thanks{}%
 
 \author{Wei-Ning Deng}
@@ -87,7 +87,7 @@
              %  but any date may be explicitly specified
 
 \begin{abstract}
-    Boyle and Turok's $CPT$-symmetric universe model posits that the universe was symmetric at the Big Bang, addressing numerous problems in both cosmology and the Standard Model of particle physics. We extend this model by incorporating the symmetric conditions at the end of the Universe, which impose constraints on the allowed perturbation modes. These constrained modes conflict with the integer wave vectors required by the global spatial geometry in a closed universe. To resolve this conflict, only specific values of curvature are permissible, and in particular the curvature density is constrained to be $\Omega_K \in \{-0.014, -0.009, -0.003, \ldots\}$, consistent with \textit{Planck} observations.
+    Boyle and Turok's $CPT$-symmetric universe model posits that the universe was symmetric at the Big Bang, addressing numerous problems in both cosmology and the Standard Model of particle physics. We extend this model by incorporating the symmetric conditions at the end of the Universe, which impose constraints on the allowed perturbation modes. These constrained modes conflict with the integer wave vectors required by the global spatial geometry in a closed universe. To resolve this conflict, only specific values of curvature are permissible, and in particular the curvature density is constrained to be $\Omega_K \in \{-0.016, -0.011, -0.004, \ldots\}$, consistent with \textit{Planck} observations.
 \end{abstract}
 
 \maketitle
@@ -100,7 +100,6 @@ To address these challenges, \citet{2018PhRvL.121y1301B, 2022AnPhy.43868767B} pr
 In this letter, we further investigate the impact of this periodic global structure on cosmological perturbations. Previous work by \citet{2022PhRvD.105h3514L} has explored this concept within the context of flat universes. Their findings suggest that the periodic conditions impose constraints on perturbations within the universe, which have observable effects on the Cosmic Microwave Background (CMB) power spectrum~\cite{2022PhRvD.105h3515B,2022PhRvD.105l3508P}.
 
 Building on this work, we extend the analysis of \citet{2022PhRvD.105h3514L} to include curved universes. Our findings indicate that the constraints imposed by the future conformal boundary conflict with the spatial boundary conditions in a closed universe. To reconcile this conflict, only specific values of curvature are permissible, which are consistent with the observations from \texttt{Planck 2018}~\cite{2020A&A...641A...6P}, adding to the recent conversation in the literature surrounding closed universes~\cite{2020NatAs...4..196D, 2021PhRvD.103d1301H, 2022MNRAS.517.3087G, 2020MNRAS.496L..91E}.
-
 
 \section{Background and perturbations} 
 We build on the derivation presented in \citet{2022PhRvD.105h3514L} and extend it to a curved universe. The perturbed FLRW metric can be written as:
@@ -135,22 +134,23 @@ where a prime denotes \(d/da\).
 
 One degree of freedom between \(r\) and \(\lambda\) can be removed from \cref{eq:friedmann_eq,eq:perturbation_a} by fixing the scaling of \(a\). Following~\cite{2022PhRvD.105h3514L}, \(r = \lambda\) is chosen, equivalent to demanding \(a=1\) when the energy density of matter radiation and dark energy are equal, after which \cref{eq:perturbation_a} becomes
 \begin{equation}\label{eq:Phi_ODE}
-    a(a^4 - 2a^2 \tilde\kappa + 1) \Phi'' + (6a^4- 10a^2 \tilde\kappa + 4 ) \Phi' + a(4a^2 + \tilde{k}^2-8\tilde\kappa) \Phi = 0, \nonumber
+    a(a^4 - 2a^2 \tilde\kappa + 1) \Phi'' + (6a^4- 10a^2 \tilde\kappa + 4 ) \Phi' + a(4a^2 + \tilde{k}^2-8\tilde\kappa) \Phi = 0, 
 \end{equation}
 \vspace{-2.5em}
 \[ \text{where} \qquad
     \tilde{k} \equiv k/\sqrt{\lambda}, \qquad \tilde \kappa \equiv \frac{3}{2\lambda}\kappa\]
-are the dimensionless wave vector and curvature respectively. This equation reduces to eq.~(23) in~\citet{2022PhRvD.105h3514L} when \( \tilde\kappa = 0 \).
+are the dimensionless wave vector and curvature respectively. The factor $\frac{3}{2}$ in $\tilde\kappa\equiv \frac{3}{2\lambda}\kappa$ is chosen such that $\tilde\kappa=1$ corresponds to the transition between a turnaround and a de-Sitter universe, which will be explained later. This equation reduces to eq.~(23) in~\citet{2022PhRvD.105h3514L} when \( \tilde\kappa = 0 \).
 Note that if we replace \(\Phi(a)\) with \(\varphi(a) \equiv a^2 \Phi(a)\), the equation remains invariant under the transformation \({a\leftrightarrow1/a}\). This symmetry is important in the next section when considering perturbations passing through the FCB as \(a\rightarrow \infty\).
 
-This equation can be solved analytically, yielding two solutions. The solution can be expressed in terms of Heun functions:
+This equation can be solved analytically, yielding two solutions, both expressed in terms of Heun functions. Since the perturbation remains frozen at the beginning and starts oscillating after crossing the horizon \((k = aH)\), the solution must satisfy the initial conditions \(\Phi(a = 0) = C\) and \(\Phi'(a = 0) = 0\), where \(C\) is a constant. Here are the two solutions:
 \begin{equation}
 \begin{aligned}\label{eq:Heun}
-    \Phi(a) &= \text{HeunG} \left( -1+2\tilde\kappa \tilde a_+^2,\frac{\tilde k^2-8\tilde\kappa}{-4 \tilde a_-^2},\frac{1}{2},2, \frac{5}{2},\frac{1}{2},a^2\tilde a_+^2\right)\\
+    \Phi_1(a) &= \text{HeunG} \left( -1+2\tilde\kappa \tilde a_+^2,\frac{\tilde k^2-8\tilde\kappa}{-4 \tilde a_-^2},\frac{1}{2},2, \frac{5}{2},\frac{1}{2},a^2\tilde a_+^2\right)\\
+    \Phi_2(a) &= \text{HeunG}\left(-1+2\tilde\kappa \tilde a_+^2,\frac{\tilde k^2-2\tilde\kappa}{-4\tilde a_-^2},-1,\frac{1}{2},-\frac{1}{2},\frac{1}{2},a^2\tilde a_+^2\right)\\
     &\tilde a_{\pm}=\sqrt{\tilde\kappa\pm\sqrt{\tilde\kappa^2-1}}
 \end{aligned}
 \end{equation}
-where \(\tilde a_{\pm}\) are the extremum values of the scale factor, corresponding to \(\dot{a}=0\) in \cref{eq:friedmann_eq}. Since the perturbation is frozen at the beginning and starts to oscillate after entering the horizon \(k = aH\), a specific linear combination of these solutions is selected to ensure that \(\Phi(a =0) = 1\) and \(\Phi'(a = 0) = 0\).
+where \(C\) is chosen to be 1 without loss of generality. \(\tilde{a}_{\pm}\) are the extremum values of the scale factor, corresponding to \(\dot{a}=0\) in \cref{eq:friedmann_eq}. Although both solutions meet these conditions, $\Phi_2$ exhibits increasing amplitude during oscillations and eventually diverges as \(a \to \infty\), rendering it non-physical. Therefore, we select the physical solution $\Phi_1$, which oscillates and decays as \(a \to \infty\).
 
 
 \section{Constraints from the future conformal boundary}\label{sec:constrain_FCB}
@@ -198,15 +198,20 @@ The corresponding \(\tilde{k}\) are the allowed values of discrete wave vectors.
 These observations have significant implications for closed universes, where the compactness of spacial slices necessitates integer wave vectors (Sec.~2.4 in~\cite{2017CCoPh..22..852T}). This requirement is generally in conflict with the discrete spectrum of wave vectors arising from FCB considerations, prompting the question of whether this conflict can be resolved by matching the two discrete sets.
 
 In \cref{fig:theta_diffK} \(\theta(\tilde{k})\) approaches a straight line for high-\(k\) modes due to perturbations oscillating as \(\sim \cos(\tilde{k}\eta/\sqrt{3})\).
-This implies that the allowed wave vectors are equally spaced for high-\(k\) modes. By adjusting \(\tilde{\kappa}\), we can align the allowed wavevectors to be integers. Note that the unit of \(\tilde{k}\) differs from that of the integer wave vectors \(k_{\text{int}}\). The transformation between them can be expressed as: \(\tilde{k}\equiv  \sqrt{\frac{2\tilde{\kappa}}{3}} \sqrt{k_{\text{int}}(k_{\text{int}}+2) }  \approx \sqrt{\frac{2\tilde{\kappa}}{3}} k_{\text{int}}\) in high-\(k\) modes. Consequently, the actual gradient is given by:
+This implies that the allowed wave vectors are equally spaced for high-\(k\) modes. By adjusting \(\tilde{\kappa}\), we can align the allowed wavevectors to be integers. 
+Note that this method does not work for low-\(k\) modes, as \(\theta(\tilde{k})\) cannot be approximated as a straight line. In these cases, the perturbation solution, which is periodic in both spatial and temporal coordinates, must be expressed as a specific linear combination of the two discrete sets. As \(k\) increases, the mode corresponding to \(n \sim k\) becomes increasingly dominant, and eventually, the two sets align in the high-\(k\) regime. This is the subject of current investigation.
+
+Also, keep in mind that the unit of \(\tilde{k}\) differs from that of the integer wave vectors \(k_{\text{int}}\). The transformation between them can be expressed as: \(\tilde{k}\equiv  \sqrt{\frac{2\tilde{\kappa}}{3}} \sqrt{k_{\text{int}}(k_{\text{int}}+2) }  \approx \sqrt{\frac{2\tilde{\kappa}}{3}} k_{\text{int}}\) in high-\(k\) modes. Consequently, the actual gradient is given by:
 \begin{equation}
 \frac{d\theta}{dk_{\text{int}}}(\tilde{\kappa},\tilde{k}\gg 1,a\rightarrow \infty) \approx \sqrt{\frac{2\tilde{\kappa}}{3}}\frac{\eta_{\infty}(\tilde{\kappa})}{\sqrt{3}} \overset{!}{=} N^{\pm 1}\frac{\pi}{2},
 \end{equation}
-where to match the integer wave vectors, the gradient should be \(N\frac{\pi}{2}\) or \(\frac{1}{N}\frac{\pi}{2}\) (where \(N\in\mathbb{N}\)), corresponding to either sparser discrete \(\theta\) or sparser \(k_{\text{int}}\) (see \cref{fig:theta_kint}). Since the gradient depends on \(\tilde{\kappa}\), this constrains the allowed curvature values. Some allowed \(\tilde{\kappa}\) values are shown in \cref{fig:Slope_kc}. The gradient increases with \(\tilde{\kappa}\) and approaches infinity as \(\tilde{\kappa}\) approaches unity, the maximum allowed curvature value. Beyond this value, the universe would collapse, resulting in a crunch.
+where to match the integer wave vectors, the gradient should be \(N\frac{\pi}{2}\) or \(\frac{1}{N}\frac{\pi}{2}\) (where \(N\in\mathbb{N}\)), corresponding to either sparser discrete \(\theta\) or sparser \(k_{\text{int}}\) (see \cref{fig:theta_kint}). Since the gradient depends on \(\tilde{\kappa}\), this constrains the allowed curvature values. Some allowed \(\tilde{\kappa}\) values are shown in \cref{fig:Slope_kc}. The gradient increases with \(\tilde{\kappa}\) and approaches infinity as \(\tilde{\kappa}\) approaches unity, the maximum allowed curvature value. Beyond this value, the universe would collapse, resulting in a crunch. 
+
+% As for the minimum, while all rational values of \(R\) are technically allowed, values with larger denominators \(B\) are less favoured by CMB observations. This is because larger \(B\) corresponds to wider spacing between discrete \(k_{\text{int}}\) values, which contradicts the CMB data, where most \(k_{\text{int}} \in \mathbb{N}\) are permitted. Therefore, values of \(\tilde{\kappa} < 0.672\) (where \(R = 1\)) are less preferred.
 
 \begin{figure}
      \includegraphics{theta-kint_loglog.pdf}
-     \caption{Phase of perturbations $\theta$, in log-log plot. In the high-\(k\) mode, the gradient of \(\theta\) approximates a straight line, indicating that the discrete wave vectors are equally spaced. In a closed universe, these wave vectors must be integers, constraining the gradient to be \(N\frac{\pi}{2}\) or \(\frac{1}{N}\frac{\pi}{2}\) (where \(N\in\mathbb{N}\))..
+     \caption{Phase of perturbations $\theta$, in log-log plot. In the high-\(k\) mode, the gradient of \(\theta\) approximates a straight line, indicating that the discrete wave vectors are equally spaced. In a closed universe, these wave vectors must be integers, constraining the gradient $d\theta/dk_{\text{int}}$ to be \(N\frac{\pi}{2}\) or \(\frac{1}{N}\frac{\pi}{2}\) (where \(N\in\mathbb{N}\)). Lines with gradient \(= \left[\frac{1}{3}\frac{\pi}{2}, \frac{1}{2}\frac{\pi}{2}, 1\frac{\pi}{2}, 2\frac{\pi}{2}, 3\frac{\pi}{2}\right]\) are plotted, corresponding to \(\tilde{\kappa} = [0.113, 0.238, 0.672, 0.986, 0.999]\).
      }
      \label{fig:theta_kint}
 \end{figure} 
@@ -217,7 +222,8 @@ where to match the integer wave vectors, the gradient should be \(N\frac{\pi}{2}
      \label{fig:Slope_kc}
 \end{figure} 
 
-The predicted values of \(\tilde{\kappa}\) are then transformed to the current curvature density \(\Omega_K=-2\tilde{\kappa}\sqrt{\Omega_\Lambda\Omega_r}\) and compared with the \texttt{Planck 2018} data (\cref{fig:Planck_kappa}). The \(\tilde{\kappa}\), for unit gradient, corresponds to \(\Omega_K\sim -0.009\). The maximum curvature, \(\tilde{\kappa}=1\), corresponds to \(\Omega_K\sim -0.014\). Although this is closer to flat than the observational value of \(-0.044^{+0.018}_{-0.015}\)~\cite{2021PhRvD.103d1301H,2020NatAs...4..196D,2020A&A...641A...6P}, incorporating matter into our model would likely yield more precise predictions. Despite its simplicity, our model recovers curvature values consistent with observational data. 
+The predicted values of \(\tilde{\kappa}\) are then transformed to the current curvature density \(\Omega_K=-2\tilde{\kappa}\sqrt{\Omega_\Lambda\Omega_r}\) and compared with the \texttt{Planck 2018} data (\cref{fig:Planck_kappa}). 
+The \(\tilde{\kappa}\), for unit gradient, corresponds to \(\Omega_K\sim -0.011\). The maximum curvature, \(\tilde{\kappa}=1\), corresponds to \(\Omega_K\sim -0.016\). Although this is closer to flat than the observational value of \(-0.044^{+0.018}_{-0.015}\)~\cite{2021PhRvD.103d1301H,2020NatAs...4..196D,2020A&A...641A...6P}, incorporating matter into our model would likely yield more precise predictions. Despite its simplicity, our model recovers curvature values consistent with observational data.
 
 \begin{figure}
      \includegraphics{Planck_kappa.pdf}
@@ -226,17 +232,18 @@ The predicted values of \(\tilde{\kappa}\) are then transformed to the current c
 \end{figure}
 
 \section{Conclusion} 
-In this letter, we extended the work of \citet{2022PhRvD.105h3514L} and \citet{2021arXiv210906204B} by solving the first-order perturbation equation to derive analytic solutions. These solutions remain physical if they exhibit symmetry or antisymmetry at the FCB. This temporal boundary condition imposes a discrete spectrum on the wave vectors, which conflicts with the integer wave vectors derived from the spatial compactness of closed universes. Since both sets of discrete \(k\) values exhibit equal spacing in the high \(k\) regime, we can reconcile them by constraining the spatial curvature to specific values.. 
+In this letter, we extended the work of \citet{2022PhRvD.105h3514L} and \citet{2021arXiv210906204B} by solving the first-order perturbation equation to derive analytic solutions. These solutions remain physical if they exhibit symmetry or antisymmetry at the FCB. This temporal boundary condition imposes a discrete spectrum on the wave vectors, which conflicts with the integer wave vectors derived from the spatial compactness of closed universes. Since both sets of discrete \(k\) values exhibit equal spacing in the high \(k\) regime, we can reconcile them by constraining the spatial curvature to specific values. 
 
 To refine the predictions of this allowed curvature spectrum further, we plan to solve the perturbations numerically in a more detailed universe model that includes matter and radiation anisotropy. The resulting solutions will be used to generate the CMB power spectra, which will then be compared with observational data, following the methodologies of~\cite{2022PhRvD.105h3515B} and~\cite{2022PhRvD.105l3508P}.
+
 
 \begin{acknowledgments}
 \section{acknowledgments}
 We extend our gratitude to Latham Boyle for his helpful feedback on the calculations and logic presented in this paper. WND was supported by a Cambridge Trusts Taiwanese Scholarship. WJH was supported by a Royal Society University Research Fellowship. 
 
 \end{acknowledgments}
-\vfill
-\pagebreak
+% \vfill
+% \pagebreak
 
 % \appendix
 

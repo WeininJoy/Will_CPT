@@ -1,0 +1,72 @@
+#!/bin/bash
+#!
+#! SLURM job script for Peta4-IceLake (Ice Lake CPUs, HDR200 IB)
+#! Hybrid MPI + OpenMP: mpi4py.futures workers + OpenMP ODE solver
+#!
+
+#! sbatch directives begin here ###############################
+#SBATCH -J integer_allowedK_DE
+#SBATCH -A DIRAC-DP264-CPU
+#SBATCH -p icelake
+#SBATCH --nodes=1
+#! 1 master process + 8 worker processes = 9 MPI tasks
+#SBATCH --ntasks=9
+#! Each MPI task gets 8 CPUs for OpenMP threads (9 * 8 = 72 cores <= 76)
+#SBATCH --cpus-per-task=8
+#SBATCH --time=36:00:00
+#SBATCH --mail-type=NONE
+
+#! sbatch directives end here #################################
+
+numnodes=$SLURM_JOB_NUM_NODES
+numtasks=$SLURM_NTASKS
+mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e 's/^\([0-9][0-9]*\).*$/\1/')
+
+. /etc/profile.d/modules.sh
+module purge
+module load rhel8/default-icl
+
+source /home/wnd22/rds/hpc-work/Will_CPT/Higher_Order_Finding_U_Matrices/HO_env/bin/activate
+which python
+
+#! Each MPI worker uses OMP_NUM_THREADS OpenMP threads for compute_U_matrices()
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export OMP_PLACES=cores
+export OMP_PROC_BIND=close
+
+#! Pin Intel MPI domains to groups of OMP_NUM_THREADS cores
+export I_MPI_PIN_DOMAIN=omp:compact
+export I_MPI_PIN_ORDER=scatter
+
+#! mpi4py.futures requires launching via: mpirun -np N python -m mpi4py.futures script.py
+#! N = 1 master + 8 workers = 9 = $SLURM_NTASKS
+np=$SLURM_NTASKS
+application="python -m mpi4py.futures find_intK_baye_opt_planck_bounds.py"
+options=""
+
+CMD="mpirun -ppn $mpi_tasks_per_node -np $np $application $options"
+
+workdir="/home/wnd22/rds/hpc-work/Will_CPT/Higher_Order_Finding_U_Matrices/find_integer_allowedK/diff_evol"
+
+###############################################################
+cd $workdir
+echo -e "Changed directory to `pwd`.\n"
+
+JOBID=$SLURM_JOB_ID
+echo -e "JobID: $JOBID\n======"
+echo "Time: `date`"
+echo "Running on master node: `hostname`"
+echo "Current directory: `pwd`"
+
+if [ "$SLURM_JOB_NODELIST" ]; then
+        export NODEFILE=`generate_pbs_nodefile`
+        cat $NODEFILE | uniq > machine.file.$JOBID
+        echo -e "\nNodes allocated:\n================"
+        echo `cat machine.file.$JOBID | sed -e 's/\..*$//g'`
+fi
+
+echo -e "\nnumtasks=$numtasks, numnodes=$numnodes, mpi_tasks_per_node=$mpi_tasks_per_node (OMP_NUM_THREADS=$OMP_NUM_THREADS)"
+echo -e "\nExecuting command:\n==================\n$CMD\n"
+
+eval $CMD
+deactivate

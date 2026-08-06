@@ -341,6 +341,39 @@ def compute_per_field_residuals(Xn1, Xn2, A, B):
     return res
 
 
+def compute_field_amplitude_scales(Xn1, Xn2, A, B):
+    """
+    For each perturbation type p, compute the mean projected signal amplitude
+        amp_p = mean_i ( ||Xn1^p @ a_i|| + ||Xn2^p @ b_i|| ) / 2
+
+    This reveals which fields dominate the optimization: fields with small
+    amp_p are effectively ignored even though their Frobenius norm = 1.
+
+    Also returns suggested equalization weights:
+        w_p = (max_amp / amp_p)^2
+    so that every field contributes equally to the squared-difference objective.
+
+    Returns
+    -------
+    amps     : dict {p: mean amplitude}
+    weights  : dict {p: suggested weight}
+    """
+    m = A.shape[1]
+    amps = {}
+    for p in PERTURBATION_TYPES:
+        amp1 = np.mean([np.linalg.norm(Xn1[p] @ A[:, i]) for i in range(m)])
+        amp2 = np.mean([np.linalg.norm(Xn2[p] @ B[:, i]) for i in range(m)])
+        amps[p] = (amp1 + amp2) / 2.0
+    max_amp = max(amps.values())
+    suggested = {}
+    for p in PERTURBATION_TYPES:
+        if amps[p] > 1e-30:
+            suggested[p] = (max_amp / amps[p]) ** 2
+        else:
+            suggested[p] = 1.0
+    return amps, suggested
+
+
 # ============================================================================
 # Plotting
 # ============================================================================
@@ -365,7 +398,9 @@ def plot_eigenvalue_spectrum(lam_all, lambda_threshold, output_dir=OUTPUT_DIR):
     plt.close()
 
 
-def plot_per_field_residuals(residuals, lam_valid, output_dir=OUTPUT_DIR):
+def plot_per_field_residuals(residuals, lam_valid, output_dir=OUTPUT_DIR,
+                             filename='match_per_field_residuals.pdf',
+                             title='Per-field residual norms — all should be small'):
     """
     Bar chart of per-field residual norms for each valid mode.
     Helps confirm that all fields are well-matched, not just an average.
@@ -381,11 +416,11 @@ def plot_per_field_residuals(residuals, lam_valid, output_dir=OUTPUT_DIR):
     ax.set_xticklabels([f"mode {i+1}\nλ={lam_valid[i]:.2e}" for i in range(m)],
                        fontsize=7)
     ax.set_ylabel('||X1 a - X2 b||  (residual norm)')
-    ax.set_title('Per-field residual norms — all should be small')
+    ax.set_title(title)
     ax.legend()
     ax.grid(True, alpha=0.3, axis='y')
     fig.tight_layout()
-    out = output_dir + 'match_per_field_residuals.pdf'
+    out = os.path.join(output_dir, filename)
     plt.savefig(out, bbox_inches='tight')
     print(f"Saved: {out}")
     plt.close()
@@ -466,11 +501,17 @@ def plot_heatmap(A_sparse, B_sparse, output_dir=OUTPUT_DIR):
 
 def plot_reconstructed_timeseries(basis_1, basis_2,
                                   A_sparse, B_sparse, lam_valid,
-                                  eta_grid, N_plot=5,
-                                  output_dir=OUTPUT_DIR):
+                                  eta_grid, norms_1, norms_2,
+                                  N_plot=5, output_dir=OUTPUT_DIR):
     """
     Overlay time series from both bases using sparse coefficients.
-    All four perturbation types should now align for valid modes.
+
+    The coefficients a, b were derived for the Frobenius-normalised matrices
+    Xn1^p = X1^p / ||X1^p||_F, so the correct reconstruction is:
+        s1 = Xn1^p @ a = basis_1[p] @ a / norms_1[p]
+        s2 = Xn2^p @ b = basis_2[p] @ b / norms_2[p]
+    Dividing by the norms is essential: without it, s1/s2 = ||X1^p||_F / ||X2^p||_F
+    which introduces a spurious per-field scale factor.
     """
     _ensure_dir(output_dir)
     dom1   = np.argmax(np.abs(A_sparse), axis=0)
@@ -482,14 +523,16 @@ def plot_reconstructed_timeseries(basis_1, basis_2,
     if N_plot == 1:
         axes = axes.reshape(1, -1)
     fig.suptitle("Match-solution sparse modes: time-series "
-                 "(Basis 1 red vs Basis 2 green)", fontsize=11)
+                 "(Basis 1 red vs Basis 2 green, Frobenius-normalised)",
+                 fontsize=11)
 
     for row, idx in enumerate(order[:N_plot]):
         dom_k = dom1[idx]
         for col, p in enumerate(PERTURBATION_TYPES):
             ax = axes[row, col]
-            s1 = basis_1[p] @ A_sparse[:, idx]
-            s2 = basis_2[p] @ B_sparse[:, idx]
+            # Divide by Frobenius norms to recover Xn^p @ coeff
+            s1 = basis_1[p] @ A_sparse[:, idx] / norms_1[p]
+            s2 = basis_2[p] @ B_sparse[:, idx] / norms_2[p]
             if np.dot(s1, s2) < 0:
                 s2 = -s2
             ax.plot(eta_grid, s1, 'r-',  lw=2,   alpha=0.85, label='B1')
@@ -575,7 +618,7 @@ def cca_sparse_match_analysis(
     print(f"  A shape: {A.shape},  B shape: {B.shape}")
 
     # ── Per-field residuals (diagnostic) ──────────────────────────────────────
-    print("\n--- Diagnostic: per-field residual norms ---")
+    print("\n--- Diagnostic: per-field residual norms (before rotation) ---")
     residuals = compute_per_field_residuals(Xn1, Xn2, A, B)
     for i in range(residuals.shape[0]):
         res_str = "  ".join(
@@ -584,9 +627,37 @@ def cca_sparse_match_analysis(
         )
         print(f"  Mode {i+1} (λ={lam_valid[i]:.2e}):  {res_str}")
 
+    # ── Field amplitude scales — key for choosing weights ────────────────────
+    print("\n--- Diagnostic: per-field projected signal amplitudes ---")
+    print("  (small amplitude = field is being ignored by the optimiser)")
+    amps, suggested_w = compute_field_amplitude_scales(Xn1, Xn2, A, B)
+    max_amp = max(amps.values())
+    for p in PERTURBATION_TYPES:
+        w_cur = weights[p] if weights is not None else 1.0
+        print(f"  {p}: amplitude = {amps[p]:.4e}  "
+              f"(ratio to max = {amps[p]/max_amp:.3f})  "
+              f"current weight = {w_cur:.1f}  "
+              f"suggested equalising weight = {suggested_w[p]:.1f}")
+    if weights is None or all(v == 1.0 for v in weights.values()):
+        print("\n  *** All weights are equal. If dm visually mismatches, rerun with:")
+        w_str = ", ".join(
+            f"'{p}': {suggested_w[p]:.0f}" for p in PERTURBATION_TYPES
+        )
+        print(f"      weights = {{{w_str}}}")
+
     # ── Step 6: Sparse rotation ───────────────────────────────────────────────
     print("\n--- Step 6: Sparse rotation ---")
     A_sparse, B_sparse = apply_sparse_rotation(A, B, method=rotation_method)
+
+    # ── Post-rotation per-field residuals (sanity check) ──────────────────────
+    print("\n--- Diagnostic: per-field residual norms (AFTER rotation) ---")
+    residuals_rot = compute_per_field_residuals(Xn1, Xn2, A_sparse, B_sparse)
+    for i in range(residuals_rot.shape[0]):
+        res_str = "  ".join(
+            f"{p}={residuals_rot[i, j]:.4f}"
+            for j, p in enumerate(PERTURBATION_TYPES)
+        )
+        print(f"  Mode {i+1}:  {res_str}")
 
     # ── Sparsity metrics ──────────────────────────────────────────────────────
     g_before_1 = np.mean([gini(A[:, i]) for i in range(A.shape[1])])
@@ -601,13 +672,17 @@ def cca_sparse_match_analysis(
     print("\n--- Plotting ---")
     plot_eigenvalue_spectrum(lam_all, lambda_threshold, output_dir)
     plot_per_field_residuals(residuals, lam_valid, output_dir)
+    plot_per_field_residuals(residuals_rot, lam_valid, output_dir,
+                             filename='match_per_field_residuals_postrot.pdf',
+                             title='Per-field residual norms AFTER rotation')
     n_show = min(20, len(lam_valid))
     plot_coefficients(A, B, A_sparse, B_sparse, lam_valid,
                       N_plot=n_show, output_dir=output_dir)
     plot_heatmap(A_sparse, B_sparse, output_dir)
     plot_reconstructed_timeseries(basis_1, basis_2,
                                   A_sparse, B_sparse, lam_valid,
-                                  eta_grid, N_plot=5, output_dir=output_dir)
+                                  eta_grid, norms_1, norms_2,
+                                  N_plot=5, output_dir=output_dir)
 
     # ── Save ──────────────────────────────────────────────────────────────────
     results = dict(
@@ -619,6 +694,9 @@ def cca_sparse_match_analysis(
         lam_valid        = lam_valid,
         lam_all          = lam_all,
         residuals        = residuals,
+        residuals_rot    = residuals_rot,
+        field_amps       = amps,
+        suggested_weights= suggested_w,
         basis_1          = basis_1,
         basis_2          = basis_2,
         Xn1              = Xn1,
@@ -640,9 +718,32 @@ def cca_sparse_match_analysis(
 # ============================================================================
 
 if __name__ == "__main__":
+    # ── Per-field weights ────────────────────────────────────────────────────
+    # After Frobenius normalisation the total energy per field is equalised
+    # (||Xn^p||_F = 1), but the GEVP can still find directions where some
+    # fields have negligible projected amplitude.  In practice dm amplitude
+    # is ~40x smaller than dr/vr, so its squared contribution to the
+    # objective is ~1600x smaller → dm is effectively ignored.
+    #
+    # Fix: weight dm by (amplitude_ratio)^2 so every field contributes
+    # equally.  Run once with equal weights first (weights=None), read the
+    # "suggested equalising weight" printed for each field, then re-run with
+    # those weights.  Start with the heuristic below and tune if needed.
+    #
+    # Equal weights (first diagnostic run):
+    #   weights = None
+    #
+    # Amplitude-equalised weights (use after reading the diagnostic output):
+    weights = {
+        'dr': 1.0,      # heuristic: (vr_amp/dr_amp)^2 ≈ (0.075/0.04)^2 ≈ 4
+        'dm': 1600.0,   # heuristic: (vr_amp/dm_amp)^2 ≈ (0.075/0.001)^2 ≈ 5600
+        'vr': 1.0,      # vr has largest projected amplitude → baseline weight
+        'vm': 1.0,
+    }
+
     results = cca_sparse_match_analysis(
         N_t              = 1000,
-        weights          = None,      # unit weights; try e.g. {'dr':1,'dm':2,'vr':1,'vm':1}
+        weights          = weights,
         lambda_threshold = 1e-3,      # relative eigenvalue threshold
         rotation_method  = 'promax',  # 'varimax' | 'promax' | 'ica'
         force_recompute  = True,
@@ -655,4 +756,9 @@ if __name__ == "__main__":
     print(f"  lambda_max        : {results['lam_all'][-1]:.4e}")
     print(f"  N_k               : {results['M'].shape[0] // 2}")
     print(f"  lambda_threshold  : {results['lambda_threshold']}")
+    print(f"  Weights used      : {results['weights']}")
+    print(f"\n  Per-field projected amplitudes (from this run):")
+    for p, amp in results['field_amps'].items():
+        sw = results['suggested_weights'][p]
+        print(f"    {p}: amp = {amp:.4e}   suggested next weight = {sw:.1f}")
     print("=" * 60)

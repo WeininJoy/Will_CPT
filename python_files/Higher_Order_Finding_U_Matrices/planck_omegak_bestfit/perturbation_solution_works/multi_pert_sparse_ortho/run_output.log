@@ -1,0 +1,950 @@
+--- Setting up parameters and functions ---
+Performing Initial Background Integration
+Initial Background Integration Done
+fcb_time: 5.233892975070522
+Further processing with fcb_time = 5.233892975070522
+Recombination conformal time: 0.06941126470823349
+No existing results found, running multi_perturbation_analysis...
+Loading extended integer K values for multi_perturbation_analysis...
+Starting multi-perturbation analysis with N=55, N_t=1000
+Using eta_grid from cutoff to FCB: eta ∈ [0, 5.2339e+00]
+
+Generating CORE basis 1 (Closed Universe)...
+
+--- Loading pre-computed time-dependent transfer matrices ---
+Loaded solution histories for 35 allowed K values.
+Time grid has 500 points from eta=0.07 to eta=5.23
+Matrix shapes: A=(35, 6, 6), B=(35, 2, 6), C=(35, 67, 6)
+               D=(35, 6, 2), E=(35, 2, 2), F=(35, 67, 2)
+
+--- Reconstructing solutions for the first 3 allowed modes ---
+
+Processing mode n=1 with k=1.638147 (index 0)
+Matrix shapes for k=1.638147:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93650008  0.93650008 -2.26314014 -1.69735654 -0.0293114  -0.02934083]
+x^∞ = [  9.51618272 -19.0516067   -0.62063922   2.30687973]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=2 with k=2.233837 (index 1)
+Matrix shapes for k=2.233837:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93553655  0.93553655 -2.2651771  -1.69888782 -0.02925745 -0.02931276]
+x^∞ = [-11.93620589 -23.69126249   1.74859459   1.83773295]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=3 with k=2.829526 (index 2)
+Matrix shapes for k=2.829526:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93531789  0.93531789 -2.27035197 -1.70277691 -0.02921952 -0.02930869]
+x^∞ = [ 16.34397779 -35.06575145  -1.03169791   1.85019344]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=4 with k=3.425216 (index 3)
+Matrix shapes for k=3.425216:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93504789  0.93504789 -2.27673645 -1.70758018 -0.02917269 -0.02930365]
+x^∞ = [-20.23158751 -48.54467614   1.37529739   1.83619762]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=5 with k=4.020906 (index 4)
+Matrix shapes for k=4.020906:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93472594  0.93472594 -2.28432379 -1.71329578 -0.02911697 -0.02929764]
+x^∞ = [ 24.54126967 -63.66479005  -1.01012446   1.8009837 ]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=6 with k=4.616596 (index 5)
+Matrix shapes for k=4.616596:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93434777  0.93434777 -2.2930973  -1.71991503 -0.02905224 -0.02929052]
+x^∞ = [-28.61648211 -81.50328687   1.12313851   1.78394318]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=7 with k=5.212285 (index 6)
+Matrix shapes for k=5.212285:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93392342  0.93392342 -2.30307431 -1.72745535 -0.02897885 -0.0292826 ]
+x^∞ = [  32.64369884 -100.11609659   -0.88146453    1.74262923]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=8 with k=5.807975 (index 7)
+Matrix shapes for k=5.807975:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93344817  0.93344817 -2.31423515 -1.73590703 -0.02889666 -0.02927373]
+x^∞ = [ -36.68284195 -121.90872662    0.90985276    1.72576887]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=9 with k=6.403665 (index 8)
+Matrix shapes for k=6.403665:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93292491  0.93292491 -2.32657786 -1.74527422 -0.0288058  -0.029264  ]
+x^∞ = [  40.62991854 -144.79646435   -0.73380974    1.69837398]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=10 with k=6.999355 (index 9)
+Matrix shapes for k=6.999355:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93233997  0.93233997 -2.3400581  -1.75552989 -0.02870589 -0.02925298]
+x^∞ = [ -44.19625248 -169.43678443    0.72152038    1.67267535]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=11 with k=7.595045 (index 10)
+Matrix shapes for k=7.595045:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93171816  0.93171816 -2.35472696 -1.76671919 -0.02859772 -0.02924144]
+x^∞ = [  47.71921166 -195.63588337   -0.58132865    1.64726202]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=12 with k=8.190734 (index 11)
+Matrix shapes for k=8.190734:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93103444  0.93103444 -2.37050935 -1.77879317 -0.02848057 -0.0292286 ]
+x^∞ = [ -50.85406808 -223.38235485    0.55435384    1.62274535]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=13 with k=8.786424 (index 12)
+Matrix shapes for k=8.786424:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93030591  0.93030591 -2.38743548 -1.79178248 -0.028355   -0.02921499]
+x^∞ = [  53.91779321 -252.84054677   -0.4405967     1.60049783]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=14 with k=9.382114 (index 13)
+Matrix shapes for k=9.382114:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92952725  0.92952725 -2.40547802 -1.80567517 -0.02822091 -0.02920044]
+x^∞ = [ -56.66324647 -284.02798062    0.41051927    1.58038457]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=15 with k=9.977804 (index 14)
+Matrix shapes for k=9.977804:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92869847  0.92869847 -2.42462207 -1.82046918 -0.02807833 -0.02918494]
+x^∞ = [  59.08889207 -315.79475085   -0.31705639    1.55646981]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=16 with k=10.573493 (index 15)
+Matrix shapes for k=10.573493:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92781981  0.92781981 -2.44485251 -1.83616284 -0.02792733 -0.02916851]
+x^∞ = [-6.14048630e+01 -3.50181307e+02  2.89098972e-01  1.53933905e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=17 with k=11.169183 (index 16)
+Matrix shapes for k=11.169183:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92689116  0.92689116 -2.46615226 -1.85275357 -0.02776797 -0.02915114]
+x^∞ = [ 6.35719218e+01 -3.86082421e+02 -2.14931648e-01  1.52294327e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=18 with k=11.764873 (index 17)
+Matrix shapes for k=11.764873:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92591273  0.92591273 -2.48850428 -1.87023936 -0.0276003  -0.02913282]
+x^∞ = [-6.53764456e+01 -4.22883309e+02  1.91591180e-01  1.50514273e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=19 with k=12.360563 (index 18)
+Matrix shapes for k=12.360563:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92488435  0.92488435 -2.51188958 -1.88861727 -0.0274244  -0.02911355]
+x^∞ = [ 6.70022900e+01 -4.60681099e+02 -1.33046474e-01  1.48686758e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=20 with k=12.956252 (index 19)
+Matrix shapes for k=12.956252:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92380749  0.92380749 -2.53629271 -1.90788755 -0.02724037 -0.02909338]
+x^∞ = [-6.85004722e+01 -5.00417731e+02  1.16381826e-01  1.47123986e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=21 with k=13.551942 (index 20)
+Matrix shapes for k=13.551942:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92268087  0.92268087 -2.56168988 -1.92804471 -0.02704823 -0.02907225]
+x^∞ = [ 6.98876206e+01 -5.41221239e+02 -7.22051766e-02  1.45544563e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=22 with k=14.147632 (index 21)
+Matrix shapes for k=14.147632:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92150635  0.92150635 -2.58806514 -1.94908965 -0.02684813 -0.02905022]
+x^∞ = [-7.11288673e+01 -5.83194051e+02  6.24324328e-02  1.43994513e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=23 with k=14.743322 (index 22)
+Matrix shapes for k=14.743322:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92028307  0.92028307 -2.61539407 -1.97101744 -0.0266401  -0.02902725]
+x^∞ = [ 7.23976330e+01 -6.26742851e+02 -3.06186996e-02  1.42574674e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=24 with k=15.339012 (index 23)
+Matrix shapes for k=15.339012:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91901395  0.91901395 -2.64366229 -1.99383116 -0.02642431 -0.02900345]
+x^∞ = [-7.36200379e+01 -6.71509717e+02  2.74427016e-02  1.41194253e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=25 with k=15.934701 (index 24)
+Matrix shapes for k=15.934701:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91769317  0.91769317 -2.6728294  -2.01751478 -0.02620068 -0.02897861]
+x^∞ = [ 7.48774457e+01 -7.17112477e+02 -5.87512074e-03  1.39781885e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=26 with k=16.530391 (index 25)
+Matrix shapes for k=16.530391:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91632691  0.91632691 -2.70288882 -2.04207823 -0.02596946 -0.02895293]
+x^∞ = [-7.62495415e+01 -7.64525609e+02  8.24869620e-03  1.38531664e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=27 with k=17.126081 (index 26)
+Matrix shapes for k=17.126081:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91491328  0.91491328 -2.73380989 -2.06751377 -0.02573069 -0.02892633]
+x^∞ = [ 7.77672692e+01 -8.12976246e+02  5.16882379e-03  1.37290124e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=28 with k=17.721771 (index 27)
+Matrix shapes for k=17.721771:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91345192  0.91345192 -2.76556549 -2.09381676 -0.02548445 -0.02889882]
+x^∞ = [-7.94167814e+01 -8.62364259e+02  1.23207403e-03  1.36048246e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=29 with k=18.317460 (index 28)
+Matrix shapes for k=18.317460:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.9119454   0.9119454  -2.79813672 -2.12098921 -0.02523091 -0.02887045]
+x^∞ = [ 8.13370934e+01 -9.13135639e+02  6.39629512e-03  1.34879769e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=30 with k=18.913150 (index 29)
+Matrix shapes for k=18.913150:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.9103909   0.9103909  -2.83148743 -2.1490205  -0.02497008 -0.02884114]
+x^∞ = [-8.35144372e+01 -9.65174145e+02  2.30807897e-03  1.33762391e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=31 with k=19.508840 (index 30)
+Matrix shapes for k=19.508840:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90879038  0.90879038 -2.86559541 -2.17791101 -0.02470211 -0.02881094]
+x^∞ = [ 8.59912927e+01 -1.01798190e+03  1.96555475e-03  1.32628534e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=32 with k=20.104530 (index 31)
+Matrix shapes for k=20.104530:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90714444  0.90714444 -2.90043366 -2.20765786 -0.02442712 -0.02877986]
+x^∞ = [-8.88346361e+01 -1.07235611e+03  7.01367683e-03  1.31584796e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=33 with k=20.700219 (index 32)
+Matrix shapes for k=20.700219:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.9054531   0.9054531  -2.93597262 -2.23825663 -0.02414522 -0.0287479 ]
+x^∞ = [ 9.20678246e+01 -1.12772401e+03 -3.73809781e-03  1.30555168e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=34 with k=21.295909 (index 33)
+Matrix shapes for k=21.295909:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90371748  0.90371748 -2.97218569 -2.26970555 -0.02385654 -0.02871509]
+x^∞ = [-9.57547770e+01 -1.18424968e+03  1.04075108e-02  1.29560186e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=35 with k=21.891599 (index 34)
+Matrix shapes for k=21.891599:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90193654  0.90193654 -3.00903859 -2.30199734 -0.02356116 -0.02868138]
+x^∞ = [ 9.92543437e+01 -1.24118311e+03 -1.12418847e-02  1.28521159e+00]
+  Reconstructing solution from pre-computed basis...
+
+Generating CORE basis 2 (Palindromic Universe)...
+
+--- Loading pre-computed time-dependent transfer matrices ---
+Loaded solution histories for 35 allowed K values.
+Time grid has 500 points from eta=0.07 to eta=5.23
+Matrix shapes: A=(35, 6, 6), B=(35, 2, 6), C=(35, 67, 6)
+               D=(35, 6, 2), E=(35, 2, 2), F=(35, 67, 2)
+
+--- Reconstructing solutions for the first 3 allowed modes ---
+
+Processing mode n=1 with k=1.586827 (index 0)
+Matrix shapes for k=1.586827:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.936571    0.936571   -2.26299785 -1.69724965 -0.02931532 -0.0293429 ]
+x^∞ = [ 1.24794591e+01 -1.92737325e+01  4.51129695e-03  2.43169936e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=2 with k=2.043315 (index 1)
+Matrix shapes for k=2.043315:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93559642  0.93559642 -2.26377988 -1.6978384  -0.02926773 -0.02931389]
+x^∞ = [-1.65137644e+01 -2.13328666e+01  3.45523369e-03  1.89547354e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=3 with k=2.722203 (index 2)
+Matrix shapes for k=2.722203:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93536107  0.93536107 -2.26933014 -1.70200868 -0.02922701 -0.02930949]
+x^∞ = [ 2.11709437e+01 -3.25795883e+01 -1.01959452e-03  1.83492617e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=4 with k=3.281168 (index 3)
+Matrix shapes for k=3.281168:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93511794  0.93511794 -2.27508208 -1.70633499 -0.02918483 -0.02930496]
+x^∞ = [-2.56902146e+01 -4.48132529e+01  8.95991631e-04  1.82934835e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=5 with k=3.914215 (index 4)
+Matrix shapes for k=3.914215:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93478773  0.93478773 -2.28287745 -1.71220562 -0.02912762 -0.0292988 ]
+x^∞ = [ 3.01959837e+01 -6.05598977e+01 -3.67193064e-03  1.79975607e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=6 with k=4.497143 (index 5)
+Matrix shapes for k=4.497143:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93443122  0.93443122 -2.29125085 -1.71852102 -0.02906604 -0.02929214]
+x^∞ = [-3.41984705e+01 -7.74570097e+01  5.65231294e-04  1.78062222e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=7 with k=5.116655 (index 6)
+Matrix shapes for k=5.116655:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93399504  0.93399504 -2.3013928  -1.72618353 -0.02899123 -0.02928394]
+x^∞ = [ 3.84012687e+01 -9.76979304e+01 -1.33847765e-03  1.76138522e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=8 with k=5.708292 (index 7)
+Matrix shapes for k=5.708292:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93353197  0.93353197 -2.31228719 -1.73443063 -0.02891105 -0.0292753 ]
+x^∞ = [-4.17491773e+01 -1.18099968e+02 -8.49382059e-04  1.72827942e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=9 with k=6.321924 (index 8)
+Matrix shapes for k=6.321924:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93299795  0.93299795 -2.32481059 -1.7439317  -0.02881873 -0.02926533]
+x^∞ = [ 4.52006520e+01 -1.41368749e+02  7.72850850e-05  1.69983908e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=10 with k=6.917618 (index 9)
+Matrix shapes for k=6.917618:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93242177  0.93242177 -2.33813621 -1.75406618 -0.02872007 -0.0292545 ]
+x^∞ = [-4.83342361e+01 -1.66037112e+02  2.16912303e-04  1.67694851e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=11 with k=7.527826 (index 10)
+Matrix shapes for k=7.527826:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93179439  0.93179439 -2.35302319 -1.76541785 -0.02861047 -0.0292429 ]
+x^∞ = [ 5.12510456e+01 -1.92518629e+02 -1.09544067e-04  1.64937961e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=12 with k=8.125274 (index 11)
+Matrix shapes for k=8.125274:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93111144  0.93111144 -2.36871801 -1.77742093 -0.02849385 -0.02923003]
+x^∞ = [-5.38218047e+01 -2.20047923e+02  1.52816202e-04  1.62383556e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=13 with k=8.733212 (index 12)
+Matrix shapes for k=8.733212:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.93037791  0.93037791 -2.38589041 -1.7905948  -0.02836672 -0.02921639]
+x^∞ = [ 5.64534697e+01 -2.50392442e+02  1.33346576e-06  1.60401948e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=14 with k=9.331447 (index 13)
+Matrix shapes for k=9.331447:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92959541  0.92959541 -2.40390029 -1.80445839 -0.02823264 -0.02920171]
+x^∞ = [-5.86006552e+01 -2.80970934e+02  2.62104138e-04  1.58012329e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=15 with k=9.937597 (index 14)
+Matrix shapes for k=9.937597:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.928756    0.928756   -2.4232956  -1.81944234 -0.02808822 -0.02918602]
+x^∞ = [ 6.06484387e+01 -3.13527722e+02 -5.39656475e-06  1.55764765e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=16 with k=10.535984 (index 15)
+Matrix shapes for k=10.535984:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92787663  0.92787663 -2.44354694 -1.83514818 -0.02793709 -0.02916958]
+x^∞ = [-6.26612440e+01 -3.48305684e+02  2.04056037e-04  1.54187662e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=17 with k=11.140547 (index 16)
+Matrix shapes for k=11.140547:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92693695  0.92693695 -2.46510413 -1.85193553 -0.02777582 -0.029152  ]
+x^∞ = [ 6.44203478e+01 -3.84148759e+02  3.51718007e-04  1.52302736e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=18 with k=11.738711 (index 17)
+Matrix shapes for k=11.738711:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.9259566   0.9259566  -2.48750037 -1.86945235 -0.02760784 -0.02913364]
+x^∞ = [-6.60218901e+01 -4.21319209e+02 -1.91043867e-05  1.50619878e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=19 with k=12.341901 (index 18)
+Matrix shapes for k=12.341901:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92491566  0.92491566 -2.51113699 -1.88802464 -0.02742999 -0.02911412]
+x^∞ = [ 6.74467894e+01 -4.59613042e+02  1.39273005e-06  1.48786811e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=20 with k=12.939508 (index 19)
+Matrix shapes for k=12.939508:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92383843  0.92383843 -2.53559306 -1.90733373 -0.02724565 -0.02909396]
+x^∞ = [-6.87655340e+01 -4.99171329e+02  2.59103551e-05  1.47134392e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=21 with k=13.541280 (index 20)
+Matrix shapes for k=13.541280:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92270231  0.92270231 -2.56122903 -1.9276779  -0.02705177 -0.02907266]
+x^∞ = [ 7.00426617e+01 -5.40397952e+02  1.55791244e-05  1.45550331e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=22 with k=14.138166 (index 21)
+Matrix shapes for k=14.138166:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92152527  0.92152527 -2.58763813 -1.94874805 -0.02685136 -0.02905057]
+x^∞ = [-7.12465170e+01 -5.82685931e+02 -7.63997096e-05  1.44060407e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=23 with k=14.738607 (index 22)
+Matrix shapes for k=14.738607:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.92029267  0.92029267 -2.61517331 -1.97083985 -0.02664177 -0.02902743]
+x^∞ = [ 7.24651957e+01 -6.26598643e+02 -2.10935086e-04  1.42632487e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=24 with k=15.334637 (index 23)
+Matrix shapes for k=15.334637:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91902242  0.91902242 -2.64344838 -1.99365817 -0.02642589 -0.02900359]
+x^∞ = [-7.36485559e+01 -6.71222929e+02 -1.59174304e-04  1.41214005e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=25 with k=15.933755 (index 24)
+Matrix shapes for k=15.933755:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91769621  0.91769621 -2.67278495 -2.01747841 -0.02620106 -0.02897868]
+x^∞ = [ 7.49040781e+01 -7.17260304e+02 -4.01342547e-05  1.39827222e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=26 with k=16.529030 (index 25)
+Matrix shapes for k=16.529030:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91632952  0.91632952 -2.70281747 -2.04201985 -0.02596998 -0.02895297]
+x^∞ = [-7.62572640e+01 -7.64473559e+02 -1.11035584e-05  1.38544930e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=27 with k=17.126937 (index 26)
+Matrix shapes for k=17.126937:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91491108  0.91491108 -2.73385454 -2.06755066 -0.02573034 -0.02892629]
+x^∞ = [ 7.77294964e+01 -8.12654050e+02  8.24117830e-05  1.37222055e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=28 with k=17.721573 (index 27)
+Matrix shapes for k=17.721573:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.9134529   0.9134529  -2.76555632 -2.09380903 -0.02548455 -0.02889884]
+x^∞ = [-7.93982529e+01 -8.62133590e+02  4.16383960e-05  1.36014873e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=29 with k=18.318550 (index 28)
+Matrix shapes for k=18.318550:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91194219  0.91194219 -2.79819572 -2.12103871 -0.02523043 -0.02887039]
+x^∞ = [ 8.13448787e+01 -9.13340515e+02  7.24938781e-06  1.34894057e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=30 with k=18.912761 (index 29)
+Matrix shapes for k=18.912761:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.91039131  0.91039131 -2.83146346 -2.14900044 -0.02497023 -0.02884114]
+x^∞ = [-8.35106970e+01 -9.65103439e+02  3.73715002e-05  1.33758072e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=31 with k=19.509175 (index 30)
+Matrix shapes for k=19.509175:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90879012  0.90879012 -2.86561683 -2.17792904 -0.02470197 -0.02881094]
+x^∞ = [ 8.59917852e+01 -1.01802535e+03  1.88887619e-05  1.32629660e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=32 with k=20.103323 (index 31)
+Matrix shapes for k=20.103323:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90714779  0.90714779 -2.90036227 -2.20759666 -0.02442768 -0.02877993]
+x^∞ = [-8.88262818e+01 -1.07215178e+03 -3.36502339e-05  1.31575459e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=33 with k=20.699599 (index 32)
+Matrix shapes for k=20.699599:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90545501  0.90545501 -2.93593566 -2.23822463 -0.02414552 -0.02874794]
+x^∞ = [ 9.20639085e+01 -1.12761114e+03 -9.14799861e-05  1.30549899e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=34 with k=21.294144 (index 33)
+Matrix shapes for k=21.294144:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90372222  0.90372222 -2.97207588 -2.26960993 -0.02385739 -0.02871517]
+x^∞ = [-9.57441214e+01 -1.18398384e+03 -6.66164683e-05  1.29552511e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=35 with k=21.889718 (index 34)
+Matrix shapes for k=21.889718:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90194163  0.90194163 -3.00891925 -2.30189252 -0.02356209 -0.02868147]
+x^∞ = [ 9.92818272e+01 -1.24132833e+03 -2.93762463e-05  1.28558219e+00]
+  Reconstructing solution from pre-computed basis...
+
+Loading extended basis (to be appended later)...
+
+--- Loading pre-computed time-dependent transfer matrices ---
+Loaded solution histories for 20 allowed K values.
+Time grid has 500 points from eta=0.07 to eta=5.23
+Matrix shapes: A=(20, 6, 6), B=(20, 2, 6), C=(20, 67, 6)
+               D=(20, 6, 2), E=(20, 2, 2), F=(20, 67, 2)
+
+--- Reconstructing solutions for the first 3 allowed modes ---
+
+Processing mode n=1 with k=22.487289 (index 0)
+Matrix shapes for k=22.487289:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.90011069  0.90011069 -3.04650099 -2.33512808 -0.02325921 -0.02864679]
+x^∞ = [-1.09146149e+02 -1.30390870e+03 -4.72392341e-02  1.27977653e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=2 with k=23.082979 (index 1)
+Matrix shapes for k=23.082979:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.89824129  0.89824129 -3.08454532 -2.36909631 -0.02295083 -0.02861134]
+x^∞ = [ 8.80391977e+01 -1.34196955e+03 -2.87532354e-01  1.25020818e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=3 with k=23.678668 (index 2)
+Matrix shapes for k=23.678668:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.89632842  0.89632842 -3.12313904 -2.40389709 -0.02263615 -0.02857504]
+x^∞ = [-2.60980462e+01 -1.33451054e+03  1.46945067e+00  1.18164897e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=4 with k=24.274358 (index 3)
+Matrix shapes for k=24.274358:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.89437232  0.89437232 -3.16224973 -2.43952587 -0.02231529 -0.02853788]
+x^∞ = [ 5.61631451e+01 -1.42328612e+03 -9.76787485e-01  1.19930907e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=5 with k=24.870048 (index 4)
+Matrix shapes for k=24.870048:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.89237354  0.89237354 -3.20184539 -2.47597873 -0.02198838 -0.02849987]
+x^∞ = [-2.62982125e+02 -1.27033180e+03  5.86851392e+00  1.01987766e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=6 with k=25.465738 (index 5)
+Matrix shapes for k=25.465738:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.89033223  0.89033223 -3.24189208 -2.51325053 -0.02165556 -0.02846101]
+x^∞ = [ 1.52818386e+01 -1.58057127e+03 -3.78150045e-01  1.21040817e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=7 with k=26.061427 (index 6)
+Matrix shapes for k=26.061427:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.88824902  0.88824902 -3.28235721 -2.55133743 -0.02131695 -0.02842132]
+x^∞ = [ 4.45267848e+00 -1.68160641e+03 -1.40440481e-01  1.22970609e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=8 with k=26.657117 (index 7)
+Matrix shapes for k=26.657117:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.88612428  0.88612428 -3.32320663 -2.59023464 -0.02097271 -0.02838079]
+x^∞ = [ 5.30401174e-01 -1.74821985e+03 -3.74438107e-02  1.22203398e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=9 with k=27.252807 (index 8)
+Matrix shapes for k=27.252807:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.88395763  0.88395763 -3.36440302 -2.62993511 -0.02062295 -0.02833941]
+x^∞ = [-5.33341309e-01 -1.82795511e+03 -5.11721751e-03  1.22262780e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=10 with k=27.848497 (index 9)
+Matrix shapes for k=27.848497:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.88175186  0.88175186 -3.40592063 -2.67044108 -0.02026787 -0.02829725]
+x^∞ = [-9.10895075e-01 -1.89892486e+03  1.07730955e-02  1.21644008e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=11 with k=28.444186 (index 10)
+Matrix shapes for k=28.444186:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.87950508  0.87950508 -3.44771547 -2.7117407  -0.01990755 -0.02825425]
+x^∞ = [-9.84420720e-01 -1.93627321e+03  2.40853216e-02  1.18904721e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=12 with k=29.039876 (index 11)
+Matrix shapes for k=29.039876:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.87721874  0.87721874 -3.48975599 -2.75383207 -0.01954218 -0.02821044]
+x^∞ = [-5.07591408e-01 -1.88389009e+03  3.62165740e-02  1.10998351e+00]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=13 with k=29.635566 (index 12)
+Matrix shapes for k=29.635566:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.87489306  0.87489306 -3.53200554 -2.79670943 -0.01917189 -0.02816582]
+x^∞ = [ 7.47479610e-01 -1.76096655e+03  2.78105756e-02  9.96332323e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=14 with k=30.231256 (index 13)
+Matrix shapes for k=30.231256:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.87252868  0.87252868 -3.57442882 -2.84036826 -0.01879683 -0.02812041]
+x^∞ = [ 1.09060711e+00 -1.80671397e+03 -2.21170340e-03  9.82390244e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=15 with k=30.826946 (index 14)
+Matrix shapes for k=30.826946:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.87012585  0.87012585 -3.61698853 -2.88480257 -0.01841716 -0.0280742 ]
+x^∞ = [-1.39023002e-01 -1.86354553e+03 -1.50670148e-02  9.74567647e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=16 with k=31.422635 (index 15)
+Matrix shapes for k=31.422635:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.86768536  0.86768536 -3.65964948 -2.93000817 -0.01803304 -0.02802721]
+x^∞ = [-1.06428189e+00 -1.93321344e+03  4.29057353e-03  9.73087845e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=17 with k=32.018325 (index 16)
+Matrix shapes for k=32.018325:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.86520753  0.86520753 -3.70237421 -2.97597917 -0.01764461 -0.02797944]
+x^∞ = [ 1.56318090e-02 -2.00228594e+03  1.90025764e-02  9.70754479e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=18 with k=32.614015 (index 17)
+Matrix shapes for k=32.614015:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.86269292  0.86269292 -3.74512605 -3.02271037 -0.01725204 -0.0279309 ]
+x^∞ = [ 1.01494449e+00 -2.06237096e+03  1.58691155e-03  9.63741592e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=19 with k=33.209705 (index 18)
+Matrix shapes for k=33.209705:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.86014213  0.86014213 -3.78786826 -3.07019662 -0.01685548 -0.02788159]
+x^∞ = [-2.08262520e-01 -2.15229963e+03 -1.01365741e-02  9.70053677e-01]
+  Reconstructing solution from pre-computed basis...
+
+Processing mode n=20 with k=33.805394 (index 19)
+Matrix shapes for k=33.805394:
+A: (6, 6), B: (2, 6), C: (67, 6)
+D: (6, 2), E: (2, 2), F: (67, 2)
+X1: (6, 4), X2: (2, 4)
+Stored recValues: [ 0.85755544  0.85755544 -3.83056263 -3.11843159 -0.0164551  -0.02783152]
+x^∞ = [-8.49002226e-01 -2.25022776e+03  7.01807711e-03  9.78807171e-01]
+  Reconstructing solution from pre-computed basis...
+  Extended basis loaded successfully
+
+--- Running Eigen-Analysis on Core Low-K Modes ---
+  QR decomposition for dr (core only)
+    Successfully processed dr
+  QR decomposition for dm (core only)
+    Successfully processed dm
+  QR decomposition for vr (core only)
+    Successfully processed vr
+  QR decomposition for vm (core only)
+    Successfully processed vm
+
+Computing combined eigenvalue analysis (core only)...
+Computing combined A matrix from all perturbations...
+  Added contribution from dr
+  Added contribution from dm
+  Added contribution from vr
+  Added contribution from vm
+  Normalized by 4 perturbation types
+
+Core Analysis: Found 19 valid modes in mismatch region.
+Core Eigenvalues (basis 1): ['0.9999', '0.9998', '0.9997', '0.9995', '0.9994']
+Core Eigenvalues (basis 2): ['0.9999', '0.9998', '0.9997', '0.9995', '0.9994']
+
+--- Appending Extended High-K Modes ---
+Appending 20 high-k modes as block-diagonal identity
+Extended eigenvector lists: now 39 eigenvectors in 55-dimensional space
+Extended M_combined matrix from 35x35 to 55x55
+  Extended dr: coeffs shape = (39, 55), basis shape = (1000, 55)
+  Extended dm: coeffs shape = (39, 55), basis shape = (1000, 55)
+  Extended vr: coeffs shape = (39, 55), basis shape = (1000, 55)
+  Extended vm: coeffs shape = (39, 55), basis shape = (1000, 55)
+Total modes after extension: 39 (core: 19, extended: 20)
+Saved results to ../multi_perturbation_results.pickle
+
+================================================================================
+Running Stacked Varimax Sparse Rotation Analysis
+================================================================================
+
+
+================================================================================
+STACKED VARIMAX SPARSE ROTATION ANALYSIS (CORRECTED)
+================================================================================
+Filtering eigenvalues > 0.99
+Found 39 valid modes.
+Calculated C_tilde via projection (M^H @ C) to ensure physical alignment.
+Stacked matrix shape: (110, 39)
+
+Applying Stacked Varimax rotation...
+  Stacked Varimax converged after 14 iterations
+Orthogonality error: 7.33e-12
+
+Sparsity (fraction of near-zero elements):
+  Basis 1 - Before: 0.690, After: 0.696
+  Basis 2 - Before: 0.687, After: 0.694
+Mode alignment correlation: 1.0000
+
+Using normalized eigenvectors for coefficients...
+Normalization check (should be all 1.0): min=1.000000, max=1.000000
+
+--- Plotting results for vr ---
+
+Saved joint sparse coefficients plot to ./figures/stack_varimax_coefficients.pdf
+Saved sparsity comparison plot to ./figures/stack_varimax_sparsity_comparison.pdf
+Saved joint sparsity heatmap to ./figures/stack_varimax_heatmap.pdf
+Saved dominant mode correlation plot to ./figures/stack_varimax_correlation.pdf
+
+Saved results to stack_varimax_sparse_results.pickle
+
+================================================================================
+STACKED VARIMAX ANALYSIS COMPLETE
+================================================================================
+Number of sparse eigenvectors: 39
+Orthogonality preserved: Yes (by construction)
+Sparsity achieved in: BOTH Basis 1 AND Basis 2
+
+Output files:
+  - stack_varimax_sparse_results.pickle
+  - stack_varimax_coefficients.pdf
+  - stack_varimax_sparsity_comparison.pdf
+  - stack_varimax_heatmap.pdf
+  - stack_varimax_correlation.pdf
+
+Dominant modes in Basis 1: [24 28 35 38 50 39 13 19 44 45 54 47 55 34 36 37 46 52  7 51 14 53 29 43
+ 25 48 49 33 31 41 10  6  4 22  1 42 15 20 40]
+Dominant modes in Basis 2: [24 28 35 38 50 39 13 19 44 45 54 47 55 34 36 37 46 52  7 51 14 53 29 43
+ 25 48 49 33 31 41 10  6  4 22  1 42 15 20 40]
+
+Mode alignment (how often dominant k matches): 100.0%
+
+================================================================================
+Plotting sparse eigenfunction time evolution
+================================================================================
+
+Saved sparse eigenfunction plot to ./figures/stack_varimax_sparse_eigenfunctions.pdf
+Saved comparison plot to ./figures/stack_varimax_sparse_vs_original.pdf
+
+Additional output files:
+  - stack_varimax_sparse_eigenfunctions.pdf
+  - stack_varimax_sparse_vs_original.pdf

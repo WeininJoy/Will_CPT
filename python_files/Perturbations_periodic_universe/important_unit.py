@@ -6,8 +6,8 @@ import math
 
 H0 = 70 * u.km/u.s/u.Mpc
 h = 0.7
-Omega_lambda = 0.73
-Omega_r = 2.47e-5 / h**2
+Omega_lambda = 0.7
+Omega_r = 4.15e-5 / h**2  # radiation, include photons and neutrinos
 k_c = 2.172
 
 l_p = math.sqrt(1./8./np.pi)  # hbar = c = 8*pi*G = 1

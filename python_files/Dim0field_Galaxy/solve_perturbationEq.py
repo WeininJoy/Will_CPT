@@ -19,30 +19,31 @@ plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 ####################
 
 # Define the radial grid
-r_initial = 1.e-1 # Avoid singularity at r=0
-r_final = 1.e2
-r_points = np.logspace(np.log10(r_initial), np.log10(r_final), 100)  # Create an array of r values
+r_initial = 1.e-3 # Avoid singularity at r=0
+r_final = 1.e5
+r_points = np.logspace(np.log10(r_initial), np.log10(r_final), 1000)  # Create an array of r values
 
 # Define the parameters of the density profile
 rho0, rs = 1.0, 1.0  
-C = 1.0  # Define the constant C = c_chi/N0
+c_chi = 1.0  # c_chi = 1.0 in late time universe
+C = c_chi / 36  # Define the constant C = c_chi/N0, N0 = 36
 
 def density_profile(r):
     ## NFW profile
-    return rho0 / (r/rs) / (1 + r/rs)**2
+    # return rho0 / (r/rs) / (1 + r/rs)**2
     ## luminous_profile
-    # return rho0 * np.exp(-r/rs)
+    return rho0 * np.exp(-r/rs)
 
 rho_solution = density_profile(r_points)  # Extract the solution for rho(r)
 
 # Define the system of first-order ODEs
 def odes(r, y):
     phi, dphi, d2phi, d3phi = y  # Unpack the variables
-    d4phi = C * density_profile(r) - (4/r) * d3phi
+    d4phi = - C * density_profile(r) - (4/r) * d3phi
     return [dphi, d2phi, d3phi, d4phi]
 
 # Boundary conditions -  You'll need to specify these based on your problem
-r_max = 1.e2
+r_max = 1.e5
 r_span = (r_max, 0)
 y_initial = [0.0, 0.0, 0.0, 0.0]  # Initial condition at r_max: phi(0)=0, dphi(0)=d2phi(0)=d3phi(0)=0
 
@@ -50,9 +51,18 @@ y_initial = [0.0, 0.0, 0.0, 0.0]  # Initial condition at r_max: phi(0)=0, dphi(0
 sol = integrate.solve_ivp(odes, r_span, y_initial, dense_output=True)
 
 # Evaluate the solution at desired points
-phi_solution = sol.sol(r_points)[0]  # Extract the solution for f(r)
+phi_solution = sol.sol(r_points)[0]  # Extract the solution for phi(r)
 phi_interpolate = interpolate.interp1d(r_points, phi_solution, fill_value="extrapolate")
+dphi_solution = sol.sol(r_points)[1]  # Extract the solution for dphi(r)/dr
+dphi_interpolate = interpolate.interp1d(r_points, dphi_solution, fill_value="extrapolate")
 
+# plt.plot(r_points, phi_solution)
+# plt.plot(r_points, dphi_solution)
+plt.plot(r_points, r_points*C*dphi_solution / (1+C*phi_solution))
+plt.xlim([1.e-3, 1.e2])
+plt.ylim([-2,0.1])
+plt.xscale('log')
+plt.show()
 ###################
 # Analytic solutions phi\propto r, r^2
 ###################
@@ -91,29 +101,31 @@ phi_interpolate = interpolate.interp1d(r_points, phi_solution, fill_value="extra
 ###################
 # Analytic solutions with phi(infty)=0, phi'(infty)=0, phi''(infty)=0, phi'''(infty)=0
 ###################
+
+# \box\phi\propto -\rho, that's why there is an minus sign
 def int_f1(r): 
-    return C*density_profile(r)* r
+    return -C*density_profile(r)* r
 def int_f2(r):
-    return C*density_profile(r)* r**2
+    return -C*density_profile(r)* r**2
 def int_f3(r):
-    return C*density_profile(r)* r**3
+    return -C*density_profile(r)* r**3
 def int_f4(r):
-    return C*density_profile(r)* r**4
+    return -C*density_profile(r)* r**4
 
-def f1(r): 
-    return -r**2/6 * quad(int_f1, r, np.inf)[0] 
-def f2(r): 
-    return - r/2 * quad(int_f2, 0, r)[0] 
-def f3(r):
-    return -1/2 * quad(int_f3, r, np.inf)[0] 
-def f4(r):
-    return -1/(6*r) * quad(int_f4, 0, r)[0] 
+# def f1(r): 
+#     return -r**2/6 * quad(int_f1, r, np.inf)[0] 
+# def f2(r): 
+#     return - r/2 * quad(int_f2, 0, r)[0] 
+# def f3(r):
+#     return -1/2 * quad(int_f3, r, np.inf)[0] 
+# def f4(r):
+#     return -1/(6*r) * quad(int_f4, 0, r)[0] 
 
-f1_solution = np.array([f1(r) for r in r_points])
-f2_solution = np.array([f2(r) for r in r_points])
-f3_solution = np.array([f3(r) for r in r_points])
-f4_solution = np.array([f4(r) for r in r_points])
-f_total = f1_solution + f2_solution + f3_solution + f4_solution
+# f1_solution = np.array([f1(r) for r in r_points])
+# f2_solution = np.array([f2(r) for r in r_points])
+# f3_solution = np.array([f3(r) for r in r_points])
+# f4_solution = np.array([f4(r) for r in r_points])
+# f_total = f1_solution + f2_solution + f3_solution + f4_solution
 # phi_interpolate = interpolate.interp1d(r_points, f_total, fill_value="extrapolate")
 
 # ###################
@@ -132,19 +144,19 @@ f_total = f1_solution + f2_solution + f3_solution + f4_solution
 # A, B = res.x
 # print(f"A: {A}, B: {B}")
 
-# # # Plot the solution
+# # Plot the solution
 # plt.figure(figsize=(3.375,2.7)) 
-# # plt.loglog(r_points, rho_solution, label=r"$\rho(r)$")
-# # plt.loglog(r_points, phi_solution, label=r"$\Phi(r)$")
+# # plt.plot(r_points, rho_solution, label=r"$\rho(r)$")
+# plt.plot(r_points, phi_solution, label=r"$\phi(r)$")
 # # plt.loglog(r_points, A*alpha_solution,'--', label=r"$\alpha(r)$")
 # # plt.loglog(r_points, B*beta_solution, '--',label=r"$\beta(r)$")
 # # plt.plot(r_points, f1_solution, '--',label=r"$f_1(r)$")
 # # plt.plot(r_points, f2_solution, '--',label=r"$f_2(r)$")
 # # plt.plot(r_points, f3_solution, '--',label=r"$f_3(r)$")
 # # plt.plot(r_points, f4_solution, '--',label=r"$f_4(r)$")
-# plt.plot(r_points, f_total, '--',label=r"$f_{tot}(r)$")
+# # plt.plot(r_points, f_total, '--',label=r"$f_{tot}(r)$")
 # # plt.loglog(r_points, A*f1_vaccumm + B*f2_vaccumm + f_total, '--',label="analytic solution")
-# # plt.xlim(1.e-3, r_final)
+# plt.xlim(1.e-2, r_final)
 # # plt.ylim(1.e-10, 1.e9)
 # plt.xscale('log')
 # plt.xlabel(f"$r$")
@@ -159,8 +171,8 @@ f_total = f1_solution + f2_solution + f3_solution + f4_solution
 ######################
 
 # Parameters
-u_min = np.log(1.e-1)  # ln(r_min)  # Choose appropriately for your problem
-u_max = np.log(1.e4)   # ln(r_max)
+u_min = np.log(1.e-3)  # ln(r_min)  # Choose appropriately for your problem
+u_max = np.log(1.e2)   # ln(r_max)
 N = 100
 du = (u_max - u_min) / (N - 1)
 
@@ -179,12 +191,12 @@ b_rho = np.zeros(N)
 b_phi = np.zeros(N)
 
 def box_phi(r):
-    return -1/r * quad(int_f2, 0, r)[0] - quad(int_f1, r, np.infty)[0]
+    return -1/r * quad(int_f2, 0, r)[0] - quad(int_f1, r, np.inf)[0]
 
 def V2(r):
     def int_boxphi2(r):
         return r**2 * box_phi(r)**2
-    return 1/r * (3./2.)* quad(int_boxphi2, 0, r)[0]
+    return - 1/r * (1./2.)* quad(int_boxphi2, 0, r)[0]
 
 # Interior points
 for i in range(1, N - 1):
@@ -192,8 +204,8 @@ for i in range(1, N - 1):
     A[i, i] = -2
     A[i, i+1] = 1 + du/2
     b_rho[i] = r[i]**2 * rho[i] * du**2
-    b_phi[i] = r[i]**2 * 3/2 * (box_phi(r[i]))**2 * du**2
-    # b_phi[i] = r[i]**2 * 3/2*C* phi_interpolate(r[i])* rho[i] * du**2
+    b_phi[i] = - r[i]**2 * 1/2 * (box_phi(r[i]))**2 * du**2
+    # b_phi[i] = r[i]**2 * 1/2*C* phi_interpolate(r[i])* rho[i] * du**2
 
 # Boundary conditions (adapt as needed for your problem)
 # Example: Neumann at u_min (dPhi/du = 0), Dirichlet at u_max (Phi=0)
@@ -214,32 +226,45 @@ Phi_phi = np.linalg.solve(A, b_phi)
 v2_rho = np.gradient(Phi_rho, du)
 v2_phi = np.gradient(Phi_phi, du)
 
+# Consider particle's direct interaction with dim-0 scalar field
+v2_phi_5force = [C * r[i]* dphi_interpolate(r[i]) / (1 + C* phi_interpolate(r[i])) for i in range(len(v2_rho))]
+
 # ######################
 # # Plotting (log scale)
 # ######################
 
-# # # Plot Phi(r) 
-# # plt.figure(figsize=(3.375,2.7)) 
-# # plt.plot(r, Phi_rho, label=r"$\Phi_\rho(r)$")
-# # plt.plot(r, Phi_phi, label=r"$\Phi_\phi(r)$")
-# # plt.ylabel(r'$\Phi(r)$')
-# # plt.title(r'$\Phi(r)$ with $\rho$ and $\phi$')
-# # plt.xscale('log')
-# # plt.xlabel(r'$r$')
-# # plt.grid(True)
-# # plt.legend()
-# # plt.savefig("Phi_solution.pdf", bbox_inches="tight")
+# # Plot box_phi(r) 
+# plt.figure(figsize=(3.375,2.7)) 
+# plt.plot(r_points, [box_phi(r) for r in r_points])
+# plt.xscale('log')
+# plt.xlabel(r'$r$')
+# plt.ylabel(r'$\nabla^2\phi(r)$')
+# plt.grid(True)
+# plt.savefig("boxphi_r.pdf", bbox_inches="tight")
+
+# # Plot Phi(r) 
+# plt.figure(figsize=(3.375,2.7)) 
+# plt.plot(r, Phi_rho, label=r"$\Phi_\rho(r)$")
+# plt.plot(r, Phi_phi, label=r"$\Phi_\phi(r)$")
+# plt.ylabel(r'$\Phi(r)$')
+# plt.title(r'$\Phi(r)$ with $\rho$ and $\phi$')
+# plt.xscale('log')
+# plt.xlabel(r'$r$')
+# plt.grid(True)
+# plt.legend()
+# plt.savefig("Phi_solution.pdf", bbox_inches="tight")
 
 # Plot v^2(r)
 plt.figure(figsize=(3.375,2.7)) 
 plt.plot(r, v2_rho, label=r"$v^2_\rho(r)$")
-plt.plot(r, v2_phi, label=r"$v^2_\phi(r)$, num")
-plt.plot(r, [V2(r) for r in r], '--',label=r"$v^2_\phi(r)$, anal")
-# plt.xscale('log')
+plt.plot(r, v2_phi, label=r"$v^2_\phi(r)$")
+plt.plot(r, v2_phi_5force, label=r"$v^2_{5force}(r)$")
+# plt.plot(r, [V2(r) for r in r], '--',label=r"$v^2_\phi(r)$, anal")
+plt.xscale('log')
 plt.xlabel(r'$r$')
 plt.ylabel(r'$v^2(r)=r\frac{d\Phi}{dr}$')
-plt.xlim(1.e-4, 2)
-plt.ylim(-0.1, 0.8)
+# plt.xlim(1.e-3, 1.e1)
+# plt.ylim(-1.3, 0.3)
 plt.grid(True)
 plt.legend()
 plt.savefig("rotation_curve_test.pdf", bbox_inches="tight")

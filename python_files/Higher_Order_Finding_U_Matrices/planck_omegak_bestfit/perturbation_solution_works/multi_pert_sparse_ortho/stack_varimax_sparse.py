@@ -91,7 +91,7 @@ def varimax_rotation(Phi, gamma=1.0, q=500, tol=1e-6):
 
 
 def apply_stacked_varimax_to_eigenvectors(eigenvecs_1, eigenvecs_2, eigenvals_1,
-                                          eigenvalue_threshold=0.95, weight_ratio=1.0):
+                                          eigenvalue_threshold=0.99, weight_ratio=1.0):
     """
     Apply Stacked Varimax rotation to eigenvectors to achieve sparsity in BOTH bases.
 
@@ -220,7 +220,7 @@ def plot_joint_sparse_coefficients(coeffs_1, coeffs_2, eigenvals_valid,
     N_basis_1 = coeffs_1.shape[1]
     N_basis_2 = coeffs_2.shape[1]
 
-    fig, axes = plt.subplots(N_plot, 2, figsize=(10, 0.7*N_plot))
+    fig, axes = plt.subplots(N_plot, 2, figsize=(10, N_plot))
     if N_plot == 1:
         axes = axes.reshape(1, -1)
 
@@ -240,8 +240,8 @@ def plot_joint_sparse_coefficients(coeffs_1, coeffs_2, eigenvals_valid,
         ax_1 = axes[i, 0]
         k_values_1 = np.arange(1, N_basis_1 + 1)
         ax_1.bar(k_values_1, coeffs_1[plot_idx, :].real, width=0.4, color='blue', alpha=0.7)
-        ax_1.set_xlim(0, min(20, N_basis_1 + 1))
-        ax_1.set_ylim(-1, 1)
+        # ax_1.set_xlim(0, min(20, N_basis_1 + 1))
+        # ax_1.set_ylim(-1, 1)
 
         dominant_k_1 = max_indices_1[plot_idx]
         ax_1.axvline(dominant_k_1 + 1, color='red', linestyle='--', alpha=0.5, linewidth=1)
@@ -253,8 +253,8 @@ def plot_joint_sparse_coefficients(coeffs_1, coeffs_2, eigenvals_valid,
         ax_2 = axes[i, 1]
         k_values_2 = np.arange(1, N_basis_2 + 1)
         ax_2.bar(k_values_2, coeffs_2[plot_idx, :].real, width=0.4, color='green', alpha=0.7)
-        ax_2.set_xlim(0, min(20, N_basis_2 + 1))
-        ax_2.set_ylim(-1, 1)
+        # ax_2.set_xlim(0, min(20, N_basis_2 + 1))
+        # ax_2.set_ylim(-1, 1)
 
         dominant_k_2 = max_indices_2[plot_idx]
         ax_2.axvline(dominant_k_2 + 1, color='red', linestyle='--', alpha=0.5, linewidth=1)
@@ -303,16 +303,16 @@ def plot_sparsity_comparison(coeffs_original_1, coeffs_original_2,
         # Original Basis 1
         ax = axes[i, 0]
         ax.bar(k_values_1, coeffs_original_1[i, :].real, width=0.4, color='blue', alpha=0.5)
-        ax.set_xlim(0, min(20, N_basis_1 + 1))
-        ax.set_ylim(-1, 1)
+        # ax.set_xlim(0, min(20, N_basis_1 + 1))
+        # ax.set_ylim(-1, 1)
         ax.set_title(f"Original B1 (λ={eigenvals_valid[i]:.3f})", fontsize=8)
         ax.grid(True, alpha=0.3, axis='y')
 
         # Original Basis 2
         ax = axes[i, 1]
         ax.bar(k_values_2, coeffs_original_2[i, :].real, width=0.4, color='green', alpha=0.5)
-        ax.set_xlim(0, min(20, N_basis_2 + 1))
-        ax.set_ylim(-1, 1)
+        # ax.set_xlim(0, min(20, N_basis_2 + 1))
+        # ax.set_ylim(-1, 1)
         ax.set_title(f"Original B2", fontsize=8)
         ax.grid(True, alpha=0.3, axis='y')
 
@@ -321,8 +321,8 @@ def plot_sparsity_comparison(coeffs_original_1, coeffs_original_2,
         dominant_k_1 = np.argmax(np.abs(coeffs_sparse_1[i, :].real))
         ax.bar(k_values_1, coeffs_sparse_1[i, :].real, width=0.4, color='blue', alpha=0.8)
         ax.axvline(dominant_k_1 + 1, color='red', linestyle='--', alpha=0.5, linewidth=1)
-        ax.set_xlim(0, min(20, N_basis_1 + 1))
-        ax.set_ylim(-1, 1)
+        # ax.set_xlim(0, min(20, N_basis_1 + 1))
+        # ax.set_ylim(-1, 1)
         ax.set_title(f"Sparse B1 (k={dominant_k_1+1})", fontsize=8)
         ax.grid(True, alpha=0.3, axis='y')
 
@@ -331,8 +331,8 @@ def plot_sparsity_comparison(coeffs_original_1, coeffs_original_2,
         dominant_k_2 = np.argmax(np.abs(coeffs_sparse_2[i, :].real))
         ax.bar(k_values_2, coeffs_sparse_2[i, :].real, width=0.4, color='green', alpha=0.8)
         ax.axvline(dominant_k_2 + 1, color='red', linestyle='--', alpha=0.5, linewidth=1)
-        ax.set_xlim(0, min(20, N_basis_2 + 1))
-        ax.set_ylim(-1, 1)
+        # ax.set_xlim(0, min(20, N_basis_2 + 1))
+        # ax.set_ylim(-1, 1)
         ax.set_title(f"Sparse B2 (k={dominant_k_2+1})", fontsize=8)
         ax.grid(True, alpha=0.3, axis='y')
 
@@ -358,6 +358,7 @@ def plot_joint_sparsity_heatmap(coeffs_sparse_1, coeffs_sparse_2, eigenvals_vali
     """
     Create a heatmap showing which modes are dominant in both bases.
     This reveals the joint sparsity structure.
+    Eigenfunctions are ordered by their dominant k (from low to high).
     """
     N_modes = len(eigenvals_valid)
 
@@ -365,21 +366,34 @@ def plot_joint_sparsity_heatmap(coeffs_sparse_1, coeffs_sparse_2, eigenvals_vali
     dominant_1 = np.argmax(np.abs(coeffs_sparse_1.real), axis=1)
     dominant_2 = np.argmax(np.abs(coeffs_sparse_2.real), axis=1)
 
+    # Sort by dominant k in Basis 1 (from low to high)
+    sorted_order = np.argsort(dominant_1)
+
+    # Reorder the coefficient matrices
+    coeffs_sparse_1_sorted = coeffs_sparse_1[sorted_order, :]
+    coeffs_sparse_2_sorted = coeffs_sparse_2[sorted_order, :]
+    dominant_1_sorted = dominant_1[sorted_order]
+    dominant_2_sorted = dominant_2[sorted_order]
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
     # Heatmap 1: Coefficients in Basis 1
-    im1 = ax1.imshow(np.abs(coeffs_sparse_1.real[:min(N_modes, 15), :min(20, coeffs_sparse_1.shape[1])]),
+    # im1 = ax1.imshow(np.abs(coeffs_sparse_1.real[:min(N_modes, 15), :min(20, coeffs_sparse_1.shape[1])]),
+    #                  aspect='auto', cmap='Blues', interpolation='nearest')
+    im1 = ax1.imshow(np.abs(coeffs_sparse_1_sorted.real[:, :]),
                      aspect='auto', cmap='Blues', interpolation='nearest')
     ax1.set_xlabel('k mode index (Basis 1)', fontsize=10)
-    ax1.set_ylabel('Eigenfunction index', fontsize=10)
+    ax1.set_ylabel('Eigenfunction (sorted by dominant k)', fontsize=10)
     ax1.set_title('Sparse Coefficients in Basis 1', fontsize=11)
     plt.colorbar(im1, ax=ax1, label='|Coefficient|')
 
     # Heatmap 2: Coefficients in Basis 2
-    im2 = ax2.imshow(np.abs(coeffs_sparse_2.real[:min(N_modes, 15), :min(20, coeffs_sparse_2.shape[1])]),
+    # im2 = ax2.imshow(np.abs(coeffs_sparse_2.real[:min(N_modes, 15), :min(20, coeffs_sparse_2.shape[1])]),
+    #                  aspect='auto', cmap='Greens', interpolation='nearest')
+    im2 = ax2.imshow(np.abs(coeffs_sparse_2_sorted.real[:, :]),
                      aspect='auto', cmap='Greens', interpolation='nearest')
     ax2.set_xlabel('k mode index (Basis 2)', fontsize=10)
-    ax2.set_ylabel('Eigenfunction index', fontsize=10)
+    ax2.set_ylabel('Eigenfunction (sorted by dominant k)', fontsize=10)
     ax2.set_title('Sparse Coefficients in Basis 2', fontsize=11)
     plt.colorbar(im2, ax=ax2, label='|Coefficient|')
 
@@ -592,7 +606,7 @@ def plot_sparse_vs_original_eigenfunctions(results, sparse_results, N_plot=3,
 # Main Workflow
 # =============================================================================
 
-def stacked_varimax_sparse_analysis(results, eigenvalue_threshold=0.95,
+def stacked_varimax_sparse_analysis(results, eigenvalue_threshold=0.99,
                                    weight_ratio=1.0, N_plot=10):
     """
     Complete workflow for Stacked Varimax sparse rotation analysis (CORRECTED).
@@ -683,6 +697,17 @@ def stacked_varimax_sparse_analysis(results, eigenvalue_threshold=0.95,
     orth_error = np.linalg.norm(eigenvecs_sparse_1.T @ eigenvecs_sparse_1 - np.eye(K))
     print(f"Orthogonality error: {orth_error:.2e}")
 
+    # Calculate sparsity metrics for both bases
+    sparsity_before_1 = np.mean(np.abs(C) < 1e-3)
+    sparsity_after_1 = np.mean(np.abs(eigenvecs_sparse_1) < 1e-3)
+    sparsity_before_2 = np.mean(np.abs(C_tilde_raw) < 1e-3)
+    sparsity_after_2 = np.mean(np.abs(eigenvecs_sparse_2) < 1e-3)
+
+    print(f"\nSparsity (fraction of near-zero elements):")
+    print(f"  Basis 1 - Before: {sparsity_before_1:.3f}, After: {sparsity_after_1:.3f}")
+    print(f"  Basis 2 - Before: {sparsity_before_2:.3f}, After: {sparsity_after_2:.3f}")
+
+
     # Check alignment of dominant modes
     dom_1 = np.argmax(np.abs(eigenvecs_sparse_1), axis=0)
     dom_2 = np.argmax(np.abs(eigenvecs_sparse_2), axis=0)
@@ -691,34 +716,44 @@ def stacked_varimax_sparse_analysis(results, eigenvalue_threshold=0.95,
     # But for high k, they should be correlated.
     print(f"Mode alignment correlation: {np.corrcoef(dom_1, dom_2)[0,1]:.4f}")
 
-    # --- Recompute Reconstruction Coefficients ---
-    print("\nComputing sparse coefficients for both bases...")
+    # --- Use Normalized Eigenvectors Directly ---
+    print("\nUsing normalized eigenvectors for coefficients...")
 
-    coefficients_sparse_1_dict = {}
-    coefficients_original_1_dict = {}
-    coefficients_sparse_2_dict = {}
-    coefficients_original_2_dict = {}
+    # The eigenvecs_sparse_1 and eigenvecs_sparse_2 are already normalized
+    # and represent the same physical modes across all perturbation types.
+    # We can use them directly as coefficients since they are in the QR-orthonormal basis.
 
-    basis_1 = results['basis_1']
-    basis_2 = results['basis_2']
     coefficients_1 = results['coefficients_1']
     coefficients_2 = results['coefficients_2']
 
-    for pert in basis_1.keys():
-        Q, R_qr = np.linalg.qr(basis_1[pert])
-        T_mat = np.linalg.inv(R_qr.T)
-        coefficients_sparse_1_dict[pert] = (eigenvecs_sparse_1.T @ T_mat)
+    # Use eigenvectors directly as coefficients (they're already normalized)
+    # Shape: eigenvecs_sparse_1 is (N_basis, K_modes), we want (K_modes, N_basis)
+    coefficients_sparse_1_dict = {}
+    coefficients_sparse_2_dict = {}
+    coefficients_original_1_dict = {}
+    coefficients_original_2_dict = {}
 
-        # Original coefficients (filtered to valid indices)
-        coefficients_original_1_dict[pert] = coefficients_1[pert][valid_indices]
+    # Since eigenvectors are basis-independent, use them for all perturbation types
+    perturbation_types = ['dr', 'dm', 'vr', 'vm']
+    for pert in perturbation_types:
+        if pert in coefficients_1:
+            # Sparse coefficients are just the transposed normalized eigenvectors
+            coefficients_sparse_1_dict[pert] = eigenvecs_sparse_1.T
+            coefficients_sparse_2_dict[pert] = eigenvecs_sparse_2.T
 
-    for pert in basis_2.keys():
-        Q, R_qr = np.linalg.qr(basis_2[pert])
-        T_mat = np.linalg.inv(R_qr.T)
-        coefficients_sparse_2_dict[pert] = (eigenvecs_sparse_2.T @ T_mat)
+            # Original coefficients (filtered to valid indices and normalized)
+            coeffs_orig_1 = coefficients_1[pert][valid_indices]
+            norms_1 = np.sqrt(np.sum(np.abs(coeffs_orig_1)**2, axis=1, keepdims=True))
+            coefficients_original_1_dict[pert] = coeffs_orig_1 / norms_1
 
-        # Original coefficients (filtered to valid indices)
-        coefficients_original_2_dict[pert] = coefficients_2[pert][valid_indices]
+            coeffs_orig_2 = coefficients_2[pert][valid_indices]
+            norms_2 = np.sqrt(np.sum(np.abs(coeffs_orig_2)**2, axis=1, keepdims=True))
+            coefficients_original_2_dict[pert] = coeffs_orig_2 / norms_2
+
+    # Verify normalization
+    test_pert = 'vr' if 'vr' in coefficients_sparse_1_dict else list(coefficients_sparse_1_dict.keys())[0]
+    norms_check = np.sqrt(np.sum(np.abs(coefficients_sparse_1_dict[test_pert])**2, axis=1))
+    print(f"Normalization check (should be all 1.0): min={norms_check.min():.6f}, max={norms_check.max():.6f}")
 
     # Get filtered eigenvalues
     eigenvals_valid = eigenvals_1[valid_indices]
@@ -808,7 +843,14 @@ if __name__ == "__main__":
         print("No existing results found, running multi_perturbation_analysis...")
         folder_path = f'../data/'
         allowedK = np.load(folder_path + 'data_allowedK/L70_kvalues.npy')
-        results = multi_perturbation_analysis(N=len(allowedK), N_t=1000, folder_path=folder_path)
+        extend_data_path = folder_path + 'data_extend_integerK/'
+        if os.path.exists(extend_data_path):
+            print("Loading extended integer K values for multi_perturbation_analysis...")
+            extended_allowedK = np.load(folder_path + 'data_extend_integerK/L70_kvalues.npy')
+            N_allowedK = len(allowedK) + len(extended_allowedK)
+        else:
+            N_allowedK = len(allowedK)
+        results = multi_perturbation_analysis(N=N_allowedK, N_t=1000, folder_path=folder_path)
 
         # Save for future use
         with open(results_file, 'wb') as f:

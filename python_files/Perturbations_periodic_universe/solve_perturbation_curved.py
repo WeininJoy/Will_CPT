@@ -12,12 +12,12 @@ from wolframclient.evaluation import WolframLanguageSession
 from wolframclient.language import wl, wlexpr
 
 plt.rcParams['axes.labelsize'] = 10
-plt.rcParams['legend.fontsize'] = 8
+plt.rcParams['legend.fontsize'] = 10
 plt.rcParams['xtick.labelsize'] = 8
 plt.rcParams['ytick.labelsize'] = 8
 plt.rcParams['text.usetex'] = True
 plt.rcParams["font.family"] = "serif"
-# plt.style.use('seaborn-poster')
+plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 
 class Universe:
     def __init__(self, Lambda, R, k_curved, n): # k_curved = - 1.2  # close:>0, open:<0, flat:0  , abs(value) < 1 : physical 
@@ -73,8 +73,12 @@ class Universe:
         eta_tot = self.eta_tot()
         eta_list = np.linspace(0, eta_tot, 100)
         a_list = [self.a(eta) for eta in eta_list]
-        plt.plot(eta_list, a_list, color=color_list[n], label = 'kc='+str(round(self.k_curved, 2)))
-        plt.axvline(x=eta_tot/2, color=color_list[n], ls='--')
+        # plt.plot(eta_list, a_list, color=color_list[n], label = r'$\tilde\kappa=$'+str(round(self.k_curved, 2)))
+        omega_lambda, omega_r = 0.7, 4.15e-5 / 0.7**2
+        omega_kappa = - 2* self.k_curved * np.sqrt(omega_lambda* omega_r)
+        # plt.plot(eta_list[:-1], a_list[:-1], color=color_list[n], label = r'$\Omega_{\kappa,0}=$'+str(round(omega_kappa, 3)))
+        plt.plot(eta_list[:-1], a_list[:-1], color=color_list[n], label = r'$\tilde\kappa=$'+str(np.round(self.k_curved, 2))+r'$, \Omega_{\kappa,0}=$'+str(round(omega_kappa, 3)))
+        plt.axvline(x=eta_tot, color=color_list[n], ls='--')
 
     #################
     # Phi solution
@@ -355,21 +359,24 @@ class Universe:
 # plot solution of a 
 ######################
 
-# k_curved_list = [-0.8, -0.4, 0.001, 0.4, 0.8] 
-# color_list = ['tab:blue', 'tab:orange','tab:green','tab:red','tab:purple']
+plt.figure(figsize=(3.5,2.7)) 
+k_curved_list = [-0.8, -0.4, 0.001, 0.4, 0.8] 
+color_list = ['tab:blue', 'tab:orange','tab:green','tab:red','tab:purple']
+# k_curved_list = [0.9, -1.e-4, -0.9]
+# color_list = ['#2D0086', '#9900E6','#FF33E6']
 
-# for n in range(len(k_curved_list)):
-#     universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
-#     universe.plot_a()
+for n in range(len(k_curved_list)):
+    universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
+    universe.plot_a()
 
-# plt.xlabel(r"$\eta$", fontsize=30)
-# plt.ylabel(r"$\log a(\eta)$", fontsize=30)
-# plt.xticks(fontsize=28)
-# plt.yticks(fontsize=28)
-# plt.yscale('log')
-# plt.ylim([2.e-2, 5.e1])
-# plt.legend(fontsize=28)
-# plt.savefig("eta-log_a.pdf")
+plt.xlabel(r"$\eta$")
+plt.ylabel(r"$\log a(\eta)$")
+plt.xticks()
+plt.yticks()
+plt.yscale('log')
+plt.ylim([2.e-2, 5.e1])
+plt.legend()
+plt.savefig("eta-log_a.pdf", bbox_inches='tight')
 
 
 # #####################
@@ -416,19 +423,19 @@ class Universe:
 # plot solution of periodic a(eta) and Phi(eta)
 ######################
 
-plt.figure(figsize=(7.05826,2.7)) 
-k_curved_list = [0.2] 
+# plt.figure(figsize=(7.05826,2.7)) 
+# k_curved_list = [0.2] 
 
-for n in range(len(k_curved_list)):
-    universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
-    universe.plot_a_Phi_eta(Phi_i=0.5)
+# for n in range(len(k_curved_list)):
+#     universe = Universe(Lambda=1., R=1., k_curved=k_curved_list[n], n=n)
+#     universe.plot_a_Phi_eta(Phi_i=0.5)
 
-plt.axhline(y=0, color='k')
-# plt.text(2.8, 3.3, r'$a=1/s$', fontsize=28, color='b', ha='right', va='bottom')
-# plt.text(2.7, 4., r'$s=1/a$', fontsize=28, color='g', ha='right', va='bottom')
-plt.xlabel(r"$\eta$")
-plt.ylabel(r"$a(\eta)$")
-plt.ylim([-5, 5])
-# plt.legend(fontsize=18, loc='upper center', mode="expand", ncol=3, fancybox=True) #, bbox_to_anchor=(0.5, 1.05)
-plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", borderaxespad=0, ncol=3)
-plt.savefig("a_Phi-eta.pdf", bbox_inches='tight')
+# plt.axhline(y=0, color='k')
+# # plt.text(2.8, 3.3, r'$a=1/s$', fontsize=28, color='b', ha='right', va='bottom')
+# # plt.text(2.7, 4., r'$s=1/a$', fontsize=28, color='g', ha='right', va='bottom')
+# plt.xlabel(r"$\eta$")
+# plt.ylabel(r"$a(\eta)$")
+# plt.ylim([-5, 5])
+# # plt.legend(fontsize=18, loc='upper center', mode="expand", ncol=3, fancybox=True) #, bbox_to_anchor=(0.5, 1.05)
+# plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", borderaxespad=0, ncol=3)
+# plt.savefig("a_Phi-eta.pdf", bbox_inches='tight')

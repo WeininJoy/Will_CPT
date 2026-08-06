@@ -1,1 +1,43 @@
 others/Neil_18092023.mp4
+
+# ── Virtual environments ────────────────────────────────────────────────────
+HO_env/
+env_entropy/
+env_perturbation/
+dim0_env/
+Kahler_Dirac_env/
+
+# ── Python cache / compiled ─────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# ── AI / MCP session files ──────────────────────────────────────────────────
+.mcp_handley_lab/
+
+# ── Large numerical data directories (100 MB – several GB) ─────────────────
+# perturbation_solution_works/ time-series chunks
+data_refined*/
+data_tail*/
+data_whole/
+
+# CMB power-spectrum CLASS runs
+PPS_CMB/
+
+# extendk_0-65/ parameter-direction datasets
+data_cosmo_param_direc*/
+data_diff_evol/
+
+# Time-series transfer-matrix data and chunked datasets (50–200 MB per file)
+*_timeseries/
+*_chunks/
+
+# ── Large CLASS Boltzmann-code builds (compiled binaries + data, 100 MB – 1 GB) ──
+class_public/
+class_public_nu_spacing/
+class_weighting_try1/
+class_nu_spacing_As_theory/
+class_nu_spacing_coefficient_type/
+class_nu_spacing_weighting_try3/
+class_quantised/

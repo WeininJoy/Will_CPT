@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import sys
+from scipy.optimize import root_scalar
 
 try:
     from classy import Class
@@ -23,25 +24,56 @@ except ImportError:
     print("Run 'cd class_nu_spacing_weighting/python && python setup.py install --user'")
     sys.exit(1)
 
+lam = 1
+rt = 1
+Omega_gamma_h2 = 2.47e-5 # photon density 
+N_ncdm = 1 # number of massive neutrino species
+m_ncdm = 0.06 # mass of massive neutrino species in eV
+Neff = 3.046
+
+def cosmological_parameters(mt, kt, h): 
+
+    # Define Omega_r by assuming massive neutrinos
+    # Omegarh2 = 0.00066984
+    # Omega_r = Omegarh2 / (h**2) # photon density
+
+    # # Define Omega_r by assuming massless neutrinos
+    Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+
+    def solve_a0(Omega_r, rt, mt, kt):
+        def f(a0):
+            return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+        sol = root_scalar(f, bracket=[1, 1.e3])
+        return sol.root
+
+    a0 = solve_a0(Omega_r, rt, mt, kt)
+    s0 = 1/a0
+    Omega_lambda = Omega_r * a0**4
+    Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+    Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+    return s0, Omega_lambda, Omega_m, Omega_K
+
 def extract_cosmological_parameters():
     """
     Extract cosmological parameters from solve_real_cosmology_vr.py
     Returns a dictionary with CLASS-compatible parameter names
     """
-    # Parameters from solve_real_cosmology_vr.py (lines 27-35)
-    h = 0.5409
-    Omega_gamma_h2 = 2.47e-5
-    Neff = 3.046
-    OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
-    OmegaM = 0.483
-    OmegaK = -0.0438
-    OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
-    z_rec = 1089.411
+    ## Parameters from solve_real_cosmology_vr.py (lines 27-35)
+    # h = 0.5409
+    # Omega_gamma_h2 = 2.47e-5
+    # Neff = 3.046
+    # OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+    # OmegaM = 0.483
+    # OmegaK = -0.0438
+    # OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
+    # tau_reio = 0.0495  # Reionization optical depth (typical value)
+    # A_s = 2.0706e-9  # Scalar amplitude (typical value)
+    # n_s = 0.97235  # Scalar spectral index (typical value)
 
-    # Other cosmological parameters
-    tau_reio = 0.0495  # Reionization optical depth (typical value)
-    A_s = 2.0706e-9  # Scalar amplitude (typical value)
-    n_s = 0.97235  # Scalar spectral index (typical value)
+    # Best-fit parameters from nu_spacing=4
+    mt, kt, h, Omegab_ratio, A_s, n_s, tau_reio = 401.38626259929055, 1.4181566171960542, 0.16686454899542, 0.5635275092831583, 1.9375648884116028, 0.9787493821596979, 0.019760560255556746
+    s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+
     k_pivot = 0.05  # Pivot scale in 1/Mpc
 
     # Derived parameters

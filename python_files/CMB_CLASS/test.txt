@@ -1,0 +1,74 @@
+CLASS is organized into several modules (background, thermodynamics, perturbations, etc.), and the recombination history (including the redshift of recombination) is computed in the thermodynamics module. In other words, you do not need to run the entire pipeline (which computes the CMB anisotropy power spectrum) if you are only interested in obtaining the recombination redshift.
+
+Here’s how you can do it:
+
+In your CLASS parameter (ini) file, change your output setting so that only the thermodynamics (and background) modules are run. For example, set
+  output = thermodynamics
+
+ This tells CLASS to compute the background evolution (which is computed by default when you request any output) and the thermodynamics module (which calculates the free electron fraction, the optical depth, and ultimately the visibility function). The peak of the visibility function—as given by g(z) = (dτ/dz) exp(–τ)—defines the recombination (or last-scattering) redshift.
+
+Run CLASS with this ini file. Because you have not requested perturbations (which are used for the CMB power spectra), CLASS will stop after computing the thermodynamics.
+
+After the run, CLASS will print out various key quantities in the log/output files. In particular, it will give you the redshift at which the visibility function is maximum (usually labeled something like “redshift of last scattering” or “z_rec” or “z_*”). That is your recombination redshift.
+
+If you need to extract it programmatically, you can either parse the thermo output file (often named thermo.dat) or, if you are using CLASS through its Python wrapper (classy) or as a library, you can access the corresponding variable from the thermodynamics structure.
+
+In summary, by setting
+
+  output = thermodynamics
+
+you avoid computing the CMB power spectrum and still get all the needed thermodynamical quantities—including the recombination redshift.
+
+I am using python rather than ini. Could you give me an example code?
+
+Below is an example of how you can use CLASS’s Python wrapper (classy) to compute thermodynamics only (without the perturbations and CMB power spectra) and then extract the recombination redshift by finding the peak of the visibility function:
+
+Make sure you have installed the classy wrapper (e.g., via pip install classy).
+from classy import Class
+import numpy as np
+
+Define your cosmological parameters.
+Note: The 'output' parameter here tells CLASS to run only the thermodynamics module.
+params = {
+"output": "thermodynamics",  # run only background & thermodynamics (no perturbations/CMB)
+"h": 0.67,
+"Omega_b": 0.022,    # baryon density parameter
+"Omega_cdm": 0.12,   # cold dark matter density parameter
+# Other parameters can be added as needed
+}
+
+Initialize and compute with CLASS.
+cosmo = Class()
+cosmo.set(params)
+cosmo.compute()
+
+Retrieve the thermodynamics outputs.
+The resulting dictionary typically contains arrays such as:
+• "z": redshift values,
+• "tau": optical depth,
+• "g": the visibility function, etc.
+thermo = cosmo.get_thermodynamics()
+
+Extract the redshift and visibility arrays.
+z_array = thermo["z"]
+g_array = thermo["g"]
+
+The recombination (last-scattering) redshift is conventionally defined as
+the redshift where the visibility function peaks (i.e., where g(z) is maximal).
+index_max = np.argmax(g_array)
+z_rec = z_array[index_max]
+
+print("Recombination (last scattering) redshift:", z_rec)
+
+Clean up.
+cosmo.empty()
+In this example:
+
+• The parameter "output" is set to "thermodynamics", so CLASS avoids computing the full perturbation evolution and CMB power spectra.
+
+• After computing, we obtain the thermodynamics dictionary with cosmo.get_thermodynamics(). This dictionary contains an array of redshifts (“z”) and the corresponding visibility function (“g”).
+
+• We then use numpy’s argmax to find the index where g(z) is maximum; the corresponding redshift gives you the recombination redshift.
+
+This approach lets you extract the recombination redshift without having to compute the entire CMB anisotropy spectrum.
+

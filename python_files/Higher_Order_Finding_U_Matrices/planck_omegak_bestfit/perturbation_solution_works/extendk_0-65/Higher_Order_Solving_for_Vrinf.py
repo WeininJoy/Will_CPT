@@ -13,7 +13,7 @@ from scipy.optimize import root_scalar
 
 
 #working in units 8piG = Lambda = c = hbar = kB = 1 throughout
-def compute_allowedK(params, folder_path):
+def compute_allowedK(params, folder_path, num_variables=200, cosmo_param_bool=False):
     """
     Compute allowedK values, which satisfy (anti)-symmetric condition at FCB.
 
@@ -27,7 +27,6 @@ def compute_allowedK(params, folder_path):
     array : allowedK values
     """
 
-    num_variables = 200  # number of pert variables
     k_min = 1.5
 
     kvalues = np.load(folder_path+'L70_kvalues.npy');
@@ -48,7 +47,7 @@ def compute_allowedK(params, folder_path):
     Fmatrices = [];
     GX3matrices = [];
     HX3matrices = [];
-    IX3matrices = [];
+    # IX3matrices = [];
 
     for i in range(len(kvalues)):
         
@@ -64,15 +63,15 @@ def compute_allowedK(params, folder_path):
         F = DEF[8:num_variables, 0:2];
         G = GHI[0:6];
         H = GHI[6:8];
-        I = GHI[8:num_variables];
+        # I = GHI[8:num_variables];
         
         #create zero arrays for G,H and I matrices
         GX3mat = np.zeros(shape=(6,4));
         GX3mat[:,2] = G;
         HX3mat = np.zeros(shape=(2,4));
         HX3mat[:,2] = H;
-        IX3mat = np.zeros(shape=(num_variables-8, 4));
-        IX3mat[:,2] = I;
+        # IX3mat = np.zeros(shape=(num_variables-8, 4));
+        # IX3mat[:,2] = I;
         
         Amatrices.append(A);
         Bmatrices.append(B);
@@ -82,7 +81,7 @@ def compute_allowedK(params, folder_path):
         Fmatrices.append(F);
         GX3matrices.append(GX3mat);
         HX3matrices.append(HX3mat);
-        IX3matrices.append(IX3mat);
+        # IX3matrices.append(IX3mat);
         
     #now set up matrix equations to solve for xinf
     vrfcb = [];
@@ -101,7 +100,7 @@ def compute_allowedK(params, folder_path):
         HX3 = HX3matrices[j];
         C = Cmatrices[j];
         F = Fmatrices[j];
-        IX3 = IX3matrices[j];
+        # IX3 = IX3matrices[j];
         X1 = X1matrices[j];
         X2 = X2matrices[j];
         recs = recValues[j];
@@ -175,30 +174,44 @@ def compute_allowedK(params, folder_path):
     np.save(folder_path+output_filename, allowedK_refined)
     print(f"\nSaved {len(allowedK_refined)} refined allowed K values to {output_filename}")
 
-    # Unpack parameters
-    mt, kt, omega_b_ratio, h = params
+    #############
+    # Calculate cosmological parameters based on input
+    #############
+    # Constants
     lam = 1
     rt = 1
-    Omega_gamma_h2 = 2.47e-5 # photon density 
+    Omega_gamma_h2 = 2.47e-5  # photon density
     Neff = 3.046
+    
+    if cosmo_param_bool == True:
+        # Unpack parameters
+        OmegaM, OmegaK, omega_b_ratio, h = params
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+        OmegaLambda = 1 - OmegaM - OmegaK - OmegaR
 
-    def cosmological_parameters(mt, kt, h): 
+    else:
+        # Unpack parameters
+        mt, kt, omega_b_ratio, h = params
 
-        Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
+        def cosmological_parameters(mt, kt, h):
+            Omega_r = (1 + Neff*(7/8)*(4/11)**(4/3) ) * Omega_gamma_h2/h**2
 
-        def solve_a0(Omega_r, rt, mt, kt):
-            def f(a0):
-                return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
-            sol = root_scalar(f, bracket=[1, 1.e3])
-            return sol.root
+            def solve_a0(Omega_r, rt, mt, kt):
+                def f(a0):
+                    return a0**4 - 3*kt*a0**2 + mt*a0 + (rt-1./Omega_r)
+                sol = root_scalar(f, bracket=[1, 1.e3])
+                return sol.root
 
-        a0 = solve_a0(Omega_r, rt, mt, kt)
-        Omega_lambda = Omega_r * a0**4
-        Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
-        Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
-        return Omega_lambda, Omega_m, Omega_K
+            a0 = solve_a0(Omega_r, rt, mt, kt)
+            s0 = 1/a0
+            Omega_lambda = Omega_r * a0**4
+            Omega_m = mt * Omega_lambda**(1/4) * Omega_r**(3/4)
+            Omega_K = -3* kt * np.sqrt(Omega_lambda* Omega_r)
+            return s0, Omega_lambda, Omega_m, Omega_K
 
-    OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+        s0, OmegaLambda, OmegaM, OmegaK = cosmological_parameters(mt, kt, h)
+        OmegaR = (1 + Neff * (7/8) * (4/11)**(4/3)) * Omega_gamma_h2 / h**2
+
     H0 = 1/np.sqrt(3*OmegaLambda); #we are working in units of Lambda=c=1
     a0=1; K=-OmegaK * a0**2 * H0**2
     allowedK_integer = [k / np.sqrt(np.abs(K)) for k in allowedK_refined]

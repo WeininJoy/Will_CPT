@@ -1,0 +1,1153 @@
+%% CPT-Symmetric Universe -- Beamer Presentation
+%% Wei-Ning Deng, Theoretical Cosmology Seminar, 17 Feb 2026
+%% Compile with: pdflatex (or xelatex for better font support)
+
+% ---------------------------------------------------------------
+%% Note
+% Strong CP
+% add arxiv numbers
+% SU(3)xSU(2)xU(1)
+% ---------------------------------------------------------------
+
+\documentclass[aspectratio=169]{beamer}
+
+%% ---------------------------------------------------------------
+%%  Packages
+%% ---------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{multimedia}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{slashed}
+
+%% ---------------------------------------------------------------
+%%  Theme
+%% ---------------------------------------------------------------
+\usetheme{default}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+% Clean, minimal style
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{footline bar}{bg=cptblue!15, fg=darkgray}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex]{footline bar}%
+    \hspace{1em}%
+    \usebeamerfont{author in head/foot}$\langle$\texttt{wnd22@cam.ac.uk}$\rangle$%
+    \hfill
+    \texttt{weiningdeng.com}%
+    \hfill
+    \insertframenumber{} / \inserttotalframenumber%
+    \hspace{1em}%
+  \end{beamercolorbox}%
+}
+\setbeamertemplate{itemize items}[circle]
+
+% Colour palette
+\definecolor{cptblue}{RGB}{0,112,192}
+\definecolor{cptyellow}{RGB}{255,215,0}
+\definecolor{cptred}{RGB}{192,0,0}
+\definecolor{cptgreen}{RGB}{0,150,60}
+\definecolor{darkgray}{RGB}{50,50,50}
+
+\setbeamercolor{frametitle}{fg=darkgray}
+\setbeamercolor{title}{fg=darkgray}
+\setbeamercolor{structure}{fg=cptblue}
+
+%% ---------------------------------------------------------------
+%%  Title info
+%% ---------------------------------------------------------------
+\title{\textbf{CPT-Symmetric Kähler-Dirac Fermions:}\\
+       Implication of the Standard Model and Cosmology}
+\author{Wei-Ning Deng \\ \small\texttt{wnd22@cam.ac.uk}}
+\institute{Pascos, University of Sheffield}
+\date{2026}
+
+%% ---------------------------------------------------------------
+%%  Helper commands
+%% ---------------------------------------------------------------
+\newcommand{\arxiv}[1]{[arXiv:\,#1]}
+\newcommand{\Red}[1]{{\color{cptred}#1}}
+\newcommand{\Blue}[1]{{\color{cptblue}#1}}
+\newcommand{\Green}[1]{{\color{cptgreen}#1}}
+\newcommand{\Yellow}[1]{{\color{cptyellow}#1}}
+
+\newcommand{\figpath}{../figures/}   % all figures live here
+
+%%================================================================
+\begin{document}
+%%================================================================
+
+%% ---- Title slide -----------------------------------------------
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[at=(current page.center)] {
+      \includegraphics[width=\paperwidth,height=\paperheight,
+                       keepaspectratio=false]{\figpath CPT_periodic.png}
+    };
+    \fill[white, opacity=0.0] (current page.south west) rectangle (current page.north east);
+    %% Title at the top
+    \node[anchor=north, text=white, align=center, yshift=-0.3cm] at (current page.north) {
+      \parbox{0.9\paperwidth}{\centering
+        {\Large\textbf{CPT-Symmetric Kähler-Dirac Fermions:}}\\[0.3em]
+        {\large Implication of the Standard Model and Cosmology}
+      }
+    };
+    %% Name and seminar info at the bottom
+    \node[anchor=south, text=white, align=center, yshift=0.3cm] at (current page.south) {
+      \parbox{0.9\paperwidth}{\centering
+        {\normalsize Wei-Ning Deng, University of Cambridge (\texttt{wnd22@cam.ac.uk})}\\[0.2em]
+        {\small Pascos, University of Sheffield (2026)} \\[0.2em] {arXiv:2511.11548}
+      }
+    };
+  \end{tikzpicture}
+\end{frame}
+
+%% ---- Outline ---------------------------------------------------
+\begin{frame}{Outline}
+  Part 1: Introduction -- CPT-symmetric universe\\[0.5em]
+  Part 2: CPT-symmetric K\"{a}hler-Dirac fermions \\[0.5em]
+  Part 3: Implications in the Standard Model and Cosmology\\[0.5em]
+  Future directions: Lattice KD,\; 4D String theory\\
+  \begin{columns}[b]
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm,keepaspectratio]{\figpath CPT_periodic.png}
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm]{\figpath lboyle3.jpg}\\
+      {\small Latham Boyle (University of Edinburgh)\\
+       \texttt{Latham.Boyle@ed.ac.uk}}
+  \end{columns}
+\end{frame}
+
+%%================================================================
+%%  PART 1 -- Introduction: CPT-Symmetric Universe
+%%================================================================
+\begin{frame}{Outline}
+  \textbf{\Blue{Part 1: Introduction -- CPT-symmetric universe}}\\[0.5em]
+  Part 2: CPT-symmetric K\"{a}hler-Dirac fermions \\[0.5em]
+  Part 3: Implications in the Standard Model and Cosmology\\[0.5em]
+  Future directions: Lattice KD,\; 4D String theory\\[0.5em]
+  \begin{columns}[b]
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm,keepaspectratio]{\figpath CPT_periodic.png}
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm]{\figpath lboyle3.jpg}\\
+      {\small Latham Boyle (University of Edinburgh)\\
+       \texttt{Latham.Boyle@ed.ac.uk}}
+  \end{columns}
+\end{frame}
+
+% %% ------------------------------------------------------------------
+% %%  P1-1  Theoretical and Observational Challenges
+% %% ------------------------------------------------------------------
+% \begin{frame}{Theoretical and Observational Challenges}
+%   \begin{columns}[c]
+%     \column{0.55\textwidth}
+%       \begin{enumerate}
+%         \item \textbf{Problems in cosmology:}\\
+%               Cosmological constant problem, nature of DM,
+%               origin of matter--antimatter asymmetry
+%         \item \textbf{Problems in particle physics:}\\
+%               Hierarchy problem, strong CP problem,
+%               origin of 3 fermion generations
+%         \item \textbf{Observational challenges:}\\
+%               BICEP/Keck \arxiv{2203.16556}: tight constraint
+%               on inflationary B-modes ($r < 0.036$)
+%         \item \textbf{No prediction for $\Omega_K$:}\\
+%               Treated as a free parameter -- but Planck 2018
+%               shows a $2\sigma$ preference for $\Omega_K < 0$
+%       \end{enumerate}
+%     \column{0.45\textwidth}
+%       \includegraphics[width=\textwidth]{\figpath r_vs_ns_bk18.pdf}
+%   \end{columns}
+% \end{frame}
+
+\begin{frame}{QFT-- physics is \textbf{locally} CPT-symmetric}
+  \begin{columns}[c]
+    \column{0.4\textwidth}
+      \Red{Question: Is there a universe that is \textbf{globally} CPT-symmetrical to our universe?}\\[0.5em]
+    \column{0.6\textwidth}
+      \includegraphics[width=\textwidth]{\figpath QFT-CPT-symmetry.png}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P1-2  CPT-symmetric universe
+%% ------------------------------------------------------------------
+\begin{frame}{CPT-symmetric universe}
+  \begin{center}
+    \includegraphics[width=\textwidth]{\figpath CPT-symmetric_universe.png}
+  \end{center}
+  \vspace{-0.5em}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P1-3  CMB acoustic peaks: Neumann BC as evidence for a temporal mirror
+%% ------------------------------------------------------------------
+% \begin{frame}{CMB acoustic peaks: direct evidence for a temporal mirror}
+%   \begin{columns}[c]
+%     \column{0.55\textwidth}
+%       \includegraphics[width=\textwidth]{\figpath A15_TT.png}\\
+%       % {\scriptsize Planck 2018 CMB TT power spectrum -- acoustic oscillations}
+%     \column{0.4\textwidth}
+%       \includegraphics[width=\textwidth]{\figpath CPT_periodic.png}\\[0.3em]
+%       % {\scriptsize Perturbations with Neumann (reflecting) BC at $\eta=0$}
+%   \end{columns}
+%   \begin{block}{}
+%     \footnotesize
+%     The \textbf{ringing pattern} in the CMB TT (and TE) power spectra is direct evidence
+%     that primordial density perturbations obeyed a
+%     \Blue{\textbf{reflecting (Neumann) BC}} at the start of the radiation era:
+%     \[
+%       \dot\Phi\big|_{\eta=0} = 0
+%       \quad\Longleftrightarrow\quad
+%       \text{Big Bang acts as a \textbf{temporal mirror}}
+%     \]
+%     If radiation era was \emph{not} preceded by inflation, it's
+%     \Red{direct obs. evidence} that BB is a temporal mirror.
+%   \end{block}
+% \end{frame}
+
+%% ------------------------------------------------------------------
+%%  P1-5  CPT solves lots of problems
+%% ------------------------------------------------------------------
+\begin{frame}{CPT-symmetry universe can solve lots of problems}
+  \small (Proposed by Latham Boyle and Neil Turok)
+  \vspace{0.4em}
+
+  \begin{center}
+    \includegraphics[width=0.92\textwidth]{\figpath CPT_univ_solve_problems.png}
+  \end{center}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  P1-12  Extended SM: RH neutrinos + Dim-0 scalars
+%% ------------------------------------------------------------------
+\begin{frame}{Extended SM solve Cosmological Constant (CC) problem}
+      % \textbf{Problem:} coupling QFT to gravity $\Rightarrow$ UV divergences in
+      % $\langle T_{\mu\nu}\rangle$, implying wildly curved spacetime on short scales.
+      \textbf{Problem:} assume cosmological constant $\Lambda$ coming from QFT vacumm energy $\Rightarrow$ $\Lambda \sim M_P^4$ (120 orders of magnitude larger than observed).\\[0.2em]
+
+      \textbf{Solution:} Extended SM with 3 $\nu_R$ + 36 dim-0 scalars + composite Higgs $\Rightarrow$ solve CC problem [arXiv:2509.09346, 2110.06258].
+  \begin{center}
+    \includegraphics[height=5.8cm]{\figpath SM_particles_dim0_RHnu.png}
+  \end{center}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  P1-7  Right-handed neutrino as dark matter (expanded for KCL)
+%% ------------------------------------------------------------------
+\begin{frame}{Right-handed neutrino as dark matter, explain Baryon asymmetry}
+  \begin{columns}[T]
+    \column{0.55\textwidth}
+      \textbf{CPT-symmetric universe predicts:}
+      \begin{itemize}
+        \item Seesaw mechanism explains small $\nu_L$ masses by introducing heavy $\nu_R$
+        \item $\mathbb{Z}_2$ symmetry stabilises \emph{one} $\nu_R$
+              $\Rightarrow$ \textbf{lightest neutrino is massless} ($\sum m_\nu \approx 0.06$ or $0.10\,\text{eV}$)
+        \item The stable $\nu_R$ is produced via metric time-dependence
+              when $H\sim M$ (analogous to Hawking radiation)
+        \item $\nu_R$ dark matter mass:
+              $M_{\nu_R}\approx 5\times10^8\,\text{GeV}$
+              {\scriptsize \arxiv{1803.08928}}
+        \item The other two $\nu_R$'s decay asymmetrically (CP violation) and transfer to \textbf{baryon asymmetry}
+              via Spaleron processes.
+      \end{itemize}
+    \column{0.43\textwidth}
+      \includegraphics[height=2.7cm,keepaspectratio]{\figpath CPT-symmetric_universe.png}\\[0.em]
+      \includegraphics[height=5cm,keepaspectratio]{\figpath mnu_constraints.pdf}\\
+      {\scriptsize sum neutrino mass (eBOSS 2007.08991)}
+  \end{columns}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  P1-18  Dim-0 scalar field seeds scale-invariant PPS
+%% ------------------------------------------------------------------
+\begin{frame}{Dim-0 scalar field seeds scale-invariant PPS}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+      \begin{align*}
+        S &= -\tfrac{1}{2}\int d^4x\sqrt{-g}\;\varphi\Delta_4\varphi \\[0.5em]
+        \langle\delta\varphi_i(\eta,\mathbf{x})\,\delta\varphi_j(\eta,\mathbf{x}')\rangle
+        &= \delta_{ij}\int\frac{d^3\mathbf{k}}{(2\pi)^3}\,
+           \frac{e^{i\mathbf{k}\cdot(\mathbf{x}-\mathbf{x}')}}{4ak^3}\\[0.5em]
+        \mathcal{P}_\mathcal{R}
+        &= \frac{3^2 5^3}{7(2\pi)^4}
+           \left(\frac{c_\beta^{SM}}{\mathcal{N}_{eff}}\right)^{\!2}
+      \end{align*}
+      \vspace{0.5em}
+      \textbf{Predicted:} $A = 12.9\pm4.5\times10^{-10}$,
+      $n_s \approx 1 - 7\alpha_3(M_P)/\pi = 0.958$\\[0.3em]
+      \textbf{Observed (Planck):} $A = 21\pm0.3\times10^{-10}$, $n_s = 0.9587\pm0.0056$
+    \column{0.4\textwidth}
+      \movie[loop,autostart,width=\textwidth]{\includegraphics[width=\textwidth]{\figpath Quantum_Fluctuations.png}}{\figpath Quantum_Fluctuations.mp4}\\
+      {\small Quantum fluctuations of dim-0 scalars seed scale-invariant PPS}
+  \end{columns}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  P3-8  Strong CP problem: Big Bang as a CT mirror
+%% ------------------------------------------------------------------
+\begin{frame}{Strong CP problem: solved by Big Bang as a $CT$ mirror}
+  {\small \arxiv{2208.10396} Boyle, Teuscher \& Turok (2022)}
+  \vspace{0.em}
+
+  \begin{columns}[T]
+    \column{0.5\textwidth}
+      \textbf{The strong CP problem:}\\
+      QCD allows a CP-violating term
+        $\bar\theta\,\frac{g_s^2}{32\pi^2}\,G_{\mu\nu}\tilde{G}^{\mu\nu}$\\[0.2em]
+      but neutron EDM demands $|\bar\theta|<10^{-10}$. Why so small?\\[0.5em]
+
+      \textbf{Embed SM in left-right symmetric model (LRSM):}\\[0.1em]
+      $SU(3)_C\!\times\!SU(2)_L\!\times\!SU(2)_R\!\times\!U(1)_{B-L}$\\[0.5em]
+
+      \textbf{Big Bang $=$ $CT$ mirror:} fields swap $L\leftrightarrow R$
+      and complex-conjugate across the Bang.
+      % \vspace{-0.5em}
+      % \begin{align*}
+      %   \tilde h_{L,R}(x) &\;\to\; \tilde h_{R,L}(x')^* \\[2pt]
+      %   \tilde\psi_{L,R}(x) &\;\to\;
+      %     {\textstyle\begin{pmatrix}\gamma^5\\1\end{pmatrix}}\!\gamma^0\,
+      %     \tilde\psi_{R,L}(x')^*
+      % \end{align*}
+      % \vspace{-1em}
+      % \small where $x'\equiv(-\tau,\mathbf{x})$ reflects through the bang.
+
+    \column{0.5\textwidth}
+      \begin{block}{How this solves strong CP}
+        $S_{\rm LRSM}$ invariant under $CT$\\
+        $\Rightarrow$ Yukawa matrices \textbf{hermitian}: $Y=Y^\dagger$\\
+        $\Rightarrow$ No overall Yukawa phase\\
+        $\Rightarrow$ $\theta G\tilde{G}$ not regenerated by chiral anomaly\\
+        \Blue{\textbf{Strong CP solved, without an axion!}}
+        \includegraphics[width=0.5\textwidth]{\figpath neutron_EDM.png}
+      \end{block}
+
+  \end{columns}
+\end{frame}
+
+%%================================================================
+%%  PART 2 -- Kähler-Dirac Fermions
+%%================================================================
+
+\begin{frame}{Outline}
+  Part 1: Introduction -- CPT-symmetric universe\\[0.5em]
+  Part 2: \textbf{\Blue{CPT-symmetric K\"{a}hler-Dirac fermions}} \\[0.5em]
+  Part 3: Implications in the Standard Model and Cosmology\\[0.5em]
+  Future directions: Lattice KD,\; 4D String theory\\[0.5em]
+  \begin{columns}[b]
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm,keepaspectratio]{\figpath CPT_periodic.png}
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm]{\figpath lboyle3.jpg}\\
+      {\small Latham Boyle (University of Edinburgh)\\
+       \texttt{Latham.Boyle@ed.ac.uk}}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-1  Problem: fermion doubling on the lattice
+%% ------------------------------------------------------------------
+\begin{frame}{Fermion doubling problem on the lattice}
+  \begin{columns}[c]
+    \column{0.52\textwidth}
+      \textbf{Wilson's lattice gauge theory} works beautifully for bosons:
+      \begin{itemize}
+        \item 0-forms (scalars) $\to$ vertices
+        \item 1-forms (gauge fields) $\to$ links
+        \item 2-forms (field strengths) $\to$ faces
+      \end{itemize}
+      \vspace{0.5em}
+      \textbf{Problem with spinors:} no natural $p$-form interpretation
+      $\Rightarrow$ placed on vertices $\Rightarrow$ \Red{extra doublers in the continuum limit}\\[0.4em]
+      Chiral theory $\xrightarrow{\text{lattice}}$ non-chiral theory
+      \hfill {\small (Nielsen--Ninomiya, 1981)}
+    \column{0.44\textwidth}
+      \includegraphics[width=\textwidth]{\figpath lattice.png}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-2  Kähler-Dirac fermions
+%% ------------------------------------------------------------------
+\begin{frame}{K\"{a}hler-Dirac (KD) fermions}
+  \textbf{Key idea:} KD fermions are $p$-forms -- they live naturally on any cell complex.
+
+  \vspace{0.5em}
+  \textbf{KD field} $\Phi$ is a \emph{polyform}: sum of $p$-forms ($p=0,\ldots,4$) with $16$ complex components.
+
+  \vspace{0.4em}
+  \textbf{KD action and equation:}
+  \[
+    S_{KD} = \langle\bar\Phi|(K-m)\Phi\rangle, \qquad
+    (d - d^\dagger - m)\Phi = 0
+  \]
+  where $K = d - d^\dagger$,\quad $-K^2 = \square$ (wave operator on forms).
+
+  \vspace{0.4em}
+  Replacing $dx^\mu \to \gamma^\mu$ assembles the 16 components into a $4\times4$ matrix $\Psi$:
+  \[
+    (i\gamma^\mu\partial_\mu - m)\Psi = 0
+    \quad\Rightarrow\quad
+    S_{KD} = \int d^4x\;\mathrm{Tr}\!\left[\bar\Psi(i\slashed\partial - m)\Psi\right]
+  \]
+  with $\bar\Psi \equiv \gamma^0\Psi^\dagger\gamma^0$ (extra $\gamma^0$ on the left!).
+
+  \vspace{0.3em}
+  \textbf{Symmetry:} $\Psi'=U_{\Lambda} \Psi V, $ where $(U_{\Lambda}, V)\in \text{Spin}(3,1)\times U(2,2)$. 
+  When restrict $V=U_{\Lambda}^{-1} \in SU(2,2)$, behave like forms.
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-3  The wrong-sign problem
+%% ------------------------------------------------------------------
+\begin{frame}{The wrong-sign problem in Lorentzian signature}
+  Diagonalise the extra $\gamma^0$: $\gamma^0 = \Omega\Lambda\Omega^T$,
+  $\Lambda = \mathrm{diag}(+1,+1,-1,-1)$.\\[0.5em]
+  In terms of $\Psi' \equiv \Psi\Omega$:
+  \[
+    S_{KD} = \int d^4x\;\mathrm{Tr}\!\left[\Lambda\,\Psi'{}^\dagger\gamma^0
+             (i\slashed\partial - m)\Psi'\right]
+  \]
+  \begin{itemize}
+    \item Columns 1--2 of $\Psi'$: \Green{right sign} $\Rightarrow$ positive norm
+    \item Columns 3--4 of $\Psi'$: \Red{wrong sign} $\Rightarrow$ \Red{negative norm states (ghosts)!}
+  \end{itemize}
+
+  \vspace{0.5em}
+  \textbf{Resolution} (Donoghue \& Menezes) : a wrong-sign action = reversal of causality arrow
+  $=$ \Blue{$PT$ reversal} \small [1908.04170].
+
+  \vspace{0.4em}
+  $\Rightarrow$ the two pairs of columns live on \textbf{two sheets} of spacetime, related by $PT$ symmetry
+  (or, equivalently, $i \leftrightarrow -i$).
+\end{frame}
+
+% %% ------------------------------------------------------------------
+% %%  P3-3b [NEW]  Connection to PT-symmetric field theories
+% %% ------------------------------------------------------------------
+% \begin{frame}{Connection to $PT$-symmetric field theories}
+%   The KD wrong-sign problem is resolved via $PT$ reversal (Donoghue \& Menezes).\\[0.3em]
+%   This is structurally parallel to a broader theme in non-Hermitian QFT:
+%   \hfill{\small Alexandre, Bender et al.}
+
+%   \vspace{0.3em}
+%   \begin{columns}[T]
+%     \column{0.48\textwidth}
+%       \begin{block}{$PT$-symmetric QFT \hfill{\scriptsize Alexandre et al.}}
+%         \begin{itemize}\small
+%           \item Non-Hermitian Hamiltonians with $\mathcal{PT}$ symmetry
+%                 can have \emph{real} spectra
+%           \item A wrong-sign mass term becomes physical under $PT$ reversal
+%           \item Dynamical mass generation via $\mathcal{PT}$ symmetry breaking
+%         \end{itemize}
+%       \end{block}
+%     \column{0.48\textwidth}
+%       \begin{block}{KD wrong-sign columns}
+%         \begin{itemize}\small
+%           \item Columns 3--4 of $\Psi'$ carry wrong-sign action
+%           \item Wrong sign $=$ $PT$ reversal of the causal arrow
+%           \item Both frameworks: a doubled structure resolves
+%                 an apparently pathological sign problem
+%         \end{itemize}
+%       \end{block}
+%   \end{columns}
+
+%   \vspace{0.4em}
+%   \Blue{Open question:} Is the KD-Majorana condition related to $\mathcal{PT}$-symmetric
+%   mass generation on the two sheets?
+%   Could the two-sheeted structure provide a \emph{geometric} realisation of
+%   non-Hermitian field theory?
+% \end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-4  Two-sheeted spacetime
+%% ------------------------------------------------------------------
+\begin{frame}{Two-sheeted spacetime}
+  \begin{columns}[c]
+    \column{0.6\textwidth}
+      \begin{itemize}
+        \item \Blue{Forward sheet} ($\Lambda_{ii}=+1$, cols 1--2):
+              standard quantum mechanics with $e^{iS}$, $[x,p]=+i$
+        \item \Blue{Backward sheet} ($\Lambda_{ii}=-1$, cols 3--4):
+              uses $e^{-iS}$, $[x,p]=-i$
+        \item The two sheets are \textbf{$PT$ mirrors} of each other
+        \item Positive energy, positive norm on \emph{both} sheets
+      \end{itemize}
+      \vspace{0.5em}
+      \textit{``Our" Big Bang is the junction of the two sheets --\\
+      exactly the CPT-symmetric universe picture!}
+    \column{0.4\textwidth}
+      \includegraphics[width=\textwidth]{\figpath posi_neg_energy_waves2.png}\\[0.1em]
+      \includegraphics[width=\textwidth]{\figpath CPT_periodic.png}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-4b  Video: CPT mirror universe
+%% ------------------------------------------------------------------
+\begin{frame}{Physical explanation of the movie Tenet?}
+  \begin{columns}[c]
+    \column{0.75\textwidth}
+  \begin{center}
+    \movie[loop,autostart,width=\textwidth]{%
+      \includegraphics[width=\textwidth]{\figpath tenet_movie_thumb.png}%
+    }{\figpath tenet_movie_clip.mp4}
+  \end{center}
+  \begin{center}
+    {\small If movie does not play:
+      \href{https://drive.google.com/file/d/1GlRzamx2jFM4WpvlJ-r3ShfUrh-gN0An/view?usp=sharing}%
+           {\textcolor{cptblue}{\underline{watch online}}}}
+  \end{center}
+    \column{0.25\textwidth}
+    \includegraphics[width=\textwidth]{\figpath Tenet.png}
+\end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-5  KD-Majorana condition
+%% ------------------------------------------------------------------
+\begin{frame}{KD-Majorana condition}
+  \textbf{Problem:} What are the particles in the backward sheet?\\[0.3em]
+
+  \vspace{0.4em}
+  \textbf{Solution:} Physics should be invariant under charge conjugation $\Rightarrow$ require \Blue{KD-Majorana condition}
+  \[
+    \Psi^c \equiv (i\gamma^2)\Psi^*(i\gamma^2) = \Psi
+  \]
+  In terms of $\Psi'$, the four columns are forced to take the form:
+  \[
+    \Psi' = \bigl(\psi_1,\;\psi_2,\;-\psi_2^c,\;\psi_1^c\bigr)
+  \]
+
+  \vspace{0.3em}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+      \begin{itemize}
+        \item A LH particle on the forward sheet is \emph{always} paired with
+              a RH anti-particle on the backward sheet
+        \item \Blue{Physical meaning:} CPT symmetry -- every particle has
+              a mirror (anti-)partner on the other sheet
+        \item No unphysical doubling of the SM
+      \end{itemize}
+    \column{0.42\textwidth}
+      \includegraphics[width=\textwidth]{\figpath KD_Majorana.png}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-6  Relation to the Standard Model
+%% ------------------------------------------------------------------
+
+\begin{frame}{Outline}
+  Part 1: Introduction -- CPT-symmetric universe\\[0.5em]
+  Part 2: CPT-symmetric K\"{a}hler-Dirac fermions \\[0.5em]
+  Part 3: \textbf{\Blue{Implications in the Standard Model and Cosmology}}\\[0.5em]
+  Future directions: Lattice KD,\; 4D String theory\\[0.5em]
+  \begin{columns}[b]
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm,keepaspectratio]{\figpath CPT_periodic.png}
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm]{\figpath lboyle3.jpg}\\
+      {\small Latham Boyle (University of Edinburgh)\\
+       \texttt{Latham.Boyle@ed.ac.uk}}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Relation to the Standard Model}
+  One SM generation (including $\nu_R$) = 16 Weyl spinors
+  $=$ 4 KD-Majorana fields.\\[0.4em]
+  Following Pati-Salam: allocate to four copies $\Psi'_{A=0,1,2,3}$ (\small [S. Catterall, 2209.03828])
+  \[
+    \Psi'_0 = \chi_0 + \chi_0^c,\quad
+    \chi_0 = \begin{pmatrix}\nu_L & e_L \\ \nu_R & e_R\end{pmatrix}
+    \quad\text{(leptons)}
+  \]
+  \[
+    \Psi'_i = \chi_i + \chi_i^c,\quad
+    \chi_i = \begin{pmatrix}u_L^i & d_L^i \\ u_R^i & d_R^i\end{pmatrix}
+    \quad\text{(quarks, color }i=1,2,3)
+  \]
+
+  \vspace{0.3em}
+  \textbf{Fermion kinetic terms unify:}
+  \[
+    \mathcal{L}_\text{KD} = \mathrm{Tr}\!\left[\bar\Psi_A(i\slashed\partial)\Psi_A\right],\quad A=0,\ldots,3
+  \]
+  Gauging $SU(3)\subset SU(4)$ and $SU(2)\times U(1)\subset U(2,2)$ (the internal symmetry)
+  reproduces \emph{all} SM fermion kinetic terms.
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-7  Yukawa couplings unify
+%% ------------------------------------------------------------------
+\begin{frame}{Yukawa couplings unify in KD formalism}
+  Standard Yukawa Lagrangian (4 separate terms):
+  \[
+    \tilde h^T\bar q_L u_R y_u + h^T\bar q_L d_R y_d
+    + \tilde h^T\bar\ell_L \nu_R y_\nu + h^T\bar\ell_L e_R y_e
+    + \text{h.c.}
+  \]
+
+  \vspace{0.3em}
+  \textbf{KD formulation} (single compact expression):
+  \[
+    \mathcal{L}_Y = \mathrm{Tr}\!\left[
+      \mathcal{H}^T\,\widehat\Psi_{A,L}^{\prime\,i}\,\Psi_{A,R}^{\prime\,j}\,
+      \mathcal{Y}_A^{ij}
+    \right] + \text{h.c.}
+  \]
+  where $\mathcal{H}$ is the \emph{KD Higgs field} and
+  $\mathcal{Y}_A^{ij}$ the \emph{KD Yukawa matrix}.
+
+  \vspace{0.4em}
+  \begin{itemize}
+    \item Expanding for leptons reproduces exactly the two lepton Yukawa terms
+    \item Forward sheet $\leftrightarrow$ particles; backward sheet $\leftrightarrow$ antiparticles
+    \item \Blue{All four SM Yukawa sectors unified in one line}
+  \end{itemize}
+\end{frame}
+
+
+% %% ------------------------------------------------------------------
+% %%  P3-8b  Why must RH neutrinos exist? (KD explanation)
+% %% ------------------------------------------------------------------
+% \begin{frame}{Why must $\nu_R$'s exist? -- a new explanation}
+%   \begin{columns}[c]
+%     \column{0.55\textwidth}
+%       \textbf{Old explanation:} seesaw mechanism explains small
+%       $\nu_L$ masses.\\[0.5em]
+%       \textbf{New (KD) explanation:}
+%       \begin{itemize}
+%         \item Each KD-Majorana field contains both LH \emph{and} RH components
+%         \item Including $\nu_L$ in $\Psi'_0$ \emph{forces} the existence of $\nu_R$
+%               on the same sheet
+%         \item $\nu_R$ is \textbf{required by the geometry} of the KD field --
+%               not just by phenomenology
+%       \end{itemize}
+%       \vspace{0.5em}
+%       \Green{This is the new explanation promised at the start of the talk!}
+%     \column{0.42\textwidth}
+%       \includegraphics[width=\textwidth]{\figpath Seesaw_mechanism.png}
+%   \end{columns}
+% \end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-9  Connection to CPT-symmetric universe
+%% ------------------------------------------------------------------
+\begin{frame}{Connection to the CPT-symmetric universe}
+  \begin{columns}[c]
+    \column{0.68\textwidth}
+      \textbf{Question:} \textit{Why} does the Big Bang act as a CPT mirror?\\[0.5em]
+      The CPT-symmetric universe was motivated by theoretical and observational reasons
+      (explain lots of problems elegantly).\\[0.4em]
+      \textbf{KD answer:} Two sheeted is required for solving negative norm problem.
+       The KD-Majorana condition \emph{requires} every particle
+      to have a mirror (anti-)partner on the other sheet.\\[0.4em]
+      \Blue{The Big Bang is precisely the junction where the two spacetime sheets meet.}
+      \[
+        \underbrace{\text{KD-Majorana}}_{\text{field theory}}
+        \;\longleftrightarrow\;
+        \underbrace{\text{CPT mirror at bang}}_{\text{cosmology}}
+      \]
+    \column{0.32\textwidth}
+      \includegraphics[width=\textwidth]{\figpath CPT_periodic.png}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-10  Black mirror (merged)
+%% ------------------------------------------------------------------
+\begin{frame}{Black mirror: an alternative black holes theory}
+  \begin{columns}[c]
+    \column{0.6\textwidth}
+      \textbf{Standard picture:} black hole has an interior.\\[0.3em]
+       \begin{itemize}\small
+        \item Problem: Hidden from Observation? Curvature singularities? Information paradox?
+         Violates all global symmetries (CPT, B-L)?
+      \end{itemize}
+      \textbf{Black mirror proposal} {\small [Tzanavaris, Latham \arxiv{2412.09558}]}
+      \begin{itemize}\small
+        \item The interior \emph{does not exist}
+        \item The horizon mirrors our exterior to the
+              ``other'' exterior (anti-universe)
+        \item Infalling particles \emph{annihilate} with anti-partners
+              from the anti-universe at the horizon
+      \end{itemize}
+      \vspace{0.2em}
+      \Green{KD-Majorana condition: explains why every infalling
+      particle is paired with a mirror anti-partner.}
+    \column{0.38\textwidth}
+      \includegraphics[height=4.0cm,keepaspectratio]{\figpath Penrose_diagram_BHMirror.png}\\[0.2em]
+      \includegraphics[height=2.6cm,keepaspectratio]{\figpath annihilate_BHmirror.png}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P3-11  Theoretical description of Tenet
+%% ------------------------------------------------------------------
+\begin{frame}{Theoretical description of Tenet?!}
+  \begin{columns}[T]
+    \column{0.54\textwidth}
+      \textbf{\Green{Same as CPT-symmetric universe:}}
+      \begin{enumerate}
+        \item There is \emph{you} and \emph{anti-you} in the universe
+              and anti-universe
+        \item Time goes backward in the anti-universe
+        \item The doors connecting universe and anti-universe
+              are \textbf{black holes}
+      \end{enumerate}
+
+      \vspace{0.5em}
+      \textbf{\Red{Difference:}}
+      \begin{enumerate}
+        \item You and anti-you \textbf{annihilate} at the transition door
+        \item If viewed from our universe: you come out of a
+              \textbf{white hole} and find that time goes backward.
+              However, you \emph{cannot change anything} -- only
+              re-experience the past
+      \end{enumerate}
+
+    \column{0.43\textwidth}
+      \includegraphics[width=\textwidth,keepaspectratio]{\figpath tenet_2.jpg}\\
+      \includegraphics[width=\textwidth,keepaspectratio]{\figpath Periodic_BHMirror.png}
+  \end{columns}
+\end{frame}
+
+%%================================================================
+%%  FUTURE DIRECTIONS
+%%================================================================
+\begin{frame}{Outline}
+  Part 1: Introduction -- CPT-symmetric universe\\[0.5em]
+  Part 2: CPT-symmetric K\"{a}hler-Dirac fermions \\[0.5em]
+  Part 3: Implications in the Standard Model and Cosmology\\[0.5em]
+  \textbf{\Blue{Future directions: Lattice KD,\; 4D String theory}}\\[0.5em]
+  \begin{columns}[b]
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm,keepaspectratio]{\figpath CPT_periodic.png}
+    \column{0.5\textwidth}\centering
+      \includegraphics[height=3.8cm]{\figpath lboyle3.jpg}\\
+      {\small Latham Boyle (University of Edinburgh)\\
+       \texttt{Latham.Boyle@ed.ac.uk}}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+%  FD-1  KD on the lattice → chiral gauge theory
+% ------------------------------------------------------------------
+\begin{frame}[shrink=5]{Future direction 1: KD fermions on the lattice}
+  {\footnotesize Boyle, Vaibhav (in preparation)}\\[0.1em]
+  \begin{columns}[T]
+    \column{0.8\textwidth}
+      \textbf{\Red{Problem:} chirality in Euclidean signature}\\[0.1em]
+      {\small \textbf{Barrett} \arxiv{2403.18428}: chiral theory in Euclidean space
+              requires dim $= 2\bmod 8$ ($2,10,18,26,\ldots$)}\\[0.2em]
+      \textbf{\Blue{Solution:} double the Hilbert space} {\footnotesize (Barrett \arxiv{2403.18428})}\\[0.1em]
+      {\small Double the Hilbert space $\mathcal{H}'=\mathcal{H}\oplus\mathcal{H}$,
+      with charge conjugation $J$ interchanging the two copies:}
+        $S_{\rm chiral}=\tfrac{1}{2}\big< J'\Psi_L,K'\Psi_L\big>$\\[0.1em]
+      \textbf{\Blue{'t~Hooft anomaly $\Rightarrow$ Pati-Salam}}\\[0.1em]
+      {\small Cancelling the $\mathbb{Z}_4$ chiral anomaly on the lattice
+      requires \textbf{4 copies} of reduced KD fermions
+      $\Rightarrow$ gauge group $SU(4)\times SU(2)_L\times SU(2)_R$}\\[0.1em]
+      \begin{block}{\small Two-sheeted spacetime is not just cosmology!}
+        \small
+        $\mathcal{H}'=\mathcal{H}\oplus\mathcal{H}$
+        $\equiv$ universe $+$ anti-universe\\[0.1em]
+        Required to simulate a \textbf{chiral gauge theory} on the lattice
+        % (e.g.\ electroweak symmetry breaking, Pati-Salam unification)
+      \end{block}
+      \column{0.2\textwidth}
+      \includegraphics[width=\textwidth]{\figpath lattice.png}\\[0.5em]
+      {\footnotesize
+        \textbf{Nielsen-Ninomiya} avoided:\\
+        equal $n_L=n_R$ in Pati-Salam\\[0.4em]
+        \textbf{Chiral anomaly} preserved\\
+        on the lattice\\[0.4em]
+       }
+  \end{columns}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  FD-4  String theory in two-sheeted 4D spacetime
+%% ------------------------------------------------------------------
+\begin{frame}{Future direction 2: K\"{a}hler-Dirac string theory in two-sheeted 4D}
+  %% Top: items 1-2 side-by-side with figure
+  \begin{columns}[T]
+    \column{0.7\textwidth}
+      \begin{enumerate}
+        \item \textbf{String theory as a candidate for quantum gravity}\\[0.2em]
+              Feynman vertices are smoothed into 2D worldsheet intersections
+              $\Rightarrow$ \Green{no point-like UV divergences}
+
+        \vspace{0.em}
+        \item \textbf{The dimension problem}\\[0.2em]
+              Conformal invariance of the 2D worldsheet fixes the target spacetime dimension:
+              \vspace{-1.em}
+              \[
+                \text{bosonic string} \;\Rightarrow\; 26\text{D},
+                \quad
+                \text{superstring} \;\Rightarrow\; 10\text{D}
+              \]
+              \vspace{-0.5em}
+              
+      \end{enumerate}
+    \column{0.3\textwidth}\centering\vspace{0.3em}
+      \includegraphics[width=0.85\textwidth,keepaspectratio]{\figpath string_theory.png}
+  \end{columns}
+\vspace{-0.5em}
+  These extra dimensions are unobserved and require compactification.   
+  \vspace{0.3em}
+  %% Bottom: open question full width
+  \begin{enumerate}\setcounter{enumi}{2}
+    \item \textbf{Open question}\\[0.2em]
+          \Blue{Can we construct a ghost-free superstring theory by placing
+          K\"{a}hler-Dirac fields on a \textbf{two-sheeted 4D spacetime}?}\\[0.3em]
+          \textit{Note:} strings in 3D space admit \textbf{knots \& braids} --
+          absent in $d \geq 4$ spatial dims
+  \end{enumerate}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  Summary
+%% ------------------------------------------------------------------
+\begin{frame}[shrink=7]{Summary}
+  \begin{columns}[T]
+    \column{0.50\textwidth}
+      \textbf{Part 1: Introduction}
+      \begin{itemize}\small
+        \item CPT-symmetric universe solves CC, strong CP, baryonic asymmetry, DM, PPS problems
+        \item Extended SM: 3 $\nu_R$ + 36 dim-0 scalars; Higgs composite
+        \item $\nu_R$ DM ($M\approx5\times10^8$ GeV); lightest $\nu$ massless
+      \end{itemize}
+      \textbf{Future directions}
+      \begin{itemize}\small
+        \item KD on lattice $\Rightarrow$ chiral SM (lattice consistency)
+        \item KD string theory in 4D $\Rightarrow$ ghost-free superstring theory
+      \end{itemize}
+      \includegraphics[width=0.8\textwidth]{\figpath CPT-symmetric_universe.png}
+    \column{0.48\textwidth}
+      \textbf{Part 2: K\"{a}hler-Dirac fermions}
+      \begin{itemize}\small
+        \item KD fermions = polyforms; live naturally on the lattice
+        \item Wrong-sign columns $\Rightarrow$ two-sheeted spacetime
+              ($PT$ mirrors)
+        \item KD-Majorana: every particle paired with mirror anti-partner
+      \end{itemize}
+      \textbf{Part 3: SM and cosmology}
+      \begin{itemize}\small
+        \item Unifies all SM fermion kinetic + Yukawa terms 
+        \item SU(3)xSU(2)xU(1) emergy from SU(4)xU(2,2) internal symmetry
+        \item Explains \emph{why} the Big Bang is a CPT mirror, Black mirror
+      \end{itemize}
+      \vspace{0.2em}
+      \centering
+      \textbf{\Blue{Thank you!}}\\
+      \small\texttt{wnd22@cam.ac.uk}, \small\texttt{arXiv:2511.11548}
+      \small\url{https://weiningdeng.com}
+  \end{columns}
+\end{frame}
+
+%%================================================================
+%%  BACKUP SLIDES
+%%================================================================
+\appendix
+
+%% ------------------------------------------------------------------
+%%  P1-5  Analytic solution of Friedmann equation
+%% ------------------------------------------------------------------
+\begin{frame}{Analytic solution of Friedmann equation in conformal time}
+  \begin{columns}[c]
+    \column{0.5\textwidth}
+      \begin{block}{}
+        \vspace{-2em}
+        \textbf{Metric:}
+        \[
+          ds^2 = a(t)^2\!\left(-dt^2 + \gamma_{ij}\,dx^i dx^j\right)
+        \]
+        \vspace{-0.5em}
+        \textbf{Friedmann equation} (Planck units):
+        \[
+          3\dot{a}^2 = \underbrace{r}_{\text{rad}}
+                     + \underbrace{\mu a}_{\text{matter}}
+                     - \underbrace{3\kappa a^2}_{\text{curvature}}
+                     + \underbrace{\lambda a^4}_{\Lambda}
+        \]
+        \vspace{0.2em}
+        \textit{General solution (Jacobi elliptic function):}\\
+        \textit{$a(t)$ is doubly periodic in the complex $t$-plane.}\\
+        {\small The imaginary time period and the action computed over a period
+         determine $T_H$ and the gravitational entropy $S_g$.
+        (thermodynamics selects the most probable universe).}  
+        \vspace{0.1em}
+      \end{block}
+    \column{0.5\textwidth}
+      \includegraphics[height=3cm,keepaspectratio]{\figpath ScaleFactorFigv2.png}\\[0.2em]
+      \begin{center}
+        \includegraphics[height=3.8cm,keepaspectratio]{\figpath TorusFig2.png}\\
+        {\scriptsize Euclidean torus: imaginary-time instanton}
+      \end{center}
+  \end{columns}
+\end{frame}
+
+
+%% ------------------------------------------------------------------
+%%  flat universe most probable
+%% ------------------------------------------------------------------
+\begin{frame}{Flat, isotropic, homogeneous universe is most probable}
+  \begin{center}
+    \includegraphics[height=7cm,keepaspectratio]{\figpath Homo_iso_flat_universe.png}
+  \end{center}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P1-11a  Gravitational UV fixed points (arXiv:2509.09346)
+%% ------------------------------------------------------------------
+\begin{frame}{Gravitational UV fixed points}
+  \begin{columns}[T]
+    \column{0.57\textwidth}
+      {\small
+      \textbf{Problem:} coupling QFT to gravity $\Rightarrow$ UV divergences in
+      $\langle T_{\mu\nu}\rangle$, implying wildly curved spacetime on short scales.}
+
+      \vspace{0.3em}
+      {\small \textbf{ERGE approach:} identify UV fixed points where
+      \emph{all} gravitational $\beta$-functions vanish.\\
+      {\scriptsize Boyle, Turok, Vaibhav, arXiv:2509.09346}}
+
+      \vspace{0.3em}
+      {\small \textbf{Beta functions:}
+      \begin{align*}
+        &\beta_{\Lambda/G} \propto n_0 - 2n_{1/2} + 2n_1 + 2n'_0 = 0\\[1pt]
+        &\beta_i\, \text{(four-deriv.\ terms)} = 0,\quad i=1,2,3,4
+      \end{align*}}
+
+      {\small \textbf{All $\beta$-functions vanish iff:}}
+      \begin{equation*}
+        \boxed{n_{1/2} = 4n_1,\quad n'_0 = 3n_1,\quad n_0 = 0}
+      \end{equation*}
+
+    \column{0.40\textwidth}
+      {\small \textbf{Conformally coupled fields:}
+      \begin{itemize}
+        \item $n_1$: gauge fields
+        \item $n_{1/2}$: Weyl/Majorana fermions
+        \item $n_0$: Klein-Gordon scalars\\
+              {\scriptsize standard 2-derivative}
+        \item $n'_0$: Fradkin-Tseytlin (FT) scalars\\
+              {\scriptsize 4-derivative conformally coupled}
+      \end{itemize}}
+
+      \vspace{0.em}
+      {\small \textbf{At the fixed point:}
+      \begin{itemize}
+        \item $G(k)\sim k^{-2}$ in UV (``softening'')
+        \item $\langle T_{\mu\nu}\rangle$ and all $\langle TT\rangle$ UV-finite
+        \item \Red{Cosmological constant problem solved}
+      \end{itemize}}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  P1-11b  Standard Model at the gravitational fixed point
+%% ------------------------------------------------------------------
+\begin{frame}{Standard Model at the gravitational fixed point}
+  \begin{columns}[T]
+    \column{0.56\textwidth}
+      SM gauge group $SU(3)\!\times\!SU(2)\!\times\!U(1)$:
+      $n_1 = 8+3+1 = 12$ gauge fields\\[0.5em]
+
+      \begin{tabular}{lcc}
+        \hline\\[-0.8em]
+        & Required & SM (incl.\ $\nu_R$) \\[0.2em]
+        \hline\\[-0.7em]
+        Fermions $n_{1/2}$ & $4\times 12=48$ & $3\times 16=\mathbf{48}$ \checkmark\\[0.2em]
+        KG scalars $n_0$   & $0$             & Higgs $\to$ composite\\[0.2em]
+        FT scalars $n'_0$  & $3\times 12=36$ & $0$ \quad (to predict!)\\[0.2em]
+        \hline
+      \end{tabular}\\[0.6em]
+
+      \textbf{Predictions:}
+      \begin{enumerate}\small
+        \item \textbf{3 generations + $\nu_R$:} $n_{1/2}\!=\!48$
+              requires right-handed neutrinos
+        \item \textbf{Composite Higgs:} $n_0\!=\!0$ forbids fundamental
+              KG scalars
+        \item \textbf{36 FT (dim-0) scalars} also generate scale-invariant
+              primordial spectrum!
+      \end{enumerate}
+    \column{0.41\textwidth}
+      \includegraphics[width=\textwidth]{\figpath SM_particles.png}\\[0.4em]
+      {\small IR: positive $G$ + arbitrarily small $\Lambda$\\[0.3em]
+      {\scriptsize arXiv:2509.09346}}
+  \end{columns}
+\end{frame}
+
+% %% ------------------------------------------------------------------
+% %%  P1-4 [NEW]  Two approaches to CPT at the quantum gravity interface
+% %% ------------------------------------------------------------------
+% \begin{frame}[noframenumbering]{Backup: Two approaches to CPT at the quantum gravity interface}
+%   \vspace{0.2em}
+%   {\small Both probe CPT in regimes where quantum gravity effects become relevant.}
+%   \vspace{0.4em}
+
+%   \begin{columns}[T]
+%     \column{0.48\textwidth}
+%       \begin{block}{\Blue{CPT-symmetric universe} \hfill {\scriptsize Boyle--Turok}}
+%         \begin{itemize}\small
+%           \item Universe + anti-universe pair, joined at the Big Bang
+%           \item CPT is an \textbf{exact} symmetry of the full spacetime
+%           \item Predictions: $\nu_R$ as DM, massless lightest $\nu$,
+%                 scale-invariant PPS
+%         \end{itemize}
+%       \end{block}
+%     \column{0.48\textwidth}
+%       \begin{block}{\Blue{CPT violation from spacetime foam} \hfill {\scriptsize Mavromatos et al.}}
+%         \begin{itemize}\small
+%           \item Planck-scale foam induces \textbf{effective CPT violation}
+%           \item Quantum decoherence of propagating matter
+%           \item Predictions: modified EPR correlations in neutral
+%                 mesons, neutrino anomalies
+%         \end{itemize}
+%       \end{block}
+%   \end{columns}
+
+%   \vspace{0.5em}
+%   \begin{center}
+%   \small
+%   \begin{tabular}{lccc}
+%     \toprule
+%     & CPT-symmetric universe & CPT foam & Standard inflation \\
+%     \midrule
+%     CPT status        & exact                   & violated & unspecified \\
+%     Quantum gravity & none     & considered     & depends (ex: string) \\
+%     DM candidate      & $\nu_R$                 & ---      & various (ex: axions)    \\
+%     Testable now?     & \Green{yes}             & \Green{yes} & \Green{yes} \\
+%     \bottomrule
+%   \end{tabular}
+%   \end{center}
+% \end{frame}
+
+%% ------------------------------------------------------------------
+%%  Backup: SM gauge group SU(3)xSU(2)xU(1) from KD formalism
+%% ------------------------------------------------------------------
+\begin{frame}[noframenumbering]{$SU(3)\times SU(2)\times U(1)$ from KD formalism}
+  \begin{columns}[T]
+    \column{0.52\textwidth}
+      \textbf{Step 1: $SU(4)$ from four KD copies}\\[-1em]
+      \[
+        \mathcal{L}_{\rm KD}
+        = \mathrm{Tr}[\Lambda\Psi_A^{\prime\dagger}\gamma^0(i\slashed\partial)\Psi_A'],A=0,1,2,3
+      \]
+       has \Blue{$SU(4)$} permuting the four copies.\\
+      \Blue{Gauge $SU(3)\subset SU(4)$} $\Rightarrow$ QCD color force.\\[0.5em]
+      
+      \textbf{Step 2: $SU(2)\times U(1)$ from the internal $V$}\\[0.2em]
+      To prevent mixing of the two sheets, we require an internal symmetry $V = U(2)\times U(2)\subset U(2,2)$, which 
+      the first/second $U(2)$ acting on the universe/antiverse respectively. Furthermore, $U(2) \cong SU(2)\times U(1)$. 
+      Restricting to one sheet $\Rightarrow \boxed{SU(3)\times SU(2)\times U(1)}$
+
+    \column{0.48\textwidth}
+      \textbf{Step 3: covariant derivative}\\
+      $D_\mu\Psi_L^{\prime i} =$
+      \vspace{-0.7em}
+      \[
+        \bigl(\partial_\mu + ig_3 G_{\mu j}^{\ i}\bigr)\Psi_L^{\prime j}
+        + ig_2\Psi_L^{\prime i}\mathcal{W}_\mu
+        + ig_1\tfrac{2}{3}\Psi_L^{\prime i}\mathcal{B}_\mu
+      \]
+      \vspace{-1.5em}
+      \[
+        \mathcal{W}_\mu = \begin{pmatrix}W_\mu & 0\\ 0 & \sigma^2W_\mu^*\sigma^2\end{pmatrix},\quad
+        \mathcal{B}_\mu = \begin{pmatrix}B_\mu & 0\\ 0 & B_\mu^*\end{pmatrix}
+      \]
+      \vspace{0.3em}
+      \textbf{All four SM fermion sectors:}
+      \vspace{-1em}
+      \begin{center}\small
+      \begin{tabular}{lcc}
+        \toprule
+        Field & remove $\mathcal{W}_\mu$ & remove $G_\mu$ \\
+        \midrule
+        $\Psi_L^{\prime i}$ (quark $L$)   &            &            \\
+        $\Psi_R^{\prime i}$ (quark $R$)   & \checkmark &            \\
+        $\Psi_L^{\prime 0}$ (lepton $L$)  &            & \checkmark \\
+        $\Psi_R^{\prime 0}$ (lepton $R$)  & \checkmark & \checkmark \\
+        \bottomrule
+      \end{tabular}
+      \end{center}
+      \vspace{-0.2em}
+      {\small Replacing $\slashed\partial\to D\!\!\!\!/$ in $\mathcal{L}_{\rm KD}$ reproduces \emph{all} SM fermion kinetic terms with gauge interactions.}
+  \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  FD-2  Composite Higgs from dim-0 scalars
+%% ------------------------------------------------------------------
+\begin{frame}{Future direction 3: composite Higgs from dim-0 scalars}
+  \begin{columns}[T]
+    \column{0.58\textwidth}
+      \textbf{Recall:} anomaly cancellation predicts
+      $n_{s,1} = 0$ -- \emph{no fundamental dimension-1 scalars}.\\[0.3em]
+      $\Rightarrow$ \textbf{The Higgs must be composite.}\\[0.4em]
+      The challenge:
+      \begin{itemize}
+        \item Build a viable composite Higgs model from the
+              collective dynamics of the \textbf{36 dim-0 scalar fields}
+        \item Constrained by LHC data: no new physics at the TeV scale
+              ($\kappa_V, \kappa_F$ within 5\% of SM)
+        \item Must reproduce Higgs mass, couplings, and EW symmetry
+              breaking without a fine-tuned hierarchy
+      \end{itemize}
+      \vspace{0.3em}
+      \Green{Getting this right would unify the origin of cosmic
+      structure and mass in a single framework.}
+    \column{0.38\textwidth}
+      \includegraphics[width=\textwidth]{\figpath SM_particles_dim0_RHnu.png}\\[0.2em]
+    \end{columns}
+\end{frame}
+
+%% ------------------------------------------------------------------
+%%  FD-3  Quadratic gravity as architect of PPS
+%% ------------------------------------------------------------------
+\begin{frame}{Future direction 4: quadratic gravity as architect of the PPS}
+  \begin{columns}[T]
+    \column{\textwidth}
+      \textbf{A deeper possibility:} the scale-invariant power
+      spectrum may not require any new matter fields at all.\\[0.4em]
+      \textbf{Quadratic gravity} (Stelle, 1977):
+      \begin{itemize}
+        \item Renormalizable theory of quantum gravity:\\
+              $\mathcal{L} = \frac{2}{\kappa^2} R+ \frac{1}{6f_0^2} R^2 - \frac{1}{2\xi^2} C_{\mu\nu\alpha\beta}C^{\mu\nu\alpha\beta} $
+        \item The ghost problem in quadratic gravity
+              $\Rightarrow$ resolved by the Donoghue--Menezes
+              $PT$ reversal \arxiv{2112.01974}.
+        \item Initial results (Boyle): quadratic gravity at the
+              Big Bang can \emph{mimic} the dim-0 scalar effect $\Rightarrow$ scale-invariant PPS without any new matter fields!
+        \item Problem: need new explanation for cosmological constant problem.
+      \end{itemize}
+      \vspace{-1.5em}
+      \begin{block}{}
+        \small
+        \textbf{Problem:} dim-0 scalars vs.\ quadratic gravity. Which one is the true architect of the scale-invariant PPS?
+      \end{block}
+  \end{columns}
+\end{frame}
+
+
+
+
+\end{document}

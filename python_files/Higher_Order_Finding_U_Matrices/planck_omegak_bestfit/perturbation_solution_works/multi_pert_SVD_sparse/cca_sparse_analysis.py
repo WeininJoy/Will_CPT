@@ -431,9 +431,15 @@ def plot_heatmap(A_sparse, B_sparse, output_dir=OUTPUT_DIR):
 
 def plot_reconstructed_timeseries(basis_1, basis_2,
                                   A_sparse, B_sparse, rho,
-                                  eta_grid, N_plot=5,
-                                  output_dir=OUTPUT_DIR):
-    """Overlay time series from both bases using sparse coefficients."""
+                                  eta_grid, norms_1, norms_2,
+                                  N_plot=5, output_dir=OUTPUT_DIR):
+    """
+    Overlay time series from both bases using sparse coefficients.
+
+    Divides by Frobenius norms so the reconstruction corresponds to
+    Xn^p @ coeff (the normalised space in which the CCA was solved),
+    avoiding spurious per-field scale factors.
+    """
     _ensure_dir(output_dir)
     dom1   = np.argmax(np.abs(A_sparse), axis=0)
     order  = np.argsort(dom1)
@@ -443,15 +449,15 @@ def plot_reconstructed_timeseries(basis_1, basis_2,
                              constrained_layout=True)
     if N_plot == 1:
         axes = axes.reshape(1, -1)
-    fig.suptitle("CCA sparse modes: time-series (Basis 1 red vs Basis 2 green)",
-                 fontsize=11)
+    fig.suptitle("CCA sparse modes: time-series (Basis 1 red vs Basis 2 green, "
+                 "Frobenius-normalised)", fontsize=11)
 
     for row, idx in enumerate(order[:N_plot]):
         dom_k = dom1[idx]
         for col, p in enumerate(PERTURBATION_TYPES):
             ax = axes[row, col]
-            s1 = basis_1[p] @ A_sparse[:, idx]
-            s2 = basis_2[p] @ B_sparse[:, idx]
+            s1 = basis_1[p] @ A_sparse[:, idx] / norms_1[p]
+            s2 = basis_2[p] @ B_sparse[:, idx] / norms_2[p]
             if np.dot(s1, s2) < 0:
                 s2 = -s2
             ax.plot(eta_grid, s1, 'r-',  lw=2,   alpha=0.85, label='B1')
@@ -551,7 +557,8 @@ def cca_sparse_analysis(
     plot_heatmap(A_sparse, B_sparse, output_dir)
     plot_reconstructed_timeseries(basis_1, basis_2,
                                   A_sparse, B_sparse, rho,
-                                  eta_grid, N_plot=5, output_dir=output_dir)
+                                  eta_grid, norms_1, norms_2,
+                                  N_plot=5, output_dir=output_dir)
 
     # ── Save ──────────────────────────────────────────────────────────────────
     results = dict(
@@ -582,9 +589,22 @@ def cca_sparse_analysis(
 # ============================================================================
 
 if __name__ == "__main__":
+    # Per-field weights to equalise contributions to the CCA objective.
+    # After Frobenius normalisation the Gram matrices have equal total energy,
+    # but the CCA can still find directions where low-amplitude fields (dm, dr)
+    # have negligible projected signal and are effectively ignored.
+    # Heuristic: w_p = (max_amp / amp_p)^2 where amp_p is the typical
+    # projected amplitude per field (vr is the largest at ~0.075).
+    weights = {
+        'dr': 1.0,      # (vr_amp/dr_amp)^2 ≈ (0.075/0.04)^2 ≈ 4
+        'dm': 100.0,   # (vr_amp/dm_amp)^2 ≈ (0.075/0.001)^2 ≈ 5600; conservative start
+        'vr': 1.0,      # baseline (largest projected amplitude)
+        'vm': 1.0,
+    }
+
     results = cca_sparse_analysis(
         N_t             = 1000,
-        weights         = None,       # unit weights; change e.g. {'dr':2,'dm':1,'vr':1,'vm':1}
+        weights         = weights,
         ev_threshold    = 1e-10,
         rho_min         = 0.99,
         rotation_method = 'promax',   # 'varimax' | 'promax' | 'ica'

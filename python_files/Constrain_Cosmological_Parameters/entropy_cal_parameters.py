@@ -81,13 +81,14 @@ class Universe:
         colors[condition_3] = 3  # Third region
 
         # Create the plot
-        plt.figure(figsize=(3.5,3))
-        plt.contourf(Kt, Mt, colors, levels=[0, 1, 2, 3], cmap='rainbow')
-        
+        fig = plt.figure(figsize=(3.375,2.7))
+        ax = fig.add_subplot(111)
+        ax.contourf(Kt, Mt, colors, levels=[0, 1, 2, 3], cmap='rainbow')
+
         # add description words
-        plt.text(0.8, 0.2, 'turnaround', fontsize=7, color='black', bbox=dict(facecolor='white', alpha=0.6))
-        plt.text(0.35, 2., 'non-symmetric de-Sitter', fontsize=7, color='black', bbox=dict(facecolor='white', alpha=0.6))
-        plt.text(0.05, 0.2, 'symmetric de-Sitter', fontsize=7, color='black', bbox=dict(facecolor='white', alpha=0.6))
+        ax.text(0.8, 0.2, 'turnaround', fontsize=7, color='black', bbox=dict(facecolor='white', alpha=0.6))
+        ax.text(0.35, 2., 'non-symmetric de-Sitter', fontsize=7, color='black', bbox=dict(facecolor='white', alpha=0.6))
+        ax.text(0.05, 0.2, 'symmetric de-Sitter', fontsize=7, color='black', bbox=dict(facecolor='white', alpha=0.6))
 
         # slope contour
         kt_list = np.logspace(-3, 0, 1000)
@@ -105,14 +106,25 @@ class Universe:
         slope_vfunc = np.vectorize(self.slope)
         Z = slope_vfunc(kt, mt)
         Z = np.array(Z, dtype=float)
-        CS = plt.contour(kt, mt, Z, levels=slope_levels, colors=['silver', 'grey', 'dimgrey'])
-        plt.clabel(CS, CS.levels, fmt=fmt, inline=True, fontsize=7)
+        CS = ax.contour(kt, mt, Z, levels=slope_levels, colors=['silver', 'grey', 'dimgrey'])
+        manual_locations = []
+        for line in CS.collections:
+            for path in line.get_paths():
+                vertices = path.vertices
+                x_mid = (vertices[:, 0].max() + vertices[:, 0].min()) / 2
+                y_mid = (vertices[:, 1].max() + vertices[:, 1].min()) / 2
+                y_offset = 0.1 * (mt.max() - mt.min())  # Adjust this value as needed
+                if y_mid > -1.7/0.66*x_mid + (1.7+y_offset): # exclude the region below the line y = -1.7/0.66*x + 1.7
+                    # Add a vertical offset to push the label upwards
+                    manual_locations.append((x_mid, y_mid + y_offset))
+
+        ax.clabel(CS, CS.levels,inline=True, fmt=fmt, manual=manual_locations, fontsize=8)
 
         # Add labels and title
-        plt.xlabel(r'$\tilde \kappa$')
-        plt.ylabel(r'$\tilde m$')
-        plt.title('Partition Plot for different universes', fontsize=10)
-        plt.savefig("partition_plot.pdf", bbox_inches="tight")
+        ax.set_xlabel(r'$\tilde \kappa$')
+        ax.set_ylabel(r'$\tilde m$')
+        ax.set_title('Partition Plot for different universes', fontsize=10)
+        ax.figure.savefig("partition_plot.pdf", bbox_inches="tight")
     
     def get_mt_as_kt0(self):
         kt = 0
@@ -249,8 +261,8 @@ class Universe:
 
     def plot_entropy_3D(self):
 
-        kt_list = np.linspace(1.e-3, 2, 20)
-        mt_list = np.linspace(0, 1.e3, 20)
+        kt_list = np.linspace(1.e-3, 0.5, 30)
+        mt_list = np.linspace(0, 5, 30)
         kt, mt = np.meshgrid(kt_list, mt_list)
 
         def entropy_divide(kt, mt):
@@ -273,10 +285,10 @@ class Universe:
         cbar = fig.colorbar(contour)
         
         # slope contour
-        kt_list = np.linspace(kt_list[0], kt_list[-1], 50)
-        mt_list = np.linspace(mt_list[0], mt_list[-1], 50)
+        kt_list = np.linspace(kt_list[0], kt_list[-1], 100)
+        mt_list = np.linspace(mt_list[0], mt_list[-1], 100)
         kt, mt = np.meshgrid(kt_list, mt_list)
-        levels = [1/4,1/3,1/2, 1]
+        levels = [1/3,1/2, 1]
         slope_levels = [N* np.pi/2 for N in levels]
         def fmt(x):
             N = 2/np.pi * x
@@ -289,11 +301,11 @@ class Universe:
         Z = slope_vfunc(kt, mt)
         Z = np.array(Z, dtype=float)
         CS = ax.contour(kt, mt, Z, levels=slope_levels, colors=['silver', 'grey', 'dimgrey'])
-        ax.clabel(CS, CS.levels, fmt=fmt, inline=True, fontsize=8)
+        ax.clabel(CS, CS.levels, fmt=fmt, inline=True, fontsize=7)
         ax.set_title(r"$S_g/S_{\Lambda}$ contour plot")
         ax.set_xlabel(r"$\tilde{\kappa}$")
         ax.set_ylabel(r"$\tilde{m}$")
-        ax.figure.savefig("entropy_g_contour.pdf", bbox_inches="tight")
+        ax.figure.savefig("entropy_g_contour_rt1.pdf", bbox_inches="tight")
 
         #####################
         # reproduce Fig. 2 in [2210.01142]
@@ -417,10 +429,11 @@ lam = 1
 rt = 1 # dimensionless radiation = r/lam
 universe = Universe(lam, rt, 0)
 # universe.plot_entropy_3D()
+universe.partition_plot()
 
-mt = 430
-kt = universe.find_kt_for_mt(mt, 1./2.)
-print(universe.transform(0.68, 1, mt, kt))
+# mt = 430
+# kt = universe.find_kt_for_mt(mt, 1./2.)
+# print(universe.transform(0.68, 1, mt, kt))
 # print(universe.transform(0.7, 1, 1.7, 0.01))
 # print(universe.transform(0.7, 1, 1.6080402010050252, 0.0617093944077409))
 # print(universe.transform(0.7, 1, 6., 0.0617093944077409))

@@ -1,0 +1,1017 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     39803,       1009]
+NotebookOptionsPosition[     37144,        956]
+NotebookOutlinePosition[     37538,        972]
+CellTagsIndexPosition[     37495,        969]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"Needs", "[", "\"\<OGRe`\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.9429156272118673`*^9, 3.9429156277550592`*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"7e657e7e-e6b0-47ca-b8a4-6de536929c95"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {
+     StyleBox[
+      TemplateBox[{"\"OGRe: An \"", 
+        StyleBox["\"O\"", Underlined, StripOnInput -> False], 
+        "\"bject-Oriented \"", 
+        StyleBox["\"G\"", Underlined, StripOnInput -> False], "\"eneral \"", 
+        StyleBox["\"Re\"", Underlined, StripOnInput -> False], 
+        "\"lativity Package for Mathematica\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontSize->Larger,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"By Barak Shoshany (\"", 
+        TemplateBox[{"\"baraksh@gmail.com\"", "mailto:baraksh@gmail.com"}, 
+         "HyperlinkURL"], "\") (\"", 
+        TemplateBox[{"\"baraksh.com\"", "https://baraksh.com/"}, 
+         "HyperlinkURL"], "\")\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"v1.7.0 (2021-09-17)\""},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     StyleBox[
+      TemplateBox[{"\"GitHub repository: \"", 
+        TemplateBox[{
+         "\"https://github.com/bshoshany/OGRe\"", 
+          "https://github.com/bshoshany/OGRe"}, "HyperlinkURL"]},
+       "RowDefault"],
+      StripOnInput->False,
+      FontWeight->Bold]},
+    {
+     TemplateBox[{
+      "\"\[Bullet] To view the full documentation for the package, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"TDocs[]\"", "Hyperlink", StripOnInput -> False], True -> 
+           StyleBox["\"TDocs[]\"", "HyperlinkActive", StripOnInput -> False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> OGRe`TDocs[], 
+        Appearance -> "Frameless", BaseStyle -> "Hyperlink", Evaluator -> 
+        Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To list all available modules, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"?OGRe`*\"", "Hyperlink", StripOnInput -> False], True -> 
+           StyleBox["\"?OGRe`*\"", "HyperlinkActive", StripOnInput -> False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+        OGRe`Private`OGRePrint[
+          Information["OGRe`*"]], Appearance -> "Frameless", BaseStyle -> 
+        "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To get help on a particular module, type \"", 
+       StyleBox["\"?\"", "Input", StripOnInput -> False], 
+       "\" followed by the module name.\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] To enable parallelization, type \"", 
+       ButtonBox[
+        TagBox[
+         PaneSelectorBox[{
+          False -> StyleBox[
+            "\"TSetParallelization[True]\"", "Hyperlink", StripOnInput -> 
+             False], True -> 
+           StyleBox[
+            "\"TSetParallelization[True]\"", "HyperlinkActive", StripOnInput -> 
+             False]}, 
+          Dynamic[
+           CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+          0], 
+         MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+        OGRe`TSetParallelization[True], Appearance -> "Frameless", BaseStyle -> 
+        "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], "\".\""},
+      "RowDefault"]},
+    {
+     TemplateBox[{"\"\[Bullet] \"", 
+       TemplateBox[{
+         DynamicBox[
+          ToBoxes[OGRe`Private`UpdateMessage, StandardForm], 
+          ImageSizeCache -> {328.546875, {3.48046875, 12.55078125}}], 
+         "\" To disable automatic checks for updates at startup, type \"", 
+         ButtonBox[
+          TagBox[
+           
+           PaneSelectorBox[{
+            False -> StyleBox[
+              "\"TSetAutoUpdates[False]\"", "Hyperlink", StripOnInput -> 
+               False], True -> 
+             StyleBox[
+              "\"TSetAutoUpdates[False]\"", "HyperlinkActive", StripOnInput -> 
+               False]}, 
+            Dynamic[
+             CurrentValue["MouseOver"]], ImageSize -> Automatic, FrameMargins -> 
+            0], 
+           MouseAppearanceTag["LinkHand"]], ButtonFunction :> 
+          OGRe`TSetAutoUpdates[False], Appearance -> "Frameless", BaseStyle -> 
+          "Hyperlink", Evaluator -> Automatic, Method -> "Preemptive"], 
+         "\".\""}, "RowDefault"]},
+      "RowDefault"]}
+   },
+   DefaultBaseStyle->"Column",
+   GridBoxAlignment->{"Columns" -> {{Left}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Column"]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942984370027852*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"903a8934-fe58-44f7-97b0-2de34366bd17"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TNewCoordinates", "[", 
+  RowBox[{"\"\<Spherical\>\"", ",", 
+   RowBox[{"{", 
+    RowBox[{"\[Eta]", ",", "r", ",", "\[Theta]", ",", "\[Phi]"}], "}"}]}], 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.9429156357526493`*^9, 3.9429156364181223`*^9}, {
+  3.942982141918446*^9, 3.942982143232777*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"91be0b3f-4ba2-436f-9be3-2469197bd235"],
+
+Cell[BoxData["\<\"Spherical\"\>"], "Output",
+ CellChangeTimes->{3.9429156374704847`*^9, 3.9429821511105213`*^9, 
+  3.9429843705817842`*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"e32a53d9-24dd-4080-b695-93b77c54a2f7"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"TSetReservedSymbols", "[", 
+   RowBox[{"{", 
+    RowBox[{"a", ",", "k"}], "}"}], "]"}], ";"}], "\n", 
+ RowBox[{"TShow", "@", 
+  RowBox[{"TNewMetric", "[", 
+   RowBox[{"\"\<FLRW\>\"", ",", "\"\<Spherical\>\"", ",", 
+    RowBox[{"DiagonalMatrix", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", 
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"]}], ",", 
+       FractionBox[
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"], 
+        RowBox[{"1", "-", 
+         RowBox[{"k", " ", 
+          SuperscriptBox["r", "2"]}]}]], ",", 
+       RowBox[{
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"], " ", 
+        SuperscriptBox["r", "2"]}], ",", 
+       RowBox[{
+        SuperscriptBox[
+         RowBox[{"a", "[", "\[Eta]", "]"}], "2"], " ", 
+        SuperscriptBox["r", "2"], " ", 
+        SuperscriptBox[
+         RowBox[{"Sin", "[", "\[Theta]", "]"}], "2"]}]}], "}"}], "]"}]}], 
+   "]"}]}]}], "Input",
+ CellChangeTimes->{{3.942915673319029*^9, 3.942915673839542*^9}, {
+  3.9429821531411963`*^9, 3.942982158933852*^9}, {3.9429843494007893`*^9, 
+  3.942984349652124*^9}},
+ CellLabel->"In[3]:=",ExpressionUUID->"9b2374c5-7305-4d99-a204-70d734cfe61f"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"FLRW\"", "\":   \"", 
+    TemplateBox[{"\"g\"", 
+      TemplateBox[{"\"\[Mu]\"", "\"\[Nu]\""}, "RowDefault"], 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False], 
+        StyleBox["\"\[Nu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"]}, "Subsuperscript", SyntaxForm -> SubsuperscriptBox], 
+    "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "r", "\[Theta]", "\[Phi]"}, 
+     "RowWithSeparators"], "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       GridBox[{{
+          RowBox[{"-", 
+            SuperscriptBox["a", "2"]}], "0", "0", "0"}, {"0", 
+          FractionBox[
+           SuperscriptBox["a", "2"], 
+           RowBox[{"1", "-", 
+             RowBox[{"k", " ", 
+               SuperscriptBox["r", "2"]}]}]], "0", "0"}, {"0", "0", 
+          RowBox[{
+            SuperscriptBox["a", "2"], " ", 
+            SuperscriptBox["r", "2"]}], "0"}, {"0", "0", "0", 
+          RowBox[{
+            SuperscriptBox["a", "2"], " ", 
+            SuperscriptBox["r", "2"], " ", 
+            SuperscriptBox[
+             RowBox[{"Sin", "[", "\[Theta]", "]"}], "2"]}]}}, RowSpacings -> 
+        1, ColumnSpacings -> 1, RowAlignments -> Baseline, ColumnAlignments -> 
+        Center], "\[NoBreak]", ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942984373212678*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"77d3d63a-f773-4dd3-9ede-644cff9e3207"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"Clear", "[", "\[Psi]", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"TDelete", "[", "\"\<Phi\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"TNewTensor", "[", 
+  RowBox[{"\"\<Phi\>\"", ",", "\"\<FLRW\>\"", ",", "\"\<Spherical\>\"", ",", 
+   RowBox[{"{", "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "}"}], ",", "\"\<\[Psi]\>\""}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.942915694681471*^9, 3.9429157006426363`*^9}, {
+  3.942915915145837*^9, 3.942915915314517*^9}, {3.942982205711401*^9, 
+  3.942982205931059*^9}},
+ CellLabel->"In[8]:=",ExpressionUUID->"57d7e253-c904-4e78-bcfe-7b341efdffa9"],
+
+Cell[BoxData["\<\"Phi\"\>"], "Output",
+ CellChangeTimes->{{3.942915702169132*^9, 3.942915705529945*^9}, 
+   3.94291591709171*^9, {3.942982175218482*^9, 3.942982206466304*^9}, {
+   3.942984376158428*^9, 3.9429843786352863`*^9}},
+ CellLabel->"Out[10]=",ExpressionUUID->"0022b35a-6a3b-4231-a84f-4b6af6fa26f0"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"TDelete", "[", "\"\<BoxPhi\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TShow", "@", 
+   RowBox[{"TCalc", "[", 
+    RowBox[{"\"\<BoxPhi\>\"", ",", 
+     RowBox[{
+      RowBox[{"TCovariantD", "[", "\"\<\[Mu]\>\"", "]"}], ".", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"TCovariantD", "[", "\"\<\[Mu]\>\"", "]"}], ".", 
+        RowBox[{"\"\<Phi\>\"", "[", "\"\<\>\"", "]"}]}], ")"}]}], ",", 
+     "\"\<\[Square]\[Psi]\>\""}], "]"}]}], "//", "FullSimplify"}]}], "Input",
+ CellChangeTimes->{{3.9429157064989567`*^9, 3.9429157146649837`*^9}},
+ CellLabel->"In[15]:=",ExpressionUUID->"c3ce67a7-ccd0-45eb-b05e-8984326a5e2c"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"BoxPhi\"", "\":   \"", 
+    TemplateBox[{"\"\[Square]\[Psi]\"", 
+      TemplateBox[{}, "RowDefault"], 
+      TemplateBox[{}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+     SubsuperscriptBox], "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "r", "\[Theta]", "\[Phi]"}, 
+     "RowWithSeparators"], "\")\"", "\" = \"", 
+    RowBox[{"-", 
+      FractionBox[
+       RowBox[{
+         RowBox[{"2", " ", 
+           TemplateBox[{"Inactive", "a", "\[Eta]"}, "InactiveD"], " ", 
+           TemplateBox[{"Inactive", 
+             RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"}, 
+            "InactiveD"]}], "+", 
+         RowBox[{"a", " ", 
+           TemplateBox[{"Inactive", 
+             RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+             SuperscriptBox["\[Eta]", "2"]}, "InactiveD"]}]}], 
+       SuperscriptBox["a", "3"]]}]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.94298438575793*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"be3446e5-e768-450c-a544-be5233e2fe3b"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{" ", 
+  RowBox[{
+   RowBox[{"TDelete", "[", "\"\<Box2Phi\>\"", "]"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"TShow", "@", 
+     RowBox[{"TCalc", "[", 
+      RowBox[{"\"\<Box2Phi\>\"", ",", 
+       RowBox[{
+        RowBox[{"TCovariantD", "[", "\"\<\[Nu]\>\"", "]"}], ".", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"TCovariantD", "[", "\"\<\[Nu]\>\"", "]"}], ".", 
+          RowBox[{"\"\<BoxPhi\>\"", "[", "\"\<\>\"", "]"}]}], ")"}]}], ",", 
+       "\"\<\[Square]\[Square]\[Psi]\>\""}], "]"}]}], "//", 
+    "FullSimplify"}]}]}]], "Input",
+ CellChangeTimes->{{3.942915725080956*^9, 3.94291573459159*^9}},
+ CellLabel->"In[19]:=",ExpressionUUID->"650f40ea-8726-4ba8-bbd0-f5cfb6200de6"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"Box2Phi\"", "\":   \"", 
+    TemplateBox[{"\"\[Square]\[Square]\[Psi]\"", 
+      TemplateBox[{}, "RowDefault"], 
+      TemplateBox[{}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+     SubsuperscriptBox], "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "r", "\[Theta]", "\[Phi]"}, 
+     "RowWithSeparators"], "\")\"", "\" = \"", 
+    FractionBox[
+     RowBox[{
+       RowBox[{"12", " ", 
+         SuperscriptBox[
+          TemplateBox[{"Inactive", "a", "\[Eta]"}, "InactiveD"], "3"], " ", 
+         TemplateBox[{"Inactive", 
+           RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"}, "InactiveD"]}], 
+       "-", 
+       RowBox[{"14", " ", "a", " ", 
+         TemplateBox[{"Inactive", "a", "\[Eta]"}, "InactiveD"], " ", 
+         TemplateBox[{"Inactive", "a", 
+           SuperscriptBox["\[Eta]", "2"]}, "InactiveD"], " ", 
+         TemplateBox[{"Inactive", 
+           RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"}, "InactiveD"]}], 
+       "-", 
+       RowBox[{"6", " ", "a", " ", 
+         SuperscriptBox[
+          TemplateBox[{"Inactive", "a", "\[Eta]"}, "InactiveD"], "2"], " ", 
+         TemplateBox[{"Inactive", 
+           RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+           SuperscriptBox["\[Eta]", "2"]}, "InactiveD"]}], "+", 
+       RowBox[{
+         SuperscriptBox["a", "2"], " ", 
+         RowBox[{"(", 
+           RowBox[{
+             RowBox[{"2", " ", 
+               TemplateBox[{"Inactive", "a", 
+                 SuperscriptBox["\[Eta]", "3"]}, "InactiveD"], " ", 
+               TemplateBox[{"Inactive", 
+                 RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"}, 
+                "InactiveD"]}], "+", 
+             RowBox[{"2", " ", 
+               TemplateBox[{"Inactive", "a", 
+                 SuperscriptBox["\[Eta]", "2"]}, "InactiveD"], " ", 
+               TemplateBox[{"Inactive", 
+                 RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+                 SuperscriptBox["\[Eta]", "2"]}, "InactiveD"]}], "+", 
+             RowBox[{"a", " ", 
+               TemplateBox[{"Inactive", 
+                 RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+                 SuperscriptBox["\[Eta]", "4"]}, "InactiveD"]}]}], ")"}]}]}], 
+     
+     SuperscriptBox["a", "7"]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942984391597217*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"395065b1-bca8-4c72-9c1a-2e0e3257311e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{" ", 
+  RowBox[{
+   RowBox[{"TDelete", "[", "\"\<FourVelocity\>\"", "]"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"TShow", "@", 
+    RowBox[{"TNewTensor", "[", 
+     RowBox[{
+     "\"\<FourVelocity\>\"", ",", "\"\<FLRW\>\"", ",", "\"\<Spherical\>\"", 
+      ",", 
+      RowBox[{"{", "1", "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "0", ",", "0", ",", "0"}], "}"}]}], 
+     "]"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.942915790916629*^9, 3.9429158111189947`*^9}, {
+  3.942915934328402*^9, 3.942915937725512*^9}, {3.942917717068972*^9, 
+  3.942917717260153*^9}, {3.94298221700099*^9, 3.942982223455254*^9}},
+ CellLabel->"In[23]:=",ExpressionUUID->"58515ead-2d81-4859-9b69-fcdb60acf69b"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"FourVelocity\"", "\":   \"", 
+    TemplateBox[{"\"\[DottedSquare]\"", 
+      TemplateBox[{
+        StyleBox["\"\[Mu]\"", ShowContents -> False, StripOnInput -> False]}, 
+       "RowDefault"], 
+      TemplateBox[{"\"\[Mu]\""}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+     SubsuperscriptBox], "\"(\"", 
+    TemplateBox[{",", "\",\"", "\[Eta]", "r", "\[Theta]", "\[Phi]"}, 
+     "RowWithSeparators"], "\")\"", "\" = \"", 
+    TagBox[
+     RowBox[{"(", "\[NoBreak]", 
+       TagBox[
+        GridBox[{{"1"}, {"0"}, {"0"}, {"0"}}, ColumnAlignments -> Center, 
+         RowSpacings -> 1, ColumnAlignments -> Left], Column], "\[NoBreak]", 
+       ")"}], 
+     Function[BoxForm`e$, 
+      MatrixForm[BoxForm`e$]]]},
+   "RowDefault"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942984397446568*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"b522013e-f1c2-43ba-b7f1-8ee449fe08f7"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"Clear", "[", 
+  RowBox[{"\[Rho]", ",", "P"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"TDelete", "[", "\"\<EnergyMomentumT\>\"", 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TList", "@", 
+   RowBox[{"TChangeDefaultIndices", "[", 
+    RowBox[{
+     RowBox[{"TCalc", "[", 
+      RowBox[{"\"\<EnergyMomentumT\>\"", ",", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"-", "2"}], 
+         RowBox[{
+          RowBox[{"\"\<BoxPhi\>\"", "[", "\"\<\>\"", "]"}], ".", 
+          RowBox[{"TCovariantD", "[", "\"\<\[Mu]\>\"", "]"}], ".", " ", 
+          RowBox[{"TCovariantD", "[", "\"\<\[Nu]\>\"", "]"}], ".", 
+          RowBox[{"\"\<Phi\>\"", "[", "\"\<\>\"", "]"}]}]}], "+", 
+        RowBox[{
+         RowBox[{"\"\<FLRW\>\"", "[", "\"\<\[Mu]\[Nu]\>\"", "]"}], 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+           RowBox[{"C", " ", 
+            RowBox[{"\"\<Phi\>\"", "[", "\"\<\>\"", "]"}], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"\[Rho]", "[", "\[Eta]", "]"}], "/", "2"}], "+", 
+              RowBox[{"P", "[", "\[Eta]", "]"}]}], ")"}]}]}], ")"}]}], " ", 
+        "+", " ", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"\"\<FourVelocity\>\"", "[", "\"\<\[Mu]\>\"", "]"}], ".", 
+          RowBox[{"\"\<FourVelocity\>\"", "[", "\"\<\[Nu]\>\"", "]"}]}], 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"\[Rho]", "[", "\[Eta]", "]"}], "+", 
+           RowBox[{"P", "[", "\[Eta]", "]"}]}], ")"}], 
+         RowBox[{"(", 
+          RowBox[{"1", "+", 
+           RowBox[{"C", " ", 
+            RowBox[{"\"\<Phi\>\"", "[", "\"\<\>\"", "]"}]}]}], ")"}]}]}], 
+       ",", "\"\<T\>\""}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "1"}], ",", 
+       RowBox[{"-", "1"}]}], "}"}]}], "]"}]}], "//", 
+  "FullSimplify"}]}], "Input",
+ CellChangeTimes->{{3.942915752091586*^9, 3.942915752625841*^9}, {
+   3.942915783218067*^9, 3.942915788847628*^9}, {3.9429158221247377`*^9, 
+   3.942915822516905*^9}, {3.94291589967642*^9, 3.942915909268471*^9}, {
+   3.9429159457551727`*^9, 3.942916122200465*^9}, {3.9429162328497953`*^9, 
+   3.942916262100963*^9}, 3.9429182387079697`*^9, {3.9429822320421267`*^9, 
+   3.942982240839246*^9}},
+ CellLabel->"In[25]:=",ExpressionUUID->"4a5aada4-4f2b-42e0-b03a-91760a6e340d"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "TMessage", "ErrorDoesNotExist", 
+   "\"The tensor \
+\\\"\\!\\(\\*RowBox[{\\\"\\\\\\\"EnergyMomentumT\\\\\\\"\\\"}]\\)\\\" does \
+not exist.\"", 2, 26, 8, 24528549216351364707, "Local", "OGRe`TMessage"},
+  "MessageTemplate2"]], "Message", "MSG",
+ CellChangeTimes->{3.942982243582121*^9, 3.942984401139879*^9},
+ CellLabel->
+  "During evaluation of \
+In[25]:=",ExpressionUUID->"27687aa6-d5a3-4a27-9455-570540ebc934"],
+
+Cell[BoxData["$Aborted"], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.94291824671636*^9, 3.942982243603179*^9, 
+  3.942984401199411*^9},
+ CellLabel->"Out[26]=",ExpressionUUID->"86ea8a16-7684-41ed-99f3-3f7cdeb41bd3"],
+
+Cell[BoxData[
+ StyleBox[
+  TagBox[GridBox[{
+     {
+      TemplateBox[{"\"EnergyMomentumT\"", "\":\""},
+       "RowDefault"]},
+     {
+      TagBox[GridBox[{
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"T\"", 
+              TemplateBox[{"\"\[Eta]\"", "\"\[Eta]\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", 
+             SuperscriptBox["a", "2"]}], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+              RowBox[{"C", " ", 
+               RowBox[{"\<\"Phi\"\>", "[", "\<\"\"\>", "]"}], " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+                 FractionBox[
+                  RowBox[{"\[Rho]", "[", "\[Eta]", "]"}], "2"]}], ")"}]}]}], 
+             ")"}]}], "+", 
+           RowBox[{
+            SuperscriptBox["a", "4"], " ", 
+            RowBox[{"(", 
+             RowBox[{"1", "+", 
+              RowBox[{"\<\"_TCalcTemp3_\"\>", "[", "\<\"\"\>", "]"}]}], ")"}],
+             " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+              RowBox[{"\[Rho]", "[", "\[Eta]", "]"}]}], ")"}]}], "+", 
+           FractionBox[
+            RowBox[{"2", " ", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"-", 
+                 TemplateBox[{"Inactive", "a", "\[Eta]"},
+                  "InactiveD"]}], " ", 
+                TemplateBox[{"Inactive", 
+                  RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+                 "InactiveD"]}], "+", 
+               RowBox[{"a", " ", 
+                TemplateBox[{"Inactive", 
+                  RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+                  SuperscriptBox["\[Eta]", "2"]},
+                 "InactiveD"]}]}], ")"}], " ", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"2", " ", 
+                TemplateBox[{"Inactive", "a", "\[Eta]"},
+                 "InactiveD"], " ", 
+                TemplateBox[{"Inactive", 
+                  RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+                 "InactiveD"]}], "+", 
+               RowBox[{"a", " ", 
+                TemplateBox[{"Inactive", 
+                  RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+                  SuperscriptBox["\[Eta]", "2"]},
+                 "InactiveD"]}]}], ")"}]}], 
+            SuperscriptBox["a", "4"]]}]},
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"T\"", 
+              TemplateBox[{"\"r\"", "\"r\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"r\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"r\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           RowBox[{
+            RowBox[{
+             RowBox[{"-", 
+              SuperscriptBox["a", "6"]}], " ", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"2", " ", 
+                RowBox[{"(", 
+                 RowBox[{"1", "+", 
+                  RowBox[{"C", " ", 
+                   RowBox[{"\<\"Phi\"\>", "[", "\<\"\"\>", "]"}]}]}], ")"}], 
+                " ", 
+                RowBox[{"P", "[", "\[Eta]", "]"}]}], "+", 
+               RowBox[{"C", " ", 
+                RowBox[{"\<\"Phi\"\>", "[", "\<\"\"\>", "]"}], " ", 
+                RowBox[{"\[Rho]", "[", "\[Eta]", "]"}]}]}], ")"}]}], "+", 
+            RowBox[{"8", " ", 
+             SuperscriptBox[
+              TemplateBox[{"Inactive", "a", "\[Eta]"},
+               "InactiveD"], "2"], " ", 
+             SuperscriptBox[
+              TemplateBox[{"Inactive", 
+                RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+               "InactiveD"], "2"]}], "+", 
+            RowBox[{"4", " ", "a", " ", 
+             TemplateBox[{"Inactive", "a", "\[Eta]"},
+              "InactiveD"], " ", 
+             TemplateBox[{"Inactive", 
+               RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+              "InactiveD"], " ", 
+             TemplateBox[{"Inactive", 
+               RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+               SuperscriptBox["\[Eta]", "2"]},
+              "InactiveD"]}]}], 
+           RowBox[{"2", " ", 
+            SuperscriptBox["a", "4"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"-", "1"}], "+", 
+              RowBox[{"k", " ", 
+               SuperscriptBox["r", "2"]}]}], ")"}]}]]},
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"T\"", 
+              TemplateBox[{"\"\[Theta]\"", "\"\[Theta]\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Theta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Theta]\"", ShowContents -> False, StripOnInput -> 
+                 False]}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           RowBox[{
+            SuperscriptBox["r", "2"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{
+               SuperscriptBox["a", "6"], " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+                 RowBox[{"C", " ", 
+                  RowBox[{"\<\"Phi\"\>", "[", "\<\"\"\>", "]"}], " ", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+                    FractionBox[
+                    RowBox[{"\[Rho]", "[", "\[Eta]", "]"}], "2"]}], ")"}]}]}],
+                 ")"}]}], "-", 
+              RowBox[{"2", " ", 
+               TemplateBox[{"Inactive", "a", "\[Eta]"},
+                "InactiveD"], " ", 
+               TemplateBox[{"Inactive", 
+                 RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+                "InactiveD"], " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"2", " ", 
+                  TemplateBox[{"Inactive", "a", "\[Eta]"},
+                   "InactiveD"], " ", 
+                  TemplateBox[{"Inactive", 
+                    RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+                   "InactiveD"]}], "+", 
+                 RowBox[{"a", " ", 
+                  TemplateBox[{"Inactive", 
+                    RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+                    SuperscriptBox["\[Eta]", "2"]},
+                   "InactiveD"]}]}], ")"}]}]}], ")"}]}], 
+           SuperscriptBox["a", "4"]]},
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"T\"", 
+              TemplateBox[{"\"\[Phi]\"", "\"\[Phi]\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Phi]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Phi]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           RowBox[{
+            SuperscriptBox["r", "2"], " ", 
+            SuperscriptBox[
+             RowBox[{"Sin", "[", "\[Theta]", "]"}], "2"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{
+               SuperscriptBox["a", "6"], " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+                 RowBox[{"C", " ", 
+                  RowBox[{"\<\"Phi\"\>", "[", "\<\"\"\>", "]"}], " ", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"P", "[", "\[Eta]", "]"}], "+", 
+                    FractionBox[
+                    RowBox[{"\[Rho]", "[", "\[Eta]", "]"}], "2"]}], ")"}]}]}],
+                 ")"}]}], "-", 
+              RowBox[{"2", " ", 
+               TemplateBox[{"Inactive", "a", "\[Eta]"},
+                "InactiveD"], " ", 
+               TemplateBox[{"Inactive", 
+                 RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+                "InactiveD"], " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"2", " ", 
+                  TemplateBox[{"Inactive", "a", "\[Eta]"},
+                   "InactiveD"], " ", 
+                  TemplateBox[{"Inactive", 
+                    RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], "\[Eta]"},
+                   "InactiveD"]}], "+", 
+                 RowBox[{"a", " ", 
+                  TemplateBox[{"Inactive", 
+                    RowBox[{"\[Psi]", "[", "\[Eta]", "]"}], 
+                    SuperscriptBox["\[Eta]", "2"]},
+                   "InactiveD"]}]}], ")"}]}]}], ")"}]}], 
+           SuperscriptBox["a", "4"]]}
+        },
+        AutoDelete->False,
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxItemSize->{
+         "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+       "Grid"]}
+    },
+    DefaultBaseStyle->"Column",
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+   "Column"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942984401998358*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"92b732e2-db81-4b1f-9620-5d8c5aa28d92"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"TDelete", "[", "\"\<FLRWEinstein\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"TList", "@", 
+  RowBox[{"TCalcEinsteinTensor", "[", "\"\<FLRW\>\"", "]"}]}]}], "Input",
+ CellChangeTimes->{{3.942916298404234*^9, 3.942916299234818*^9}, {
+  3.942983229849288*^9, 3.942983246982811*^9}},
+ CellLabel->"In[28]:=",ExpressionUUID->"e51b0180-1a72-430a-9c66-155bde4c7222"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "TMessage", "ErrorDoesNotExist", 
+   "\"The tensor \
+\\\"\\!\\(\\*RowBox[{\\\"\\\\\\\"FLRWEinstein\\\\\\\"\\\"}]\\)\\\" does not \
+exist.\"", 2, 28, 9, 24528549216351364707, "Local", "OGRe`TMessage"},
+  "MessageTemplate2"]], "Message", "MSG",
+ CellChangeTimes->{3.9429844121455097`*^9},
+ CellLabel->
+  "During evaluation of \
+In[28]:=",ExpressionUUID->"251a9fac-f37d-404e-83ea-7542eeeb5ae4"],
+
+Cell[BoxData["$Aborted"], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942983248784616*^9, 3.9429844121914473`*^9},
+ CellLabel->"Out[28]=",ExpressionUUID->"3b579805-74dc-4da0-b6b5-9623fc5394ce"],
+
+Cell[BoxData[
+ StyleBox[
+  TagBox[GridBox[{
+     {
+      TemplateBox[{"\"FLRWEinstein\"", "\":\""},
+       "RowDefault"]},
+     {
+      TagBox[GridBox[{
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"G\"", 
+              TemplateBox[{"\"\[Eta]\"", "\"\[Eta]\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Eta]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          RowBox[{"3", " ", 
+           RowBox[{"(", 
+            RowBox[{"k", "+", 
+             FractionBox[
+              SuperscriptBox[
+               TemplateBox[{"Inactive", "a", "\[Eta]"},
+                "InactiveD"], "2"], 
+              SuperscriptBox["a", "2"]]}], ")"}]}]},
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"G\"", 
+              TemplateBox[{"\"r\"", "\"r\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"r\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"r\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           RowBox[{
+            RowBox[{
+             SuperscriptBox["a", "2"], " ", "k"}], "-", 
+            SuperscriptBox[
+             TemplateBox[{"Inactive", "a", "\[Eta]"},
+              "InactiveD"], "2"], "+", 
+            RowBox[{"2", " ", "a", " ", 
+             TemplateBox[{"Inactive", "a", 
+               SuperscriptBox["\[Eta]", "2"]},
+              "InactiveD"]}]}], 
+           RowBox[{
+            SuperscriptBox["a", "2"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"-", "1"}], "+", 
+              RowBox[{"k", " ", 
+               SuperscriptBox["r", "2"]}]}], ")"}]}]]},
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"G\"", 
+              TemplateBox[{"\"\[Theta]\"", "\"\[Theta]\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Theta]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Theta]\"", ShowContents -> False, StripOnInput -> 
+                 False]}, "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           RowBox[{
+            SuperscriptBox["r", "2"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              SuperscriptBox[
+               TemplateBox[{"Inactive", "a", "\[Eta]"},
+                "InactiveD"], "2"], "-", 
+              RowBox[{"a", " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"a", " ", "k"}], "+", 
+                 RowBox[{"2", " ", 
+                  TemplateBox[{"Inactive", "a", 
+                    SuperscriptBox["\[Eta]", "2"]},
+                   "InactiveD"]}]}], ")"}]}]}], ")"}]}], 
+           SuperscriptBox["a", "2"]]},
+         {
+          TemplateBox[{"=", "\"=\"", 
+            TemplateBox[{"\"G\"", 
+              TemplateBox[{"\"\[Phi]\"", "\"\[Phi]\""}, "RowDefault"], 
+              TemplateBox[{
+                StyleBox[
+                "\"\[Phi]\"", ShowContents -> False, StripOnInput -> False], 
+                StyleBox[
+                "\"\[Phi]\"", ShowContents -> False, StripOnInput -> False]}, 
+               "RowDefault"]}, "Subsuperscript", SyntaxForm -> 
+             SubsuperscriptBox]},
+           "RowWithSeparators"], "\<\"=\"\>", 
+          FractionBox[
+           RowBox[{
+            SuperscriptBox["r", "2"], " ", 
+            SuperscriptBox[
+             RowBox[{"Sin", "[", "\[Theta]", "]"}], "2"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              SuperscriptBox[
+               TemplateBox[{"Inactive", "a", "\[Eta]"},
+                "InactiveD"], "2"], "-", 
+              RowBox[{"a", " ", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"a", " ", "k"}], "+", 
+                 RowBox[{"2", " ", 
+                  TemplateBox[{"Inactive", "a", 
+                    SuperscriptBox["\[Eta]", "2"]},
+                   "InactiveD"]}]}], ")"}]}]}], ")"}]}], 
+           SuperscriptBox["a", "2"]]}
+        },
+        AutoDelete->False,
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxItemSize->{
+         "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+       "Grid"]}
+    },
+    DefaultBaseStyle->"Column",
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+   "Column"], "DisplayFormula",
+  StripOnInput->False]], "Output",
+ Editable->False,
+ CellLabelStyle->Directive["CellLabel", Smaller, 
+   RGBColor[0, 0, 1]],
+ CellChangeTimes->{3.942984413255301*^9},
+ CellLabel->"OGRe:",ExpressionUUID->"fda952f8-951e-4eba-b838-e6d98dce98df"]
+}, Open  ]]
+},
+WindowSize->{1112.25, 601.5},
+WindowMargins->{{Automatic, 0}, {0, Automatic}},
+FrontEndVersion->"14.1 for Linux x86 (64-bit) (July 16, 2024)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"29618264-7262-4a26-a42f-34ff40be076b"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[576, 22, 218, 3, 29, "Input",ExpressionUUID->"7e657e7e-e6b0-47ca-b8a4-6de536929c95"],
+Cell[797, 27, 5035, 128, 204, "Output",ExpressionUUID->"903a8934-fe58-44f7-97b0-2de34366bd17"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5869, 160, 393, 8, 29, "Input",ExpressionUUID->"91be0b3f-4ba2-436f-9be3-2469197bd235"],
+Cell[6265, 170, 217, 3, 33, "Output",ExpressionUUID->"e32a53d9-24dd-4080-b695-93b77c54a2f7"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6519, 178, 1262, 34, 73, "Input",ExpressionUUID->"9b2374c5-7305-4d99-a204-70d734cfe61f"],
+Cell[7784, 214, 1678, 40, 110, "Output",ExpressionUUID->"77d3d63a-f773-4dd3-9ede-644cff9e3207"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9499, 259, 643, 12, 69, "Input",ExpressionUUID->"57d7e253-c904-4e78-bcfe-7b341efdffa9"],
+Cell[10145, 273, 306, 4, 33, "Output",ExpressionUUID->"0022b35a-6a3b-4231-a84f-4b6af6fa26f0"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10488, 282, 664, 14, 49, "Input",ExpressionUUID->"c3ce67a7-ccd0-45eb-b05e-8984326a5e2c"],
+Cell[11155, 298, 1157, 28, 55, "Output",ExpressionUUID->"be3446e5-e768-450c-a544-be5233e2fe3b"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12349, 331, 730, 17, 49, "Input",ExpressionUUID->"650f40ea-8726-4ba8-bbd0-f5cfb6200de6"],
+Cell[13082, 350, 2534, 58, 57, "Output",ExpressionUUID->"395065b1-bca8-4c72-9c1a-2e0e3257311e"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15653, 413, 723, 17, 49, "Input",ExpressionUUID->"58515ead-2d81-4859-9b69-fcdb60acf69b"],
+Cell[16379, 432, 1038, 25, 86, "Output",ExpressionUUID->"b522013e-f1c2-43ba-b7f1-8ee449fe08f7"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17454, 462, 2383, 56, 158, "Input",ExpressionUUID->"4a5aada4-4f2b-42e0-b03a-91760a6e340d"],
+Cell[19840, 520, 445, 10, 26, "Message",ExpressionUUID->"27687aa6-d5a3-4a27-9455-570540ebc934"],
+Cell[20288, 532, 293, 6, 33, "Output",ExpressionUUID->"86ea8a16-7684-41ed-99f3-3f7cdeb41bd3"],
+Cell[20584, 540, 10149, 247, 177, "Output",ExpressionUUID->"92b732e2-db81-4b1f-9620-5d8c5aa28d92"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30770, 792, 386, 6, 49, "Input",ExpressionUUID->"e51b0180-1a72-430a-9c66-155bde4c7222"],
+Cell[31159, 800, 422, 10, 26, "Message",ExpressionUUID->"251a9fac-f37d-404e-83ea-7542eeeb5ae4"],
+Cell[31584, 812, 271, 5, 33, "Output",ExpressionUUID->"3b579805-74dc-4da0-b6b5-9623fc5394ce"],
+Cell[31858, 819, 5270, 134, 175, "Output",ExpressionUUID->"fda952f8-951e-4eba-b838-e6d98dce98df"]
+}, Open  ]]
+}
+]
+*)
+
