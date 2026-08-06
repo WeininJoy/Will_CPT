@@ -1,0 +1,13 @@
+Computing sources
+DEBUG perturbations_get_k_list (scalars): has_cls=0, k_output_values_num=5
+Perturbations mode: Using only k_output_values (5 k-modes, no full k-list generation)
+k_output_values merge: Skipping merge for scalars (already optimized)
+Evolving mode 1/1
+Evolving ic 1/1
+evolving 5 wavenumbers
+
+
+Error in perturbations_init 
+=>operator()(L:934) :error in perturbations_solve(ppr, pba, pth, ppt, index_md, index_ic, index_k, &pw);
+=>perturbations_solve(L:3305) :error in perturbations_vector_init(ppr, pba, pth, ppt, index_md, index_ic, k, interval_limit[index_interval], ppw, previous_approx);
+=>perturbations_vector_init(L:4404) :condition (ppw->approx[ppw->index_ap_tca] == (int)tca_off) is true; scalar initial conditions assume tight-coupling approximation turned on

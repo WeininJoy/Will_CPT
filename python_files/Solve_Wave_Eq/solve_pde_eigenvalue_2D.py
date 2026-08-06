@@ -244,7 +244,7 @@ if __name__=="__main__":
     eigenvalues_threshold = float(sys.argv[2])
     num_processes = int(sys.argv[3])
     kappa = 1.5
-    T = 1.
+    T = np.pi 
 
     # Interval t=[a, b], x=[c, d]
     a, b = 0, T

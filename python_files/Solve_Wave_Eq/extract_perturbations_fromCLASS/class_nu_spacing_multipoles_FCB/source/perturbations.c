@@ -1712,11 +1712,25 @@ int perturbations_timesampling_for_sources(
        adding a few sampled values above z_max_pk, to make
        interpolations more relia=ble up to z_max_pk, without boundary
        effects. */
-    class_call(background_tau_of_z(pba,
-                                   ppt->z_max_pk+1,
-                                   &tau_ini),
-               pba->error_message,
-               ppt->error_message);
+
+    /* MODIFICATION: Ensure tau_ini is early enough for tight-coupling to be ON.
+       When z_max_pk is small (or 0), starting at z=z_max_pk+1 can be too late.
+       Use the earliest time in thermodynamics table (pth->tau_ini) when needed. */
+
+    if (ppt->z_max_pk > 100) {
+      /* z_max_pk is high enough, use normal behavior */
+      class_call(background_tau_of_z(pba,
+                                     ppt->z_max_pk+1,
+                                     &tau_ini),
+                 pba->error_message,
+                 ppt->error_message);
+    }
+    else {
+      /* z_max_pk is low, use earliest available time to ensure tight-coupling */
+      tau_ini = pth->tau_ini;
+      fprintf(stdout,"DEBUG perturbations tau_ini selection: z_max_pk=%e too small, using pth->tau_ini=%e\n",
+              ppt->z_max_pk, tau_ini);
+    }
 
     /* obsolete: previous choice was to start always at recombination time */
     /* tau_ini = pth->tau_rec; */
@@ -2172,6 +2186,36 @@ int perturbations_get_k_list(
        k_min, we define exactly the same sampling in the three cases
        K=0, K<0, K>0 */
 
+    /* DEBUG: print flags */
+    fprintf(stdout,"DEBUG perturbations_get_k_list (scalars): has_cls=%d, k_output_values_num=%d\n",
+            ppt->has_cls, ppt->k_output_values_num);
+
+    /* OPTIMIZATION: If NO CMB output is requested AND k_output_values are specified,
+       use ONLY k_output_values instead of generating the full k-list */
+    if (ppt->has_cls == _FALSE_ && ppt->k_output_values_num > 0) {
+
+      /* Allocate k array with exact size needed */
+      class_alloc(ppt->k[ppt->index_md_scalars],
+                  ppt->k_output_values_num * sizeof(double),
+                  ppt->error_message);
+
+      /* Directly copy k_output_values to k array */
+      for (index_k = 0; index_k < ppt->k_output_values_num; index_k++) {
+        ppt->k[ppt->index_md_scalars][index_k] = ppt->k_output_values[index_k];
+      }
+
+      /* Set all k_size variables */
+      ppt->k_size[ppt->index_md_scalars] = ppt->k_output_values_num;
+      ppt->k_size_cmb[ppt->index_md_scalars] = ppt->k_output_values_num;
+      ppt->k_size_cl[ppt->index_md_scalars] = ppt->k_output_values_num;
+      ppt->k_size_pk = ppt->k_output_values_num;
+
+      fprintf(stdout,"Perturbations mode: Using only k_output_values (%d k-modes, no full k-list generation)\n",
+              ppt->k_output_values_num);
+
+      goto scalars_k_list_done;
+    }
+
     /* allocate array with, for the moment, the largest possible size */
 
     /* the following is a boost on k_per_decade_for_pk for the interacting idm-idr cases (relevant for large k and a_idm_dr) */
@@ -2284,6 +2328,9 @@ int perturbations_get_k_list(
     class_realloc(ppt->k[ppt->index_md_scalars],
                   ppt->k_size[ppt->index_md_scalars]*sizeof(double),
                   ppt->error_message);
+
+  scalars_k_list_done:
+    ; /* Label target - scalar k-list generation complete */
   }
 
   /** - vector modes */
@@ -2561,10 +2608,73 @@ int perturbations_get_k_list(
     /* Allocate storage */
     class_alloc(ppt->index_k_output_values,sizeof(double)*ppt->md_size*ppt->k_output_values_num,ppt->error_message);
 
-    /** - --> Find indices in ppt->k[index_md] corresponding to 'k_output_values'.
-        We are assuming that ppt->k is sorted and growing, and we have made sure
-        that ppt->k_output_values is also sorted and growing.*/
-    for (index_mode=0; index_mode<ppt->md_size; index_mode++){
+    /* Check if we used the optimization (k-list is already k_output_values) */
+    if (ppt->has_cls == _FALSE_ &&
+        ppt->has_scalars == _TRUE_ &&
+        ppt->k_size[ppt->index_md_scalars] == ppt->k_output_values_num) {
+
+      /* The scalar k-list is already exactly k_output_values, no merge needed.
+         Just set up index_k_output_values to point to sequential indices. */
+      fprintf(stdout,"k_output_values merge: Skipping merge for scalars (already optimized)\n");
+
+      for (index_k_output = 0; index_k_output < ppt->k_output_values_num; index_k_output++) {
+        ppt->index_k_output_values[ppt->index_md_scalars*ppt->k_output_values_num+index_k_output] = index_k_output;
+      }
+
+      /* For other modes (vectors, tensors), proceed with normal merge if they exist */
+      for (index_mode=0; index_mode<ppt->md_size; index_mode++){
+        if (index_mode == ppt->index_md_scalars) continue; /* Skip scalars, already handled */
+
+        /* Normal merge logic for non-scalar modes */
+        newk_size = ppt->k_size[index_mode]+ppt->k_output_values_num;
+
+        class_alloc(tmp_k_list,sizeof(double)*newk_size,ppt->error_message);
+
+        index_k=0;
+        index_k_output=0;
+        for (index_newk=0; index_newk<newk_size; index_newk++){
+          if (index_k >= ppt->k_size[index_mode])
+            add_k_output_value = _TRUE_;
+          else if (index_k_output >= ppt->k_output_values_num)
+            add_k_output_value = _FALSE_;
+          else if (ppt->k_output_values[index_k_output] < ppt->k[index_mode][index_k])
+            add_k_output_value = _TRUE_;
+          else
+            add_k_output_value = _FALSE_;
+
+          if (add_k_output_value == _TRUE_){
+            tmp_k_list[index_newk] = ppt->k_output_values[index_k_output];
+            ppt->index_k_output_values[index_mode*ppt->k_output_values_num+index_k_output]=index_newk;
+            index_k_output++;
+          }
+          else{
+            tmp_k_list[index_newk] = ppt->k[index_mode][index_k];
+            index_k++;
+          }
+        }
+
+        free(ppt->k[index_mode]);
+        ppt->k[index_mode] = tmp_k_list;
+        ppt->k_size[index_mode] = newk_size;
+
+        index_k = newk_size-1;
+        while (ppt->k[index_mode][index_k] > k_max_cl[index_mode])
+          index_k--;
+        ppt->k_size_cl[index_mode] = MIN(index_k+2,ppt->k_size[index_mode]);
+
+        index_k = newk_size-1;
+        while (ppt->k[index_mode][index_k] > k_max_cmb[index_mode])
+          index_k--;
+        ppt->k_size_cmb[index_mode] = MIN(index_k+2,ppt->k_size[index_mode]);
+      }
+    }
+    else {
+      /* Normal case: merge k_output_values into all k-lists */
+
+      /** - --> Find indices in ppt->k[index_md] corresponding to 'k_output_values'.
+          We are assuming that ppt->k is sorted and growing, and we have made sure
+          that ppt->k_output_values is also sorted and growing.*/
+      for (index_mode=0; index_mode<ppt->md_size; index_mode++){
 
       newk_size = ppt->k_size[index_mode]+ppt->k_output_values_num;
 
@@ -2612,7 +2722,8 @@ int perturbations_get_k_list(
       /** - --> The two MIN statements are here because in a normal run, the cl and cmb
           arrays contain a single k value larger than their respective k_max.
           We are mimicking this behavior. */
-    }
+      }
+    } /* End of else block (normal merge case) */
   }
 
   /* For testing, can be useful to print the k list in a file:

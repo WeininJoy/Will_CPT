@@ -16,7 +16,7 @@ Omega_gamma_h2 = 2.47e-5 # photon density
 Neff = 3.046
 N_ncdm = 1  # number of massive neutrino species
 m_ncdm = 0.06  # mass of massive neutrino species in e
-k_of_interest = [0.001, 0.01, 0.05, 0.1, 0.2]  # in h/Mpc
+k_of_interest = []  # in h/Mpc
 
 def cosmological_parameters(mt, kt, h): 
 
@@ -82,14 +82,6 @@ params = {
 
     # Limit k-range to prevent overflow in primordial k-grid calculation
     'P_k_max_1/Mpc': max(k_of_interest) * 1.5,  # Set max k slightly above our highest k
-
-    # CRITICAL: Precision parameters to prevent too many k-modes when extending to far future
-    # These control the k-grid sampling and prevent memory overflow
-    # Since we only care about k_output_values, make the internal k-grid VERY sparse
-    'k_step_sub': 2.0,           # Much larger step = far fewer k-modes (default: 0.05)
-    'k_step_super': 0.1,         # Much larger step = far fewer k-modes (default: 0.002)
-    'k_per_decade_for_pk': 2.0,  # Minimal k per decade (default: 10.0)
-    'k_per_decade_for_bao': 2.0, # Minimal k in BAO region (default: 70.0)
 
     # Precision parameters to control multipole hierarchy
     'l_max_g': 50,        # Maximum photon temperature multipole (default: 12)
