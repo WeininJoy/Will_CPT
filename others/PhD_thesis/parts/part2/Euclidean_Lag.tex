@@ -1,0 +1,311 @@
+\chapter{Euclidean Signature and Alternative Lagrangians}\label{chapter:Lag_Euclidean}
+
+\chapterabstract{In this chapter, we first review the Hermiticity and chirality problems inherent to conventional Euclidean Lagrangians. We then introduce von Nieuwenhuizen's Wick rotation; by actively Wick rotating the spinors alongside the spacetime coordinates, the resulting Euclidean Lagrangian preserves the mathematical structure of its Lorentzian counterpart, successfully restoring Hermiticity. Unfortunately, this framework leaves the chirality problem unresolved. We subsequently extend this Wick rotation methodology to Kähler-Dirac (KD) fermions. Remarkably, due to the presence of the additional $\gamma^0$ matrix, chirality is strictly preserved in the Euclidean KD Lagrangian. This critical mathematical feature establishes a robust pathway for constructing anomaly-free chiral gauge theories on a lattice. Inspired by this Euclidean formulation, we also explore alternative configurations for the Lorentzian Lagrangian, rigorously analyzing their respective equations of motion, quantization properties, and associated KD-Majorana conditions. Our results demonstrate that, despite distinct mathematical expressions, the underlying physical paradigms—specifically the emergence of negative-norm states, the fundamental necessity of a two-sheeted spacetime, and the role of the KD-Majorana condition—remain fundamentally invariant.}
+
+% 4. Possible solutions to Lagrangian in Euclidean signature: 
+% - Conventional Euclidean Lagrangian: Hermitian problem, and chiral problem.
+% - Question: could we solve the problem by direct Wick rotate Lagrangian in Lorentzian signature to Euclidean one? 
+% - First try -- starting from SO(p,q), could we find a larger group which contain Wick rotation? The answer is no.
+% - Solution: Van Nieuwenhuizen's Wick rotate conventional Dirac Lagrangian, get a Hermitian Lagrangian. However Chiral problem remain.
+% - Solution: Nieuwenhuizen's Wick rotate KD fermions. It is Hermitian and Chiral! 
+% - Barrett work about needing two sheets of Hilbert space to get the Chiral Lagrangian. We show a more elegant picture by our KD-Majorana fermion.
+% - Different Lagrangians: with $\gamma^5$ acting from left/right/both sides. Discuss the Majorana and Dirac type Lagrangians, and the new eom (with additional $\gamma^5$ acting from the right of mass term).
+
+% Editor's note: Elevated the introduction to sound more formal and academically rigorous.
+The conventional Euclidean Lagrangian for Dirac fermions is given by: 
+\[
+\mathcal{L}_E=\psi^\dagger (\gamma_E^\mu\partial_\mu +m)\psi
+\]
+where $\gamma^\mu\partial_\mu$ is summed over $\mu=\{1,2,3,4\}$, with $\gamma^4=i\gamma^0$. 
+
+It is straightforward to verify that this Lagrangian is inherently non-Hermitian: 
+\[
+\mathcal{L}_E^\dagger=\partial_\mu\psi^\dagger (\gamma_E^\mu)^\dagger \psi+m\psi^\dagger\psi=\psi^\dagger (-\gamma_E^\mu\partial_\mu +m)\psi
+\]
+Here, we have used the Euclidean signature property $(\gamma_E^\mu)^\dagger=\gamma_E^\mu$, and the minus sign in the kinetic term arises from integration by parts.
+
+Furthermore, this standard Euclidean Lagrangian is non-chiral, since the kinetic term has left- and right-handed Weyl spinors coupled together. In other words, left- and right-handed spinors do not evolve independently, violating the observation. One might argue that possessing a non-Hermitian and non-chiral Lagrangian in Euclidean space is acceptable, provided that the physical properties evaluated in the Lorentzian signature remain robust. In this view, the Euclidean signature is merely a mathematical artifice: one Wick rotates to Euclidean space to perform the path integral, and subsequently rotates back to Lorentzian space to extract physical observables.
+
+However, a fundamental difficulty arises because the Dirac Lagrangians in Lorentzian and Euclidean signatures cannot be continuously transformed into one another. Specifically, the Lorentzian kinetic term contains an additional $\gamma^0$ matrix, which has no direct analogue (i.e., no corresponding $\gamma_E^4$ insertion) in the standard Euclidean formulation. This structural discontinuity complicates the process of Wick rotating the Euclidean results back to the Lorentzian regime. It is precisely this discontinuity that renders the Euclidean Lagrangian non-Hermitian and non-chiral, even though its Lorentzian counterpart is both Hermitian and chiral. This suggests a potential resolution: if one can formulate a truly continuous Wick rotation, it may be possible to construct a Euclidean Lagrangian that fully inherits the physical properties of the Lorentzian one. 
+
+Fortunately, this concept was explored in von Nieuwenhuizen's work \cite{VANNIEUWENHUIZEN199629}, leading to the discovery of a strictly Hermitian Euclidean Lagrangian (\cref{sec:Nieuwenhuizen_Wick_rotation}). However, while this Lagrangian resolves the Hermiticity issue, it remains non-chiral. Interestingly, by extending this continuous rotation formalism to Kähler-Dirac (KD) fermions, we can successfully construct a Lagrangian that is simultaneously Hermitian and chiral (\cref{sec:extend_KD}). Finally, motivated by these geometric properties, we demonstrate that there are multiple valid Lagrangian formulations in Lorentzian signature. We explore their properties and physical significance in \cref{sec:diff_Lagrangian}.
+
+\section{van Nieuwenhuizen's Wick Rotation for the Standard Dirac Lagrangian}\label{sec:Nieuwenhuizen_Wick_rotation}
+
+% Editor's note: Replaced conversational transitions and tightened mathematical prose.
+Note that in this chapter, we assume $(-,+,+,+)$ metric convention, such that one only needs to Wick rotate time while keeping the three spatial coordinate invariant. Under this convention, the Dirac Lagrangian in Minkowski space is written as: 
+\[
+\mathcal{L}_M=-\psi^\dagger \gamma^0 i (\gamma^\mu\partial_\mu +m)\psi
+\]
+A standard Wick rotation maps real time to imaginary time via $t\to -i t_E$ and sets $\gamma^4=i\gamma^0$. The Lagrangian then becomes:
+\[
+\mathcal{L}_M=-\psi^\dagger \gamma^4(\gamma^\mu\partial_\mu +m)\psi
+\]
+where the sum over $\mu$ now runs from $1$ to $4$, and $\partial_t=i\partial_{t_E}\equiv i\partial_4$ (the additional $i$ cancel out the $i$ in kinetic term). 
+
+Von Nieuwenhuizen's critical insight was that the Wick rotation must act not only on the spacetime coordinates, but also continuously on the spinors within a 5D rotational space, defining $\gamma^5=\gamma^1\gamma^2\gamma^3\gamma^4$. To achieve this, the spinor is rotated via $\psi_E =S(\theta=\pi/2)\psi$, where the rotation operator is $S(\theta)=e^{\gamma^4\gamma^5\theta}$. At $\theta=\pi/2$, the rotation maps the system fully into Euclidean signature. To ensure the resulting Euclidean Lagrangian is Hermitian, the conjugate field must transform as $\bar\psi_E =\bar\psi S^{-1}=\psi^\dagger\gamma^4 S^{-1}$. Since the matrices satisfy $S\gamma^4=\gamma^4 S^{-1}$, we find $\psi_E^\dagger \gamma^4 =\psi^\dagger S\gamma^4$, which simplifies to $\psi_E^\dagger=\psi^\dagger S$.
+
+It is essential to emphasize that the Hermitian conjugate transforms as $\psi^\dagger \to \psi^\dagger S$, rather than $\psi^\dagger \to \psi^\dagger S^{-1}$ (noting that $S^T=S^\dagger =S^{-1}$). This distinction is required to enforce the correct transformation rule $\bar\psi\to \bar\psi S^{-1}$. Fortunately, this property is naturally satisfied since $\bar{\psi}=\psi^\dagger\gamma^4$ and $S\gamma^4=\gamma^4 S^{-1}$, .
+
+Furthermore, the gamma matrices themselves must undergo the corresponding similarity transformation, $\gamma_E^\mu=S\gamma^\mu S^{-1}$:
+\[\gamma_E^i=\gamma^i, \gamma_E^4=\gamma^4\cos\theta+\gamma^5\sin\theta=\gamma^5\text{ (when }\theta=\pi/2\text{)}, \\ \gamma_E^5=\gamma_E^1\gamma_E^2\gamma_E^3\gamma_E^4=-\gamma^4\]
+, where $\gamma^i$ remain unchanged for $i=1,2,3$, while $\gamma^4$ and $\gamma^5$ swap roles. 
+Combining these elements, we can Wick rotate the Lorentzian Lagrangian to obtain the Euclidean counterpart:
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_M  = -\psi^\dagger \gamma^4(\gamma^\mu\partial_\mu +m)\psi
+&=-\psi^\dagger S\gamma^4(S\gamma^\mu S^{-1}\partial_\mu +m) S\psi\\
+&=\psi_E^\dagger \textcolor{red}{\gamma_E^5}(\gamma_E^\mu\partial_\mu +m)\psi_E==\mathcal{L}_E
+\end{aligned}
+\end{equation}
+where we have applied the identity $S\gamma^4=\gamma^4 S^{-1}$. Note that after the 5D Wick rotation, the $\gamma^4$ matrix in the Lorentzian Lagrangian is replaced by $\gamma_E^5$ in the Euclidean Lagrangian (while the one in $\gamma_E^\mu$ still remain $\gamma_E^4$). This additional $\gamma_E^5$ insertion is crucial for ensuring that the Euclidean Lagrangian is Hermitian, as we will demonstrate below.
+
+We can readily confirm that this modified Lagrangian is Hermitian:
+\[\mathcal{L}_E^\dagger= \partial_\mu\psi_E^\dagger(\gamma_E^\mu)^\dagger(\gamma_E^5)^\dagger\psi_E=-\psi_E^\dagger\gamma_E^\mu \gamma_E^5\partial_\mu\psi_E =\psi_E^\dagger \gamma_E^5\gamma_E^\mu\partial_\mu\psi_E=\mathcal{L}_E\]
+Here, the minus sign arising from the anticommutation relation $\gamma_E^\mu\gamma_E^5=-\gamma_E^5\gamma_E^\mu$ perfectly cancels the minus sign generated by integration by parts.
+
+% If we choose the Weyl basis, where $\gamma_E^\mu=\begin{pmatrix}0&\sigma^\mu\\ \bar\sigma^\mu &0\end{pmatrix}$ and $\gamma_E^5=\begin{pmatrix}\mathbbm{1}&0\\ 0&-\mathbbm{1}\end{pmatrix}$, we find that the Lorentz transformations for the left- and right-handed spinors remain decoupled:
+% \begin{equation}
+% \begin{aligned}
+% \psi_E^\dagger \gamma_E^5\gamma_E^\mu\partial_\mu \psi_E &\to \psi_E^\dagger U_\Lambda^\dagger \gamma_E^5 U_\Lambda\gamma_E^\mu U_\Lambda^{-1}U_\Lambda\partial_\mu \psi_E\\
+% \to U_\Lambda^\dagger \gamma_E^5 U_\Lambda=\gamma_E^5 &\text{, given }U_\Lambda=\begin{pmatrix}u_L&0\\ 0&u_R\end{pmatrix}\to u_L^\dagger u_L=u_R^\dagger u_R=\mathbbm{1}
+% \end{aligned}
+% \end{equation}
+% Consequently, the system still preserves the required $SO(4)\sim SU(2)\times SU(2)$ Euclidean rotational symmetry. 
+
+% Editor's note: Fixed "swap with roll" to "swap roles".
+Despite these successes, this Lagrangian remains non-chiral. To illustrate this, consider the standard Weyl basis where $\gamma^\mu=i\begin{pmatrix}0& \sigma^\mu\\ -\sigma^\mu & 0\end{pmatrix}$ and $\gamma^5=\begin{pmatrix}\mathbbm{1}& 0\\ 0 & \mathbbm{1}\end{pmatrix}$ \footnote{In this chapter, we choose (-+++) convention, where $\gamma^i=i\begin{pmatrix}0& \sigma^i\\ -\sigma^i & 0\end{pmatrix}, \gamma^0=\begin{pmatrix}0& \mathbbm{1}\\ -\mathbbm{1} & 0\end{pmatrix}$, and $\gamma^4=i\gamma^0$. Here the index $\mu$ runs from 1 to 4, so $\gamma^\mu=i\begin{pmatrix}0& \sigma^\mu\\ -\sigma^\mu & 0\end{pmatrix}$. The corresponding $\gamma^5=\gamma^1\gamma^2\gamma^3\gamma^4=\begin{pmatrix}\mathbbm{1}& 0\\ 0 & \mathbbm{1}\end{pmatrix}$}. After the Wick rotation, $\gamma^4$ and $\gamma^5$ swap roles; consequently, $\gamma^4_E$ becomes diagonal while $\gamma_E^5$ becomes off-diagonal. As a result, the time derivative term in $\psi_E^\dagger \gamma_E^5(\gamma_E^\mu\partial_\mu +m)\psi_E$ inevitably mixes chiralities. Interestingly, this chirality problem is naturally resolved when we transition to the Kähler-Dirac fermion framework.
+
+
+\section{Extension to the KD Lagrangian}\label{sec:extend_KD}
+
+
+The Minkowski Lagrangian for KD fermions is given by: 
+\[
+\mathcal{L}_M=-\,{\rm Tr}[\gamma^0\Psi^\dagger \gamma^0 i (\gamma^\mu\partial_\mu +m)\Psi]
+\]
+Note that $\Psi$ is a $4\times 4$ bi-spinor matrix. To ensure that the bilinear $\bar\Psi\Psi$ is Lorentz invariant, an additional $\gamma^0$ must act from the left, defining the adjoint as $\bar{\Psi}=\gamma^0\Psi^\dagger \gamma^0$. We can diagonalize this additional $\gamma^0$ matrix via $\gamma^0=\Omega \Lambda\Omega^T$, where $\Lambda=-\gamma^5$. By absorbing the rotation matrix $\Omega$ into a redefined field, $\Psi'=\Psi\Omega$, the Lagrangian takes the form: 
+\[
+\mathcal{L}_M=-\,{\rm Tr}[\gamma^5\Psi'^\dagger \gamma^0 i (\gamma^\mu\partial_\mu +m)\Psi']
+\]
+Following the exact same Wick rotation methodology as in the previous section (where $\Psi_E=S\Psi S^{-1}$ and $\Psi_E^\dagger=S^{-1}\Psi^\dagger S$), the corresponding Euclidean Lagrangian evaluates to:
+\begin{equation}\label{eq:Euclidean_KD_Lagrangian}
+    \mathcal{L}_E=\,{\rm Tr}[\gamma_E^4\Psi_E^\dagger \gamma_E^5(\gamma_E^\mu\partial_\mu +m)\Psi_E]
+\end{equation}
+
+% Editor's note: Changed \psi_E to \Psi_E in the trace equations to maintain consistency with the bi-spinor notation used in this section.
+We can immediately verify that this Lagrangian is Hermitian: 
+\[\mathcal{L}_E^\dagger=\,{\rm Tr}[ \partial_\mu\Psi_E^\dagger(\gamma_E^\mu)^\dagger(\gamma_E^5)^\dagger\Psi_E(\gamma_E^4)^\dagger]=-\,{\rm Tr}[\Psi_E^\dagger\gamma_E^\mu \gamma_E^5\partial_\mu\Psi_E \gamma_E^4]=\,{\rm Tr}[\gamma_E^4\Psi_E^\dagger \gamma_E^5\gamma_E^\mu\partial_\mu\Psi_E]=\mathcal{L}_E\]
+where we utilized the cyclic property of the trace, $\,{\rm Tr}[ABC]=\,{\rm Tr}[CAB]$.
+
+% By following a calculation identical to that in the previous section, one can also confirm that this formulation rigorously preserves the $SO(4)=SU(2)\times SU(2)$ symmetry.
+
+Most importantly, we can prove that this KD Euclidean Lagrangian is strictly chiral when evaluated in the Weyl basis, where $\gamma_E^\mu$ are off-diagonal $\gamma_E^\mu=i\begin{pmatrix}0& \sigma^\mu\\ -\sigma^\mu & 0\end{pmatrix}$ and $\gamma_E^5=\begin{pmatrix}\mathbbm{1}& 0\\ 0 & \mathbbm{1}\end{pmatrix}$:
+\begin{equation}\label{eq:Lagrangian_KD_Euclidean}
+\begin{aligned}
+    \mathcal{L}_E&=\,{\rm Tr}[\gamma_E^4\Psi_E^\dagger \gamma_E^5\gamma_E^\mu\partial_\mu \Psi_E]\\
+    &=-\,{\rm Tr}\left[\begin{pmatrix}0& \mathbbm{1}\\ -\mathbbm{1} & 0\end{pmatrix}(\Psi_{E,+}^\dagger+\Psi_{E,-}^\dagger )\begin{pmatrix}\mathbbm{1}& 0\\ 0 & \mathbbm{1}\end{pmatrix}\begin{pmatrix}0& \sigma^\mu\\ -\sigma^\mu & 0\end{pmatrix}(\partial_\mu \Psi_{E,+}+\partial_\mu \Psi_{E,-})\right]\\
+    &=-\left(\,{\rm Tr}[\gamma_E^4\Psi_{E,+}^\dagger \gamma_E^5\gamma_E^\mu\partial_\mu \Psi_{E,+}]+\,{\rm Tr}[\gamma_E^4\Psi_{E,-}^\dagger \gamma_E^5\gamma_E^\mu\partial_\mu \Psi_{E,-}]\right)\\
+    &=\,{\rm Tr}[(\ell_L^c)^\dagger\sigma^\mu\partial_\mu\ell_L]+\,{\rm Tr}[(\ell_R^c)^\dagger\sigma^\mu\partial_\mu\ell_R]-\text{h.c.}
+\end{aligned}
+\end{equation}
+In this derivation, we applied the KD-Majorana condition: 
+$\Psi=\begin{pmatrix}
+        \ell_L& \ell_R^c \\
+        \ell_R& \ell_L^c
+    \end{pmatrix}=\Psi^c$
+and separated $\Psi$ into its block-diagonal ($\Psi_+$) and block-off-diagonal ($\Psi_-$) components as follows:
+\begin{equation}
+\begin{aligned}
+   \Psi_{\pm}=\frac{1}{2}(\Psi\pm\gamma^5\Psi\gamma^5) \quad \implies \quad \Psi_+=\begin{pmatrix}
+        \ell_L& 0 \\
+        0& \ell_L^c
+    \end{pmatrix}, \quad \Psi_-=\begin{pmatrix}
+        0& \ell_R^c \\
+        \ell_R& 0
+    \end{pmatrix}
+\end{aligned}
+\end{equation}
+
+The final expression in \cref{eq:Lagrangian_KD_Euclidean} demonstrates that the Weyl spinor natively couples with its own charge conjugate, where LH and RH fermions are decoupled -- it is a chiral theory! Moreover, this outcome aligns perfectly with the recent theoretical results published by Barrett \cite{Barrett2024}. Barrett established that a strictly chiral theory mandates a spacetime dimension of $2 \text{ mod } 8$ (e.g., $2, 10, 18, \dots$). However, physical spacetime is 4-dimensional. To resolve this apparent contradiction, Barrett demonstrated that a chiral model can be successfully constructed in 4D by doubling the Hilbert space (effectively utilizing a two-sheeted 4D spacetime), formulated mathematically as $\langle J\psi|D\psi\rangle$, where $J\psi=\psi^c$. This is remarkably consistent with our derived \cref{eq:Lagrangian_KD_Euclidean}, which explicitly features particles coupled to their corresponding antiparticles.
+
+This result carries significant theoretical weight. In a forthcoming paper \cite{BoyleVaibhav}, Vaibhav and Boyle apply Barrett's argument by positing a doubled Hilbert space (two distinct 4D spacetimes and two independent KD fields) to construct an anomaly-free KD lattice gauge theory. However, the derivation presented here reveals that this two-sheeted spacetime structure is already intrinsically encoded within the fundamental geometry of a \textit{single} KD field (as evidenced by \cref{eq:Lagrangian_KD_Euclidean}). We do not need to introduce a second independent KD field to achieve this doubling. 
+
+Why, then, should we utilize KD fields for lattice gauge theory? The original motivation was that KD fields can be seamlessly mapped onto differential forms, allowing them to be discretized on a lattice without introducing unphysical fermion doubling. We now have a profound secondary motivation: the geometric requirement of a two-sheeted 4D spacetime—necessary to resolve the chiral anomaly—is naturally and elegantly embedded within the structure of a single KD field. This makes the KD formalism a uniquely powerful candidate for constructing anomaly-free lattice gauge theories.
+
+A final subtlety regarding the Wick rotation should be noted. During the rotation, we effectively swap $\gamma^4_E \leftrightarrow \gamma_E^5$. In Lorentzian signature, this corresponds to swapping $\gamma^0 \leftrightarrow \gamma^5$, which is equivalent to transforming between the Weyl and Dirac bases. Consequently, if one begins in Lorentzian signature using the Weyl basis, the standard Wick rotation yields a Euclidean Lagrangian cast in the Dirac basis—a formulation that obfuscates the underlying chiral properties. However, because a change of basis (Weyl vs. Dirac) leaves the underlying physics invariant, we are free to apply a basis transformation immediately after the Wick rotation to ensure the Lagrangian remains explicitly chiral in both signatures. This basis change does not affect the physical observables derived from the path integral. The invariance is easily proven:
+\begin{equation}
+\begin{aligned}
+    \gamma^\mu\to S\gamma^\mu S^{-1}, \quad \psi\to S\psi , \quad \psi^\dagger\to \psi^\dagger S^\dagger\\
+    \psi^\dagger \gamma^0\gamma^\mu\partial_\mu \psi\to \psi^\dagger S^\dagger S\gamma^0 S^{-1} S\gamma^\mu S^{-1}S\partial_\mu \psi=\psi^\dagger \gamma^0\gamma^\mu\partial_\mu \psi
+\end{aligned}
+\end{equation}
+
+Having established a continuous Wick rotation that maps the Lagrangian into a well-defined Euclidean signature, the next technical challenge is performing the Euclidean path integral via the new Hermitian and chiral Lagrangian, and subsequently Wick rotating back to compute exact physical probability amplitudes. This extensive calculation is left for future work.
+
+
+\section{Alternative Lagrangians}\label{sec:diff_Lagrangian}
+
+Examining the Euclidean KD Lagrangian in \cref{eq:Euclidean_KD_Lagrangian}, we note the critical presence of the additional $\gamma_E^5$ matrix. Returning to Lorentzian signature, recall that the existence of negative-norm (ghost) states in the KD field stems directly from the additional $\gamma^0$ in the Lagrangian's kinetic term. This raises an intriguing theoretical question: is it possible to define an alternative Lorentzian Lagrangian by judiciously inserting $\gamma^5$ operators such that the negative-norm states are entirely eliminated? Note that multiplying the original Lagrangian $\mathcal{L}_M={\rm Tr}[\gamma^0 \Psi^\dagger \gamma^0\gamma^\mu\partial_\mu\Psi]$ by $\gamma^5$ remains theoretically viable; because $\gamma^5$ anticommutes with $\gamma^\mu$, the action remains fully Lorentz invariant.
+
+At first glance, this approach appears highly promising. After diagonalizing the extra $\gamma^0$, the Lagrangian takes the form $\mathcal{L}_M={\rm Tr}[\Lambda \Psi'^\dagger \gamma^0\gamma^\mu\partial_\mu\Psi']$, where $\Lambda=-\gamma^5$. Since $(\gamma^5)^2=\mathbbm{1}$, it seems that multiplying the action by an additional $\gamma^5$ would perfectly cancel the negative signs, rendering the entire theory positive-definite. 
+
+However, this naive approach overlooks the necessary transformation of the matrices themselves. Recall that we diagonalized $\gamma^0$ via $\gamma^0=\Omega \Lambda\Omega^\top=-\Omega \gamma^5\Omega^\top$. Under this same transformation matrix $\Omega$, $\gamma^5$ itself transforms into $\gamma^5=\Omega\gamma^0\Omega^\top$. Consequently, any new Lagrangian featuring an explicitly inserted $\gamma^5$ will invariably introduce a transformed $\gamma^0$ matrix, ensuring that the problematic negative-norm states persist. 
+
+\begin{equation}
+\begin{aligned}
+    \mathcal{L}_M&={\rm Tr}[\gamma^5\gamma^0 \Psi^\dagger \gamma^0\gamma^\mu\partial_\mu\Psi]
+    =-{\rm Tr}[(\Omega \gamma^0\Omega^\top)(\Omega \gamma^5\Omega^\top)\Psi^\dagger \gamma^0\gamma^\mu\partial_\mu\Psi]\\
+    &=-{\rm Tr}[\gamma^0\gamma^5(\Psi\Omega)^\dagger\gamma^0\gamma^\mu\partial_\mu(\Psi\Omega)]
+    =-{\rm Tr}[\gamma^0\gamma^5\Psi'^\dagger\gamma^0\gamma^\mu\partial_\mu \Psi']
+\end{aligned}
+\end{equation}
+
+One might suggest inserting the $\gamma^5$ directly into the \textbf{already-transformed} Lagrangian. However, this brutally violates Lorentz invariance. The transformed field $\Psi'=\Psi\Omega$ obeys the modified Lorentz transformation $\Psi'\to U_\Lambda \Psi' U_\Lambda'^{-1}$, where $U_\Lambda'$ is the standard Lorentz matrix with its $\gamma^0$ generators replaced by $\gamma^5$ (as discussed in \cref{subsec:mixing_term_Lorentz_spin_connection}). For reader's convenience, I write it explicitly again:
+
+\begin{equation}
+\begin{aligned}
+    &\Psi\to U_\Lambda \Psi U_\Lambda^{-1}
+    , \quad \Psi'=\Psi\Omega \\
+    \implies & U_\Lambda \Psi U_\Lambda^{-1}\Omega =U_\Lambda \Psi \Omega \Omega^{-1}U_\Lambda^{-1} \Omega=U_\Lambda \Psi' U_\Lambda'^{-1}
+\end{aligned}
+\end{equation}
+where $U_\Lambda'^{-1}=\Omega^{-1}U_\Lambda^{-1} \Omega$.
+Because $\Omega^{-1}\gamma^0 \Omega=-\gamma^5$ and $\Omega^{-1}\gamma^i \Omega=\gamma^i$, $U_\Lambda'$ is structurally identical to a Lorentz transformation matrix wherein $\gamma^0$ is mapped to $\gamma^5$. Specifically, if $U_\Lambda$ is defined in the Weyl basis, $U_\Lambda'$ evaluates equivalently to a transformation in the Dirac basis.
+
+Therefore, manually appending a $\gamma^5$ matrix from the left (of \textbf{already-transformed} Lagrangian) to explicitly cancel the negative-norm states (i.e. $\Lambda=-\gamma^5$ from diagonalized $\gamma^0$) fundamentally destroys the Lorentz invariance of the theory.
+
+Although it is strictly impossible to mathematically eliminate the negative-norm states by redefining $\bar\Psi$ with extra $\gamma^5$ insertions, these variant Lagrangians remain mathematically valid Lorentz-invariant formulations. In the remainder of this section, we explore the properties and physical implications of appending $\gamma^5$ from the left, right, or both sides of the spinor. 
+
+First, we establish their geometric connection to differential forms. By selecting the off-diagonal Weyl basis $\gamma^\mu=\begin{pmatrix}
+    0& \sigma^\mu \\ \bar\sigma^\mu &0
+\end{pmatrix}$, the $4\times 4$ KD spinor maps to differential forms as $\Psi=\begin{pmatrix}
+    E& O' \\ O &E'
+\end{pmatrix}$, where the diagonal and off-diagonal blocks explicitly correspond to even ($E$) and odd ($O$) forms, respectively. Multiplying by $\gamma^5$ from both sides strategically applies a minus sign exclusively to the off-diagonal (odd-form) blocks: $\gamma^5\Psi\gamma^5=\begin{pmatrix}
+    E& -O' \\ -O &E'
+\end{pmatrix}$. Consequently, defining a Lorentz-invariant bilinear $\bar{\Psi}\Psi$ by appending $\gamma^5$ to both sides of the adjoint is functionally equivalent to flipping the sign of the odd-form kinetic terms. This variant elegantly preserves a transparent mapping to the underlying exterior calculus. In contrast, appending a single $\gamma^5$ from either the left or the right obscures this geometric mapping. Nevertheless, we will rigorously evaluate all configurations as theoretically viable spinor formulations.
+
+
+\subsection{Construction of Hermitian and Physical Lagrangians}
+
+A physically viable Lagrangian must be strictly Hermitian, and its variation must systematically recover a generalized Klein-Gordon equation. When inserting $\gamma^5$ operators on the left, right, or both sides of the adjoint $\bar\Psi$, one frequently discovers that the kinetic trace ${\rm Tr}[i\bar{\Psi}\gamma^\mu\partial_\mu\Psi]$ or the mass trace ${\rm Tr}[m\bar{\Psi}\Psi]$ becomes anti-Hermitian. While it is tempting to simply multiply the offending term by an imaginary unit "$i$" to restore Hermiticity, this naive fix often destroys the correct Klein-Gordon equation of motion. A strictly physical Lagrangian must carefully satisfy both requirements.
+
+We categorize the permissible physical Lagrangians below. 
+When $\gamma^5$ acts exclusively from the left, both the kinetic and mass terms naturally evaluate as anti-Hermitian. Consequently, we multiply both terms by "$i$": 
+\begin{equation}
+    \mathcal{L}_1={\rm Tr}[ \bar\Psi\gamma^\mu\partial_\mu\Psi+im\bar\Psi\Psi], \quad \text{where } \bar\Psi=\gamma^5\gamma^0\Psi^\dagger\gamma^0
+\end{equation}
+
+This modifying "$i$" subsequently propagates into the derived equation of motion. The resulting Klein-Gordon equation acquires an overall minus sign from $i^2=-1$, but the fundamental dynamical relationship $\partial^2 + m^2 = 0$ is preserved perfectly.
+
+When $\gamma^5$ acts from the right (or from both sides), the Hermiticity mismatch is split: only one of the two terms (kinetic or mass) evaluates as anti-Hermitian. Multiplying only the anti-Hermitian term by "$i$" introduces a relative sign error, generating a tachyonic or ill-defined Klein-Gordon equation. To resolve this, we must construct hybridized Lagrangians that systematically mix the right-acting and both-acting adjoint definitions: 
+\begin{equation}
+\begin{aligned}
+    \mathcal{L}_2={\rm Tr}[ i\bar\Psi_{\text{right}}\gamma^\mu\partial_\mu\Psi-m\bar\Psi_{\text{both}}\Psi]; &\quad
+    \mathcal{L}_3={\rm Tr}[ \bar\Psi_{\text{both}}\gamma^\mu\partial_\mu\Psi-im\bar\Psi_{\text{right}}\Psi], \\
+    \text{where }\bar\Psi_{\text{right}}=\gamma^0\Psi^\dagger\gamma^0\gamma^5,&\qquad \bar\Psi_{\text{both}}=\gamma^5\gamma^0\Psi^\dagger\gamma^0\gamma^5.
+\end{aligned}
+\end{equation}
+Because these hybrid Lagrangians feature mismatched powers of $\gamma^5$ across the kinetic and mass terms, their varied equation of motion takes the highly non-standard form: 
+\begin{equation}
+    i\gamma^\mu\partial_\mu\Psi -m\Psi\gamma^5=0
+\end{equation}
+which features an unusual $\gamma^5$ matrix acting on the mass term from the right \footnote{Because the additional $\gamma^5$ in the equation $i\gamma^\mu\partial_\mu\Psi-m\Psi\gamma^5=0$ effectively flips the sign of the latter two columns of $\Psi$, one might naively conclude that the fermions on the backward sheet possess negative inertial mass. This interpretation is incorrect. The true physical mass must be evaluated in the diagonalized basis $\Psi'=\Psi\Omega$. Take $\mathcal{L}_2$ for example, the diagonalized equation of motion becomes $i\gamma^\mu\partial_\mu\Psi'-m\Psi'\gamma^0=0$, wherein an additional $\gamma^0$ acts on the mass term. Because the diagonalized spinor itself is internally restructured as $\Psi'=\begin{pmatrix}\ell_L& \ell_R^c\\ \ell_L^c & \ell_R  \end{pmatrix}$ (will discussed in \cref{subsec:KD_Majorana_diff_Lagrangian}), expanding the matrix trace proves that the physical mass terms evaluate identically to those of the conventional Lagrangian.}. Astonishingly, this exotic equation of motion strictly satisfies the standard Klein-Gordon dynamics. This is proven by defining the independent kinetic and mass operators:
+\[ D(\Psi)=i\gamma^\mu \partial_\mu\Psi,\quad M(\Psi)=m\Psi\gamma^5\]
+
+Because these two operators fundamentally commute, $D(M(\Psi))=M(D(\Psi)) \implies [D,M]=0$, operating twice on the field yields: 
+\begin{equation}
+    (D+M)(D-M)\Psi=(D^2-M^2)\Psi=-(\partial^2+m^2)\Psi=0
+\end{equation}
+which is identically the required Klein-Gordon equation. Note that this unique dynamical property is exclusively permitted for $4\times 4$ KD spinors, as $4\times 1$ spinors could not  have matrix multiplied from the right-hand side (i.e. the additional $\gamma^5$).
+
+The next critical step is to quantize these variant Lagrangians to definitively check for the presence of negative-norm states. To simplify this analysis, we employ the same diagonalization procedure used for the original Lagrangian ($\bar\Psi=\gamma^0\Psi^\dagger\gamma^0$), transforming the kinetic structure into a form resembling the conventional Dirac framework. 
+
+For the left-acting Lagrangian $\mathcal{L}_1$, we diagonalize the combined matrix $\gamma^5\gamma^0$, yielding: 
+\begin{equation}
+\begin{aligned}
+    \mathcal{L}_1&={\rm Tr}[ \gamma^5\gamma^0\Psi^\dagger\gamma^0\gamma^\mu\partial_\mu\Psi+im\gamma^5\gamma^0\Psi^\dagger\gamma^0\Psi]\\
+    &={\rm Tr}[ i\gamma^5\Psi'^\dagger\gamma^0\gamma^\mu\partial_\mu\Psi'-m\gamma^5\Psi'^\dagger\gamma^0\Psi']
+\end{aligned}
+\end{equation}
+where $\gamma^5\gamma^0=\Omega(\textcolor{red}{i}\gamma^5)\Omega^\dagger$ and $\Psi'=\Psi\Omega$. Note that the additional "$i$" in diagonalized matrix $i\gamma^5$ cancel out with the overall "$i$" previously added to make the Lagrangian Hermitian, causing the final trace perfectly mirrors the conventional KD Lagrangian.
+
+Analyzing the hybrid Lagrangian $\mathcal{L}_2={\rm Tr}[ i\bar\Psi_{\text{right}}\gamma^\mu\partial_\mu\Psi-m\bar\Psi_{\text{both}}\Psi]$ is considerably more intricate. After diagonalizing the embedded $\gamma^0$, the kinetic term expands to: 
+
+\begin{equation}
+\begin{aligned}
+    \mathcal{L}_2^{\text{kin}}&={\rm Tr}[ i\gamma^0\Psi^\dagger\gamma^0\gamma^5\gamma^\mu\partial_\mu\Psi]={\rm Tr}[ i(\gamma^5\Psi'^\dagger\gamma^5)\gamma^0\gamma^\mu\partial_\mu\Psi']\\
+    &={\rm Tr}[ i(\Psi_+'^\dagger-\Psi_-'^\dagger)\gamma^0\gamma^\mu\partial_\mu(\Psi_+'+\Psi'_-)]\\
+    &={\rm Tr}[ i\Psi_+'^\dagger\gamma^0\gamma^\mu\partial_\mu\Psi_+']-{\rm Tr}[ i\Psi_-'^\dagger\gamma^0\gamma^\mu\partial_\mu\Psi_-']
+\end{aligned}
+\end{equation}
+where $\Psi'_\pm=\frac{1}{2}(\Psi'\pm\gamma^5\Psi'\gamma^5)$, which implies $\gamma^5\Psi'\gamma^5=\Psi'_+-\Psi'_-$. The components $\Psi'_+$ and $\Psi'_-$ represent the diagonal and off-diagonal blocks of the matrix field, respectively. 
+
+Performing an identical decomposition for the mass term gives: 
+\begin{equation}
+    -m{\rm Tr}[ \gamma^5\gamma^0\Psi^\dagger\gamma^0\gamma^5\Psi]=-m{\rm Tr}[\gamma^0\Psi_+'^\dagger\gamma^0\Psi_+']+m{\rm Tr}[\gamma^0\Psi_-'^\dagger\gamma^0\Psi_-']
+\end{equation}
+
+In standard chiral gauge theories, the kinetic operators fully decouple the left- and right-handed spinors (e.g., $i\ell_L^\dagger\bar\sigma^\mu\partial_\mu\ell_L$), whereas the mass operator strongly couples them (e.g., $m\ell_L^\dagger\ell_R$). To satisfy this structural requirement, we are mathematically forced to define the internal matrix as $\Psi'=\begin{pmatrix} \ell_L&\ell_R^c\\ \ell_L^c & \ell_R\end{pmatrix}$. This configuration explicitly differs from the conventional definition, $\Psi'=\begin{pmatrix} \ell_L&\ell_R^c\\  \ell_R&\ell_L^c\end{pmatrix}$. Consequently, the required KD-Majorana condition must be heavily modified (as detailed in \cref{subsec:KD_Majorana_diff_Lagrangian}). Furthermore, because the Lagrangian for $\Psi'_-$ (the off-diagonal components) carries a leading minus sign, these specific components represent the physical fermions constrained to the backward spacetime sheet. 
+
+Finally, we analyze the inverted hybrid Lagrangian $\mathcal{L}_3={\rm Tr}[ \bar\Psi_{\text{both}}\gamma^\mu\partial_\mu\Psi-im\bar\Psi_{\text{right}}\Psi]$. After diagonalizing the left-acting $\gamma^5\gamma^0$ matrix and separating the field into $\Psi_\pm$, the kinetic term evaluates to:
+\begin{equation}
+\begin{aligned}
+    {\rm Tr}[ \gamma^5\gamma^0\Psi^\dagger\gamma^0\gamma^5\gamma^\mu\partial_\mu\Psi]=-{\rm Tr}[ i\Psi_+'^\dagger\gamma^0\gamma^\mu\partial_\mu\Psi_+']+{\rm Tr}[ i\Psi_-'^\dagger\gamma^0\gamma^\mu\partial_\mu\Psi_-']
+\end{aligned}
+\end{equation}
+The requisite "$i$" emerges from the diagonalization $\gamma^5\gamma^0=\Omega(i\gamma^5)\Omega^\dagger$. Notice that this kinetic term structurally mirrors $\mathcal{L}_2$.
+
+The mass term for $\mathcal{L}_3$ diagonalizes to: 
+\begin{equation}
+    {\rm Tr}[im\gamma^0\Psi'\gamma^0\gamma^5\Psi']
+\end{equation}
+To preserve algebraic consistency across the terms, we must employ the exact same transformation matrix $\Omega$ used above ($\gamma^5\gamma^0=\Omega(i\gamma^5)\Omega^\dagger$) to define $\Psi'=\Psi\Omega$. This constraint forces the lingering left-acting $\gamma^0$ to remain in the mass trace. 
+
+The spurious "$i$" and $\gamma^5$ operators in this mass term can be beautifully canceled by executing a global chiral phase transformation, $\Psi'\to e^{i\frac{\pi}{4}\gamma^5}\Psi'$ (which leaves the kinetic term invariant). The mass term then collapses to: 
+\begin{equation}
+    {\rm Tr}[-m\gamma^0\Psi'\gamma^0\Psi']
+\end{equation}
+
+Recombining the simplified kinetic and mass blocks yields: 
+\begin{equation}
+    {\rm Tr}[-m\gamma^0\Psi'\gamma^0\Psi']=-m{\rm Tr}[\gamma^0\Psi_+'^\dagger\gamma^0\Psi_+']-m{\rm Tr}[\gamma^0\Psi_-'^\dagger\gamma^0\Psi_-']
+\end{equation}
+Crucially, the mass terms for $\Psi'_+$ and $\Psi'_-$ here carry identical signs. This parity differs from $\mathcal{L}_2$, distinguishing the two theories purely by their chiral structure. If one alternatively redefines the internal matrix as $\Psi'=\begin{pmatrix} \ell_L&-\ell_R^c\\ \ell_L^c & \ell_R\end{pmatrix}$ or $\begin{pmatrix} \ell_L&\ell_R^c\\ -\ell_L^c & \ell_R\end{pmatrix}$, the mathematical structure of $\mathcal{L}_3$ becomes entirely isomorphic to $\mathcal{L}_2$.
+
+Throughout this rigorous analysis, we confirm that regardless of how $\gamma^5$ is inserted into the KD Lagrangian, exactly half of the dynamical terms acquire a negative sign. The fundamental topological necessity of the two-sheeted spacetime architecture is mathematically inescapable.
+
+\subsection{The KD-Majorana Condition}\label{subsec:KD_Majorana_diff_Lagrangian}
+
+We must now evaluate how the vital KD-Majorana condition is modified across these three Lagrangian variants, shedding light on their distinct physical interpretations. 
+
+Recall that the canonical charge conjugation for KD fermions is defined as $\Psi^c=(i\gamma^2)\Psi^*(i\gamma^2)$. Upon diagonalizing the additional $\gamma^0$ and absorbing the transformation into $\Psi'=\Psi\Omega$, this condition maps cleanly into the new basis:
+\[ \Psi'^c=(i\gamma^2)\Psi^*(i\gamma^2)\Omega=(i\gamma^2)(\Psi\Omega)^*\Omega^{-1}(i\gamma^2)\Omega=(i\gamma^2)\Psi'^*(i\gamma^2)\]
+This simplification relies on the fact that $\Omega$ is purely real ($\Omega^*=\Omega=\frac{1}{\sqrt{2}}\begin{pmatrix} \mathbbm{1}&-\mathbbm{1}\\ \mathbbm{1}&\mathbbm{1} \end{pmatrix}$) and satisfies $\Omega^{-1}(i\gamma^2)\Omega=(i\gamma^2)$.
+
+For the conventional Lagrangian, populating the field as $\Psi'=\begin{pmatrix}\ell_L& \ell_R^c\\ \ell_R & \ell_L^c  \end{pmatrix}$ ensures that $\Psi'^c=(i\gamma^2)\Psi'^*(i\gamma^2)=\Psi'$, explicitly satisfying the KD-Majorana condition. As detailed in the previous chapter, substituting this specific internal structure into the kinetic, mass, and Yukawa traces perfectly recovers the standard interactions of the SM. 
+
+For the variant Lagrangian featuring a left-acting $\gamma^5$ ($\mathcal{L}_1$), the transformation matrix $\Omega$ evaluates as strictly imaginary ($\Omega=\frac{1}{\sqrt{2}}\begin{pmatrix} \mathbbm{1}&i\mathbbm{1}\\ i\mathbbm{1}&\mathbbm{1} \end{pmatrix}$), since the diagonalization targets $\gamma^5\gamma^0$ rather than $\gamma^0$. Despite this shift, one can rigorously prove that the identity $\Psi'^c=(i\gamma^2)\Psi'^*(i\gamma^2)$ remains valid. If we assume the conventional population $\Psi'=\begin{pmatrix}\ell_L& \ell_R^c\\ \ell_R & \ell_L^c  \end{pmatrix}$, we again successfully recover $\Psi'^c=\Psi'$. 
+
+However, for the hybrid variants $\mathcal{L}_2$ and $\mathcal{L}_3$, the underlying Lagrangian structure diverges sharply from the conventional KD framework, necessitating a revised approach.
+
+Consider $\mathcal{L}_2$. To successfully extract standard SM terms from this action (e.g., proper chiral kinetic terms and mixed LH/RH mass terms), we are forced to populate the matrix as $\Psi'=\begin{pmatrix}\ell_L& \ell_R^c\\ \ell_L^c & \ell_R  \end{pmatrix}$. Executing the charge conjugation operator on this specific block configuration yields: 
+\[ \Psi'^c=(i\gamma^2)\begin{pmatrix}\ell_L& \ell_R^c\\ \ell_L^c & \ell_R  \end{pmatrix}^*(i\gamma^2)=\begin{pmatrix}-\ell_R^c& -\ell_L\\ \ell_R & \ell_L^c  \end{pmatrix}=\gamma^5\Psi'\gamma^0\]
+This transformed field is explicitly not equal to $\Psi'$. However, this modified KD-Majorana condition ($\Psi'^c=\gamma^5\Psi'\gamma^0$) is nonetheless invariant under Lorentz transformations. Here is the proof:
+
+The Lorentz transformation of the diagonalized field is governed by $U_\Lambda\Psi'U_\Lambda'$. Because $U_\Lambda$ is spanned by the standard basis $\gamma^\mu$ ($\mu=\{0,1,2,3\}$) while $U_\Lambda'$ is spanned by the alternate basis ($\mu=\{5,1,2,3\}$), the modified KD-Majorana condition remains invariant under the transformation: 
+\[\tilde\Psi'^c=U_\Lambda\Psi'^cU_\Lambda'=U_\Lambda\gamma^5\Psi'\gamma^0U_\Lambda'=\gamma^5U_\Lambda\Psi'U_\Lambda'\gamma^0 =\gamma^5\tilde\Psi'^c\gamma^0\]
+which relies on the standard commutation properties $[\gamma^5,U_\Lambda]=0$ and $[\gamma^0,U'_\Lambda]=0$.
+
+An identical geometric consistency applies to $\mathcal{L}_3$. The baseline charge conjugation operator remains $\Psi'^c=(i\gamma^2)\Psi'^*(i\gamma^2)$. However, due to its requisite internal population $\Psi'=\begin{pmatrix}\ell_L& -\ell_R^c\\ \ell_L^c & \ell_R  \end{pmatrix}$, the emergent KD-Majorana condition evaluates to:
+\[ \Psi'^c=(i\gamma^2)\begin{pmatrix}\ell_L& -\ell_R^c\\ \ell_L^c & \ell_R  \end{pmatrix}^*(i\gamma^2)=\begin{pmatrix}-\ell_R^c& -\ell_L\\ -\ell_R & \ell_L^c  \end{pmatrix}=\gamma^5\Psi'(\gamma^5\gamma^0)\]
+
+This KD-Majorana condition is similarly Lorentz invariant. Under the transformation $U_\Lambda\Psi'U_\Lambda'$, the right-acting matrix $U_\Lambda'$ is constructed using the hybridized basis $\gamma^\mu$ where $\mu=\{50,1,2,3\}$, defining $\gamma^{50}=\gamma^5\gamma^0$. After applying the commutation relations between the bases and Lorentz transformation matrices, one can show KD-Majorana condition is Lorentz invariant.
+
+Finally, it is trivial to verify that all the derived variant Lagrangians are dynamically invariant if one globally replaces the field $\Psi'$ with its conjugate $\Psi'^c$. Although this global substitution frequently generates an overall minus sign, this sign inversion is entirely physically benign, as the total action dynamically evaluates to zero due to the strict cancellation between the forward and backward sheets.
+
+In conclusion, alternative Lagrangian formulations constructed via the arbitrary insertion of $\gamma^5$ operators successfully replicate the physical dynamics of the original KD Lagrangian, despite requiring different matrix representations and modified KD-Majorana conditions.
+
+
+
+\printbibliography[heading=subbibintoc, title={References for Chapter \thechapter}]

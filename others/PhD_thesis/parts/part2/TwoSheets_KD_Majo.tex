@@ -1,0 +1,341 @@
+\chapter{Two-sheeted spacetime and KD Majorana condition}\label{chapter:two-sheet_KD_Majorana}
+
+% - John Donohue's paper: two sheeted PT-reverse spacetime. PT transformation of the Lagrangian = change sign of i --> both make Lagrangian positive definite
+% - Question: the forward and backward sheets might mix together under Lorentz transformation (acting from the right) and curved spacetime (additional spin connection acting from the right). Ex: Lorentz boosting.
+% - Solution: decouple the left and right symmetry $U_\Lambda \Psi' V$. The Lagrangian has larger symmetry: $V\in U(2,2)$. Where $U_\Lambda$ is its subgroup. Since Lagrangian is invariant under the transformation, we can always add $U_\Lambda$ to cancel out the $U_\Lambda^{-1}$ acting from the right --> $U_\Lambda \Psi'$ under Lorentz transform. Similarly, we can cancel out the spin connection term $\Psi' \omega_\mu$ by gauge field coming from $V$: say $\Psi' A_\mu$. As a result, we go back to conventional fermions' Lorentz transformation and spin connection. --> It is indeed fermions, not bosons.
+% - Questions: what are the particles in backward sheet? 
+% - Charge conjugation of KD fermions (have additional $i\gamma^2$ acting from the right) -> map farward to backward and vice versa -> particles in backward sheets are just anti-particles
+% - For physics remain invariant under charge conjugation, we need KD-Majorana condition. Show that it is invariant under Lorentz transformation.
+% - To satisfy this condition and no mixing between forward and backward sheets, V is constrained to be $U(2)\times U(2)$, which $U(2)$ are charge conjugate of one another other. Could it be $U(2)\times U(1)$ in the standard model?
+
+\chapterabstract{This chapter introduces a two-sheeted spacetime framework to resolve the negative-norm pathology inherent to Kähler Dirac (KD) fermions. By postulating that negative-norm (and negative-energy) states reside on a $PT$-reversed spacetime sheet, their effective energy is inverted, successfully yielding a positive-definite Lagrangian. Because these two sheets possess opposite arrows of time, fermions on opposing sheets must remain strictly isolated; any cross-sheet mixing would explicitly violate macroscopic causality. However, right-acting Lorentz transformations and spin connection terms in curved spacetime naturally threaten to induce such unphysical mixing. We resolve this vulnerability by exploiting the internal symmetry degrees of freedom of the KD field, systematically restricting kinematic transformations to act exclusively from the left. This rigorous constraint not only eliminates all cross-sheet mixing but also mathematically confirms that KD fields describe physical fermions rather than bosons. Finally, we examine the physical identity of the states residing on the backward-evolving sheet. Enforcing consistency under charge conjugation necessitates the imposition of a KD-Majorana condition. This condition elegantly dictates that the fermions on the backward sheet are the exact antiparticles of those on the forward sheet, providing a robust theoretical foundation for why the two spacetime sheets must remain perfectly $CPT$-symmetric, even at the quantum scale.}
+
+\section{Two-Sheeted Spacetime}\label{sec:Two-sheeted_spacetime}
+
+% Editor's note: Elevated the conversational tone to formal academic prose.
+Before detailing the two-sheeted spacetime solution, it is necessary to clarify foundational concepts regarding negative energy, backward time propagation, and antiparticles. 
+
+\subsection{Negative Energy, Backward Time Propagation, and Antiparticles}
+
+In quantum field theory (QFT), a conventional Dirac spinor is expanded as: 
+\begin{equation}\label{eq:psi_expansion}
+    \psi(x)=\int \frac{d^3}{(2\pi)^{3/2}\sqrt{E_p/m}} \sum_s [b(p,s)u(p,s)e^{-ip\cdot x}+d^\dagger (p,s)v(p,s)e^{ip\cdot x}].
+\end{equation}
+
+Here, the phase factor $e^{-ip\cdot x}=e^{-iEt}e^{i\vec{p}\cdot\vec{x}}$ corresponds to a particle with positive energy propagating forward in time. This is easily verified by applying the Schrödinger equation: $i\partial_t \psi=i(-iE)\psi=E\psi$. Conversely, the conjugate phase $e^{iEt}=e^{-i(-E)t}=e^{-iE(-t)}$ mathematically represents a particle with \textbf{negative} energy, or equivalently, a particle propagating \textbf{backward} in time. 
+
+Does this negative energy or backward propagation lead to a vacuum unbounded from below or violate causality? It does not. According to the Feynman-Stueckelberg interpretation, a negative-energy particle running \textbf{backward} in time is physically equivalent to a positive-energy antiparticle running \textbf{forward} in time. To see this explicitly, we take the charge conjugation of the negative-frequency solution $\psi=v e^{iEt}$: 
+\[\psi^c=i\gamma^2 \psi^*=i\gamma^2 v^*e^{-iEt}=ue^{-iEt}.\]
+
+Written in its complete representation, the charge-conjugated field is: 
+\begin{equation}\label{eq:psic_expansion}
+    \psi^c(x)=\int \frac{d^3}{(2\pi)^{3/2}\sqrt{E_p/m}} \sum_s [b^\dagger(p,s)v(p,s)e^{ip \cdot x}+d(p,s)u(p,s)e^{-ip\cdot x}].
+\end{equation}
+where we use the property $v^c=u$ and $u^c=v$.
+
+Thus, \cref{eq:psi_expansion} actually serves as a compact representation for two distinct physical fields: particles ($\psi$) and antiparticles ($\psi^c$). This should be interpreted as follows: annihilating a forward-moving particle is physically equivalent to creating a forward-moving antiparticle. Both physical states strictly possess positive energy. 
+
+This positivity is explicitly manifest in the Hamiltonian: 
+\begin{equation}
+\begin{aligned}
+H=\int d^3x(\Pi\dot\psi-\mathcal{L})=i\int d^3x(\psi^\dagger\dot\psi)\\
+\propto i\int d^3x (b^\dagger u^\dagger e^{ipx}+dv^\dagger e^{-ipx})(-iE)(bu e^{-ipx}-d^\dagger v e^{ipx})\\
+=\int E (b^\dagger b-dd^\dagger)=\int E(b^\dagger b+d^\dagger d)-\delta^{(3)}(\vec{0})\int E.
+\end{aligned}
+\end{equation}
+
+In the final step, applying the canonical anticommutation relations cancels the minus sign introduced by the time derivative of $e^{-i(-E)t}$, ultimately yielding a positive sign for both number operators, $b^\dagger b$ and $d^\dagger d$. Consequently, the calculated energy for physical states containing either particles or antiparticles is always positive.
+
+\subsection{The Negative Lagrangian and the Two-Sheeted Solution}
+
+Returning to the problematic negative-sign Lagrangian derived in the previous chapter, we rewrite it here for convenience: 
+\begin{equation}
+  \label{eq:S_KD_Lorentzian1p}
+  S_{KD}=\int d^{4}x\,{\rm Tr}[\Lambda\Psi'{}^{\dagger}\gamma^{0}(i\partial\!\!\!\!\;\!/-m)\Psi'].
+\end{equation}
+If we expand the field into its columns, $\Psi'=(\psi'_1, \psi'_2, \psi'_3, \psi'_4)$, the latter two columns ($\psi'_3, \psi'_4$) inherently carry a negative action (or Lagrangian). This scenario is fundamentally different from the standard Dirac case! If we were to calculate the Hamiltonian, the overall minus sign of the Lagrangian would propagate directly to the Hamiltonian ($H=\Psi\Pi-\mathcal{L}$, where $\Pi=\frac{\partial \mathcal{L}}{\partial \dot\Psi}$), leading to particles and antiparticles with genuinely negative energies. Similarly, this negative sign infects the anticommutation relations: 
+\begin{equation}
+\begin{aligned}
+    \{b(p,s),b^\dagger(p',s')\}&=-\delta^{(3)}(\vec{p}-\vec{p}')\delta_{ss'}\\
+    \{d(p,s),d^\dagger(p',s')\}&=-\delta^{(3)}(\vec{p}-\vec{p}')\delta_{ss'},
+\end{aligned}
+\end{equation}
+which immediately generates negative-norm (ghost) states:
+\[ \big<1|1\big>=\big<0|bb^\dagger|0\big>=\big<0|(-b^\dagger b-\delta)|0\big>=-\big<0|0\big>.\]
+
+At first glance, one might conclude that the theory is fundamentally unphysical due to the presence of these ghost states. However, as elucidated by Donoghue \cite{Donoghue:2019ecz}, an overall minus sign in front of the action physically corresponds to a reversal of the arrow of causality in quantum theory; or, more precisely, a parity and time ($PT$) reversal (detailed below). A field with a ``wrong-sign" action must be quantized using anti-time-ordered propagators rather than standard time-ordered Feynman propagators. 
+
+To intuitively grasp this, consider the Schrödinger equation: $i\partial_t \psi=E\psi$. If we switch the overall sign of the action—equivalent to switching the sign convention of the imaginary unit "$i$"—the equation becomes $-i\partial_t \psi=E\psi$. Based on the Feynman-Stueckelberg interpretation, this indicates that physical particles and antiparticles with positive energy propagate \textbf{backward} in time; the causal arrow is entirely reversed!
+
+Because we do not empirically observe particles propagating backward in time, how should we interpret the second two columns of fermions (in \cref{eq:S_KD_Lorentzian1p}) that carry this negative Lagrangian? Drawing on the previous discussion, they must exist in a $PT$-reversed spacetime. What happens when we also consider charge conjugation ($C$)? 
+
+The expansion of $\psi$ (\cref{eq:psi_expansion}) and its charge conjugate $\psi^c$ (\cref{eq:psic_expansion}) offers a critical hint. Reversing the sign of "$i$" transforms the phase factors $e^{\pm ip \cdot x}$ into $e^{\mp ip\cdot x}$; effectively, $\psi$ transforms into $\psi^c$ and vice versa! This demonstrates that the second two columns are not merely $PT$-reversed, but fully $CPT$-reversed. 
+
+This conceptual alignment perfectly resonates with Boyle and Turok's series of works on the $CPT$-symmetric universe \cite{Boyle:2018tzc, Boyle:2018rgh, Boyle:2021jej, Turok:2022fgq, Boyle:2022lcq}. In their framework, the Big Bang serves as a temporal mirror at which two sheets of spacetime (a universe/anti-universe pair, related strictly by $CPT$ symmetry) are joined. It is highly natural to postulate that the latter two columns of the KD spinor represent fermions residing on the $CPT$-reversed sheet (the anti-universe). If an observer is situated in this anti-universe—effectively flipping $PT$, or the sign of "$i$"—the action mathematically returns to a positive-definite form.
+
+The comprehensive topological picture is therefore as follows: spacetime consists of two distinct sheets—one with its arrow of causality pointing forward, and the other pointing backward. The $\Lambda_{ii}=+1$ spinors (the first two columns of $\Psi'$) live on the ``forward" sheet, while the $\Lambda_{ii}=-1$ spinors (the last two columns of $\Psi'$) live on the ``backward" sheet. These two sheets are mutual $PT$ mirrors. An inversion of the coordinates $x^{\mu}\to-x^{\mu}$ on the $\Lambda_{ii}=-1$ sheet flips the Dirac operator $i\partial\!\!\!\!\;\!/\,\to-i\partial\!\!\!\!\;\!/\,$, thereby flipping the overall sign of the action on that sheet, rendering it physically identical to the action on the $\Lambda_{ii}=+1$ sheet.
+
+An alternative, mathematically convenient perspective is that the ``two sheets" share the same spacetime orientation but adopt different square roots of $-1$ (again, following \cite{Donoghue:2019ecz}). Where ``our sheet" utilizes $+i$, the ``other sheet" utilizes $-i$ (specifically in the formulation of quantum mechanics). Consequently, a plane wave $e^{-ip\cdot x}$ on our sheet maps to $e^{ip\cdot x}$ on the other sheet. Standard quantum mechanics dictates summing over ${\rm e}^{iS}$, canonically quantizing via $[x,p]=i$, and evolving states via $\dot{A}=i[H,A]$ on our sheet; however, it must utilize ${\rm e}^{-iS}$, $[x,p]=-i$, and $\dot{A}=-i[H,A]$ on the opposing sheet.
+
+Both perspectives effectively repair the KD theory, reliably yielding states with strictly positive energy and positive norms across both sheets.
+
+% Editor's note: Formalized the derivation text describing the PT flip.
+\subsection{Proof of a Positive-Definite Lagrangian in the Two-Sheeted Picture}
+
+In the following, we will provide a detailed proof demonstrating how applying a $PT$ transformation (or equivalently flipping sign of $i$) correctly absorbs the negative sign, yielding a positive-definite framework. 
+For a conventional Dirac spinor, the field transforms as $\tilde\psi(\tilde x)=(PT)\psi(x)$, where $\tilde x=-x$ and the $PT$ operator is given by $(PT)=\eta \gamma^0\gamma^1\gamma^3K=\eta\begin{pmatrix}0&\sigma^2\\ \sigma^2 & 0\end{pmatrix} K$ (where $K$ complex conjugate everything to its right). However, because the KD spinor is a $4\times 4$ matrix constructed from $\gamma^\mu$ matrices, it must transform analogously to $\gamma^\mu$: $\tilde\Psi(\tilde x)=(PT)\Psi(x) (PT)^{-1}$. This transformation rule is preserved even after diagonalizing the extra $\gamma^0$ via $\Psi'=\Psi\Omega$, yielding $\tilde\Psi'(\tilde x)=(PT)\Psi'(x) (PT)^{-1}$. 
+
+Decomposing $\Psi'$ into blocks, assume $\Psi'=\begin{pmatrix}\ell_L&\ell_R^c\\ \ell_R & \ell_L^c\end{pmatrix}$ (we will explain the expansion later in \cref{sec:KD-Majorana}). Applying the transformation gives:
+\begin{equation}
+\begin{aligned}
+    (PT)\Psi'(x) (PT)^{-1}&=\eta\begin{pmatrix}0&\sigma^2\\ \sigma^2 & 0\end{pmatrix} K\begin{pmatrix}\ell_L&\ell_R^c\\ \ell_R & \ell_L^c\end{pmatrix} K^{-1} \eta^{-1}\begin{pmatrix}0&\sigma^2\\ \sigma^2 & 0\end{pmatrix}\\
+    &=\begin{pmatrix}0&\sigma^2\\ \sigma^2 & 0\end{pmatrix} \begin{pmatrix}\ell_L^*&(\ell_R^c)^*\\ \ell_R^* & (\ell_L^c)^*\end{pmatrix}  \begin{pmatrix}0&\sigma^2\\ \sigma^2 & 0\end{pmatrix}=\begin{pmatrix}\sigma^2(\ell_L^c)^*\sigma^2&\sigma^2\ell_R^*\sigma^2\\ \sigma^2(\ell_R^c)^*\sigma^2 & \sigma^2\ell_L^*\sigma^2\end{pmatrix}\\
+    &=\begin{pmatrix}\ell_L&-\ell_R^c\\ -\ell_R & \ell_L^c\end{pmatrix}, \text{ where }\ell_R^c=-\sigma^2\ell_R^*\sigma^2, \ell_L^c=\sigma^2\ell_L^*\sigma^2.
+\end{aligned}
+\end{equation}
+Note that the operator $K=K^{-1}$ takes the complex conjugate of all terms to its right. 
+
+Observe that flipping spacetime for the entire matrix $\Psi'$ introduces an overall minus sign in front of $\ell_R$ and $\ell_R^c$. Because we intend to invert spacetime \textit{only} for the fields on the backward sheet, we define the composite field as: 
+\[ \tilde \Psi'(x)=\begin{pmatrix}\ell_L(x)&-\ell_R^c(\tilde x)\\ \ell_R(x) & \ell_L^c(\tilde x)\end{pmatrix}.\]
+
+Applying this mixed-coordinate field to the Lagrangian yields: 
+\begin{equation}
+\begin{aligned}
+    \,{\rm Tr}[i\Lambda\tilde\Psi'{}^{\dagger}\gamma^{0}\gamma^\mu\partial_\mu\tilde \Psi']&=\,{\rm Tr}[\ell_L^\dagger \bar{\sigma}^\mu\partial_\mu\ell_L+\ell_R^\dagger \sigma^\mu\partial_\mu\ell_R]\textcolor{red}{-}\,{\rm Tr}[(\ell_R^c)^\dagger \bar{\sigma}^\mu\partial_\mu\ell_R^c(\tilde x)+(\ell_L^c)^\dagger \sigma^\mu\partial_\mu\ell_L^c(\tilde x)]\\
+    &=\,{\rm Tr}[\ell_L^\dagger \bar{\sigma}^\mu\partial_\mu\ell_L+\ell_R^\dagger \sigma^\mu\partial_\mu\ell_R]\textcolor{red}{+}\,{\rm Tr}[(\ell_R^c)^\dagger \bar{\sigma}^\mu\tilde\partial_\mu\ell_R^c(\tilde x)+(\ell_L^c)^\dagger \sigma^\mu\tilde\partial_\mu\ell_L^c(\tilde x)].
+\end{aligned}
+\end{equation}
+Crucially, the fields on the second sheet must be differentiated with respect to the reversed coordinates $\tilde x=-x$. This coordinate chain rule introduces an additional minus sign, rendering the entire kinetic Lagrangian positive-definite. 
+
+Similarly, for the mass term, we obtain:
+\begin{equation}
+\begin{aligned}
+    \,{\rm Tr}[m\Lambda\tilde\Psi'{}^{\dagger}\gamma^{0}\tilde \Psi']=m\big(\ell_L^\dagger\ell_R+\ell_R^\dagger\ell_L+(\ell_R^c)^\dagger\ell_L^c+(\ell_L^c)^\dagger\ell_R^c\big).
+\end{aligned}
+\end{equation}
+
+One might question whether this global two-sheeted picture is the unique interpretation. The motivation for proposing a global duality is that we do not empirically observe backward-moving particles in our universe. However, could this represent a highly localized effect? For instance, Donoghue \cite{Donoghue:2019ecz} hypothesizes that the backward-moving ghosts predicted by quadratic gravity may physically exist within our universe, but evade observation simply because they are highly unstable and decay in extremely short time. Could KD fermions be interpreted through a similar localized mechanism? If so, this could lead to novel physical predictions at ultra-high energies, such as the transient observation of backward-moving fermions. Constructing a fully consistent physical theory along these lines—and identifying the precise high-energy phenomenological signatures—requires substantial theoretical development, which we leave for future investigation.
+
+\section{Preventing Mixing Terms via Decoupled Internal Symmetries}\label{sec:prevent_mixing_term}
+
+% Editor's note: Enhanced the transitions and clarified the distinction between Lorentz (spinor) transformations and internal gauge symmetries.
+A critical issue arises: do the fermions on the forward and backward sheets mix under standard kinematic transformations, thereby violating causality? 
+
+\subsection{Mixing Induced by Lorentz Transformations and the Spin Connection}\label{subsec:mixing_term_Lorentz_spin_connection}
+
+The primary concern is the Lorentz transformation. Because $\Psi$ is a $4\times 4$ matrix rather than a standard $4\times 1$ column spinor, its Lorentz transformation is given by the bi-spinor mapping $\Psi(x)\to U_{\Lambda(x)} \Psi(x) U_{\Lambda(x)}^{-1}$ (as derived in \cref{sec:Lorentz_transform}). 
+
+The invariant trace of the original field transforms as:
+\begin{equation}
+\begin{aligned}
+    \,{\rm Tr}[\gamma^0\Psi^\dagger\gamma^0 \Psi]&\to  \,{\rm Tr}[\gamma^0(U_{\Lambda} \Psi U_{\Lambda}^{-1})^\dagger\gamma^0 U_{\Lambda} \Psi U_{\Lambda}^{-1}]\\
+    &=\,{\rm Tr}[U_{\Lambda}\gamma^0 \Psi^\dagger\gamma^0 U_{\Lambda}^{-1}U_{\Lambda} \Psi U_{\Lambda}^{-1}]=\,{\rm Tr}[\gamma^0\Psi^\dagger\gamma^0 \Psi].
+\end{aligned}
+\end{equation}
+, where $U_\Lambda^\dagger=\gamma^0 U_\Lambda^{-1}\gamma^0$.
+
+However, after diagonalizing the additional $\gamma^0=\Omega\Lambda\Omega^{-1}$, $\Psi$ becomes $\Psi'=\Psi\Omega$. And the Lorentz transformation becomes:
+
+\begin{equation}\label{eq:Lorentz_transform_Psi_prime}
+    U_{\Lambda} \Psi U_{\Lambda}^{-1}\Omega= U_{\Lambda} \Psi(\Omega \Omega^{-1})U_{\Lambda}^{-1}\Omega=U_{\Lambda} \Psi' U_{\Lambda}'^{-1}
+\end{equation}
+, where $U_{\Lambda}'^{-1}=\Omega^{-1}U_{\Lambda}^{-1}\Omega$.
+
+% Translating this invariance to the diagonalized field $\Psi'$ gives:
+% \begin{equation}
+% \begin{aligned}
+%     \,{\rm Tr}[(\Omega\Lambda\Omega^{-1})\Psi^\dagger\gamma^0 \Psi]&\to  \,{\rm Tr}[(\Omega\Lambda\Omega^{-1})(U_{\Lambda} \Psi U_{\Lambda}^{-1})^\dagger\gamma^0 U_{\Lambda} \Psi U_{\Lambda}^{-1}]\\
+%     &=\,{\rm Tr}[U_{\Lambda}(\Omega\Lambda\Omega^{-1}) \Psi^\dagger\gamma^0 U_{\Lambda}^{-1}U_{\Lambda} \Psi U_{\Lambda}^{-1}]\\
+%     &=\,{\rm Tr}[(\Omega\Omega^{-1})U_{\Lambda}(\Omega\Lambda\Omega^{-1}) \Psi^\dagger\gamma^0  \Psi (\Omega\Omega^{-1})U_{\Lambda}^{-1}]\\
+%     &=\,{\rm Tr}[U_{\Lambda}'\Lambda \Psi'^\dagger\gamma^0  \Psi' U_{\Lambda}'^{-1}], \quad \text{where } U_{\Lambda}'=\Omega U_{\Lambda}\Omega^{-1}, \text{ and } \Psi'=\Psi\Omega.
+% \end{aligned}
+% \end{equation}
+% \footnotesize{Note that the big $\Lambda=\text{diag}[1,1,-1,-1]$ coming from diagonalized $\gamma^0$, which have nothing to do with the $\Lambda$ in $U_{\Lambda}$ representing Lorentz transform.}
+
+% From this calculation, it is evident that the Lorentz transformation of the diagonalized field takes the form $U_{\Lambda} \Psi' U_{\Lambda}'^{-1}$. Crucially, the Lorentz matrix acting from the right is $U_{\Lambda}'^{-1}$, not $U_{\Lambda}^{-1}$.
+
+Given that 
+\[ \Omega^{-1} \gamma^0\Omega=\Lambda=-\gamma^5, \quad \text{and} \quad \Omega^{-1}\gamma^i\Omega=\gamma^i,\] 
+we can interpret $U_{\Lambda}$ and $U_{\Lambda}'$ as being formulated in the Weyl and Dirac bases, respectively. So $U_\Lambda'^\dagger=\gamma^5 U_\Lambda'^{-1}\gamma^5=\Lambda U_\Lambda'^{-1}\Lambda$, analogous to $U_\Lambda^\dagger=\gamma^0 U_\Lambda^{-1}\gamma^0$.
+
+Consequently, we observe:
+\[ U_{\Lambda}'\Lambda (U_{\Lambda}')^\dagger= U_{\Lambda}'\Lambda (\Lambda U_{\Lambda}'^{-1}\Lambda)=\Lambda=\begin{pmatrix}\mathbbm{1}&0\\ 0 & -\mathbbm{1}\end{pmatrix},\]
+which formally proves that $U_{\Lambda}'\subset U(2,2)$. 
+
+We must now investigate whether the transformation $U_{\Lambda} \Psi' U_{\Lambda}'^{-1}$ mixes the first two and last two columns. While the left-acting matrix $U_{\Lambda}$ respects the block structure, the right-acting matrix $U_{\Lambda}'^{-1}$ induces mixing. Because $U_{\Lambda}'=e^{-\frac{i}{4}\lambda_{\alpha\beta}\Sigma'^{\alpha\beta}}$, assuming $\Sigma^{\alpha\beta}$ is written in the Weyl basis ($\gamma^0=\begin{pmatrix}0&\mathbbm{1}\\ \mathbbm{1}&0\end{pmatrix}$), the corresponding generator $\Sigma'^{\alpha\beta}$ must reside in the Dirac basis, where $\gamma'^0=-\gamma^5=\begin{pmatrix}\mathbbm{1}&0\\ 0 & -\mathbbm{1}\end{pmatrix}$.
+
+The resulting generators are:
+\begin{equation}
+\begin{aligned}
+    \Sigma'^{ij}&=\Sigma^{ij}=\frac{i}{2}[\gamma^i,\gamma^j]=-i\epsilon_{ijk}\begin{pmatrix}\sigma^k&0\\ 0&\sigma^k\end{pmatrix}\\
+    \Sigma^{0i}&=\frac{i}{2}[\gamma^0,\gamma^i]=i\begin{pmatrix}-\sigma^i&0\\ 0&\sigma^i\end{pmatrix}\\
+    \Sigma'^{0i}&=\frac{i}{2}[\gamma'^0,\gamma'^i]=\frac{i}{2}[-\gamma^5,\gamma^i]=i\begin{pmatrix}0&\sigma^i\\ \sigma^i&0\end{pmatrix}.
+\end{aligned}
+\end{equation}
+Because $\gamma^i$ is off-diagonal while $\gamma^5$ is diagonal, the spatial generators $\Sigma'^{ij}$ remain block-diagonal, whereas the boost generators $\Sigma'^{0i}$ become completely off-diagonal. Multiplying an off-diagonal matrix from the right inevitably mixes the columns of $\Psi'$:
+\begin{equation}
+\begin{aligned}
+    \Psi'=\begin{pmatrix}\psi_{F1}&\psi_{B1}\\ \psi_{F2}&\psi_{B2}\end{pmatrix}\to \Psi'\Sigma'^{0i}=i\begin{pmatrix}\psi_{F1}&\psi_{B1}\\ \psi_{F2}&\psi_{B2}\end{pmatrix}\begin{pmatrix}0&\sigma^i\\ \sigma^i&0\end{pmatrix}=i\begin{pmatrix}\psi_{B1}\sigma^i&\psi_{F1}\sigma^i\\ \psi_{B2}\sigma^i&\psi_{F2}\sigma^i\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+Applying this to an infinitesimal Lorentz boost gives: 
+\begin{equation}
+\begin{aligned}
+    e^{-\frac{i}{4}\lambda_{0i}\Sigma^{0i}}\Psi'e^{\frac{i}{4}\lambda_{0i}\Sigma'^{0i}}=\begin{pmatrix}\psi_{F1}&\psi_{B1}\\ \psi_{F2}&\psi_{B2}\end{pmatrix}+\frac{1}{4}\lambda_{0i}\left[\begin{pmatrix}\sigma^i\psi_{F1}&\sigma^i\psi_{B1}\\ \sigma^i\psi_{F2}&\sigma^i\psi_{B2}\end{pmatrix}-\begin{pmatrix}\psi_{B1}\sigma^i&\psi_{F1}\sigma^i\\ \psi_{B2}\sigma^i&\psi_{F2}\sigma^i\end{pmatrix}\right].
+\end{aligned}
+\end{equation}
+The presence of the second matrix clearly demonstrates that the forward and backward sheets mix under Lorentz boosting. 
+
+An identical mixing problem occurs in curved spacetime via the spin connection. Recall that the bi-spinor covariant derivative is $D_\mu\Psi=\partial_\mu\Psi+[\omega_\mu,\Psi]$. The commutator explicitly subtracts $\Psi\omega_\mu$, applying the spin connection from the right, which necessarily mixes the columns. 
+
+\subsection{Resolution via the $U(2,2)$
+ Internal Symmetry}\label{subsec:solution_internal_symmetry}
+
+How can this pervasive mixing problem be resolved? To answer this, we must return to the framework of differential forms. Differential forms inherently describe bosons with integer spin (e.g., 0-forms for scalar spin-0 fields, 1-forms for vector spin-1 fields). The spinor formulation of KD fermions is mathematically constructed from these bosonic forms. This raises a fundamental question: should $\Psi$ physically be classified as a fermion or a boson? 
+
+To clarify this, note that the action (\ref{eq:KD_action_Psi}) possesses a substantially larger symmetry group, ${\rm Spin}(3,1)\times U(2,2)$. Specifically, it remains invariant under transformations of the form $\Psi'\to U_{\Lambda}\Psi' V$, where $V$ is any arbitrary element of the group $U(2,2)=\{V| V\Lambda V^{\dagger}=\Lambda\}$ (with $\Lambda={\rm diag}(1,1,-1,-1)$). Thus, the left-acting matrix $U_{\Lambda}$ encodes the true Lorentz group (under which $\Psi'$ transforms as a pure {\it spinor}), while the right-acting matrix $V$ represents a $U(2,2)$ {\it internal} symmetry (since the transformation $\Psi'\to \Psi' V$ holds independent of any coordinate transformation). As proven previously, the right-acting boost matrix satisfies $U_{\Lambda}'\subset U(2,2)$. When we restrict this general transformation to the diagonal subgroup $V=U_{\Lambda}'^{-1}$ (a specific synchronized combination of Lorentz and internal symmetry), $\Psi$ transforms mathematically {\it as if} it were a polyform field, which explains why it maps so naturally onto a discrete lattice cell complex. However, to construct a physically sensible quantized theory without negative-norm states, we must treat $\Psi'$ as a Grassmann-valued field satisfying fermionic anticommutation relations. 
+
+Because the Lagrangian is fully invariant under the internal symmetry $U(2,2)$, we are free to apply an internal gauge transformation $V = U_\Lambda'$ to exactly cancel the problematic $U_\Lambda'^{-1}$ acting from the right. Consequently, the physical Lorentz transformation reverts strictly to the conventional single-sided spinorial form: $\Psi' \to U_\Lambda \Psi'$. In this restricted, physical formulation, $\Psi'$ behaves strictly as a fermion. 
+
+Applying this same logic to the spin connection: if the physical field transforms as $\Psi' \to U_\Lambda \Psi'$, then covariance demands that its derivative transforms as $D_\mu\Psi' \to U_\Lambda (D_\mu\Psi')$. To satisfy this condition, the covariant derivative be defined as: $D_\mu\Psi'=\partial_\mu\Psi+\omega_\mu\Psi$ (see \cref{sec:Lorentz_spin_connec_fermions} for derivation), which is the same as standard fermions. Under this redefinition, the forward and backward sheets remain strictly isolated.
+
+Finally, one might object that redefining the Lorentz transformation and spin connection in this manner severs the direct equivalence between the KD spinor formulation and the geometric differential formulation, particularly in curved spacetime or under active boosts. This poses a potential conceptual hurdle for lattice gauge theory, where simulations explicitly embed differential forms on a discrete lattice. 
+
+In Minkowski space, this discrepancy is easily resolved. We simply fix the observational reference frame for the duration of the simulation, fixing the transformation map between the spinor and differential formalisms. Any active Lorentz transformation applied to the system must then be manually compensated by applying the internal gauge matrix $V=U_\Lambda'$ from the right to preserve the non-mixing fermionic behavior. 
+
+In curved spacetime, however, the situation is substantially more complex, as the local spin connection $\omega_\mu$ varies continuously across the simulated manifold. A universally robust computational solution to this dynamic mixing remains an open question. Nevertheless, for the majority of current lattice gauge theory applications, the flat Minkowski space formalism is entirely sufficient.
+
+% So far, we \textbf{assume} there is no mixing terms to fit with observation. But one might ask: is there a deeper, theoretical justification for why the spin connection should fundamentally forbid mixing between the forward and backward sheets? Recent work by Tzanavaris on the free boundary problem in General Relativity \cite{Tzanavaris:2026ujl} demonstrates that the initial singularity (the Big Bang) imposes rigid constraints on the metric ($K^i_j\propto \dot g_{\mu\nu}=0$). In the KD formalism, while the right-acting spin connection generally mixes columns, it is specifically the time-dependent components (analogous to Lorentz boosts) that mix the forward and backward sheets; purely spatial components (analogous to spatial rotations) preserve the block structure. This invites a compelling conjecture: do the boundary conditions at the Big Bang strictly constrain the spin connection to contain only spatial rotations, thereby forbidding the time-like components necessary for inter-sheet mixing? Furthermore, is this property dynamically preserved as the universe evolves? If so, this would provide a rigorous gravitational mechanism explaining the absolute isolation of the two sheets. Proving this requires formulating robust boundary terms for spinors by simultaneously varying the tetrad and the spin connection—a mathematically challenging task due to their interdependent geometric definitions. We leave this intriguing hypothesis to future theoretical work. 
+
+\vspace{0.25cm}
+\section{The KD-Majorana Condition}\label{sec:KD-Majorana}
+
+% Editor's note: Elevated and formalized the discussion on Majorana conditions and CPT symmetry mappings.
+If the particles comprising ``our" Standard Model reside exclusively on ``our" forward sheet, what physical entities occupy the backward sheet? This dichotomy raises two immediate theoretical concerns. First, we must rigorously forbid any interactions between the two sheets that would violate macroscopic causality or conflict with existing experimental limits \footnote{even though Lorentz transform and spin connection only act from left, and would not fix the two sheets, the remaining degree of freedom of internal symmetry $V\in U(2,2)$ might still mix the two sheets}. Second, if we successfully render the sheets entirely independent and non-interacting, we seemingly double the fundamental particle content of the Standard Model in a manner completely inaccessible to empirical verification.
+
+Fortunately, there exists a highly elegant theoretical resolution to both problems. 
+
+\subsection{Charge Conjugation and the KD-Majorana Condition}
+Whereas the standard charge conjugate of a Dirac spinor is given by $\psi^c=i\gamma^{2}\psi^{\ast}$, the charge conjugate of a full KD matrix spinor is defined as $\Psi^c=(i\gamma^2)\Psi^{\ast}\textcolor{red}{(i\gamma^2)}$ \cite{Catterall:2020fep, Butt:2021brl}. Note that there is an additional $(i\gamma^2)$ acting from the right, since $\Psi$ is a $4\times 4$ spinor, the charge conjugation matrix should act from both sides $C^{-1}\Psi C$.
+
+Because of this additional $(i\gamma^2)$ acting from the right, after charge conjugation, particle in the first column would become its anti-particle in the fourth column. Similarly, particle in the second column would become its anti-particle in the third column. And vice versa:
+\begin{equation}
+\begin{aligned}
+    \Psi=\begin{pmatrix} \psi_{1}, \psi_{2},0,0\end{pmatrix}\quad &\implies \quad \Psi^c=\begin{pmatrix} 0,0,-\psi_{2}^{c}, \psi_{1}^{c}\end{pmatrix},\\
+    \Psi=\begin{pmatrix} 0,0,-\psi_{2}^{c}, \psi_{1}^{c}\end{pmatrix}\quad &\implies \quad \Psi^c=\begin{pmatrix} \psi_{1}, \psi_{2},0,0\end{pmatrix}.
+\end{aligned}
+\end{equation}
+Since taking charge conjugation means changing observer to the other sheet, it means a particle in forward sheets becomes anti-particle in backward sheet after changing observer! Which is non-physical. To preserve the physics, the only way is to assume:
+\begin{equation}\label{eq:KD-Majorana}
+  \Psi'=\Psi'^c=(\psi_{1}, \psi_{2}, -\psi_{2}^{c}, \psi_{1}^{c}).
+\end{equation}
+, meaning that a particle in forward sheet always per with an anti-particle in backward sheet. The two-sheets are totally CPT symmetric! \footnote{Related to CPT-symmetric universe model, KD-Majorana condition explain why the universe and anti-universe should be totally CPT-symmetric.}
+
+Analog to the conventional Majorana condition $\psi^{c}=\psi$, we call it ``KD-Majorana condition"\footnote{the concept of a KD-Majorana condition is mathematically similar to the ``reduced" Kähler–Dirac field discussed in \cite{Butt:2021brl}. In this chapter, we clarify its strict theoretical necessity and physical interpretation within a two-sheeted spacetime.}:
+\begin{equation}
+  \Psi^{c}\equiv(i\gamma^{2})\Psi^{\ast}(i\gamma^{2})=\Psi,
+\end{equation} 
+or, equivalently, expressed in terms of the diagonalized field $\Psi'=\Psi\Omega$:
+\begin{equation}
+  \Psi'{}^{c}\equiv(i\gamma^{2})(\Psi')^{\ast}\beta=\Psi',\quad \text{where } \beta\equiv \Omega^{T}(i\gamma^{2})\Omega=(i\gamma^2).
+\end{equation}
+\footnote{Note that this KD-Majorana condition is Lorentz invariant with respect to both the strictly left-acting transformation ($\Psi\to U_{\Lambda}\Psi$) and the bi-directional transformation ($\Psi\to U_{\Lambda}\Psi U_{\Lambda}^{-1}$).  }
+
+% Under this definition, the KD-Majorana condition enforces a profound $CPT$ symmetry. The charge conjugation operator maps a left-handed (LH) particle on the forward sheet directly to a right-handed (RH) antiparticle on the ($PT$-reversed) backward sheet, and vice versa. This mapping is explicitly demonstrated by applying the operator to a trial state:
+
+% (Notice that the components $\psi_{1}^c$ and $\psi_2^c$ have logically swapped spatial positions within the matrix). Consequently, if a field $\Psi'$ satisfies the KD-Majorana condition, its four internal columns are strictly locked into the form: 
+% \begin{equation}\label{eq:KD-Majorana}
+%   \Psi'=\Psi'^c=(\psi_{1}, \psi_{2}, -\psi_{2}^{c}, \psi_{1}^{c}).
+% \end{equation}
+
+Just as an ordinary Majorana spinor cannot have independent LH and RH spinors, but instead mathematically binds a LH particle to its RH antiparticle, a KD-Majorana spinor forbids the isolated existence of a particle on the forward sheet. It dictates that any particle on the forward sheet is inextricably paired with a antiparticle on the backward sheet, forcing their superposition to remain strictly invariant under $\Psi \to \Psi^c$. In essence, the theory provides fermions living in forward and backward sheets, and the KD-Majorana condition further demands a perfectly invariant, balanced combination of the two. 
+
+It should be noted that, from a conventional single-sheet perspective, imposing the KD-Majorana condition (while treating $\Psi$ as a Grassmann variable) causes the total KD action to vanish identically, because the kinetic contribution of the forward sheet is precisely negated by the backward sheet. However, because the two topological sheets carry fundamentally opposite causality signatures (different values of $-1$), their respective contributions to the path integral do not destructively interfere in this naive manner. 
+
+\subsection{Transformation Under $CPT$ Reversal}
+
+By imposing KD-Majorana condition, the two sheets become totally $CPT$ symmetric. Subsequently, in this subsection, we would like to evaluate the transformational properties of these Lagrangians under global $CPT$ reversal. It is a foundational tenet of QFT that the conventional Dirac equation is invariant under $CPT$, ensuring that macroscopic physics remains universally symmetric. This is easily proven by confirming that the Dirac Lagrangian is invariant under the simultaneous transformations $(t,x,y,z)\to (-t,-x,-y,-z)$, $i\to -i$, $\gamma^\mu \to (\gamma^\mu)^*$, and $\psi\to \eta \gamma^5 \psi^*$. 
+
+However, when evaluating a KD Lagrangian—regardless of the specific left/right $\gamma^5$ insertions used to define the adjoint $\bar\Psi$—the global action inevitably acquires an overall minus sign upon $CPT$ reversal. This minus sign arises directly from the additional left-acting $\gamma^0$ in $\bar\Psi=\gamma^0\Psi^\dagger\gamma^0$. Noting that the $4\times 4$ spinor matrix transforms as $\Psi\to \eta \gamma^5\Psi^*\gamma^5$, the fundamental scalar trace ${\rm Tr}[\bar\Psi\Psi]={\rm Tr}[\gamma^0\Psi^\dagger\gamma^0\Psi]$ transforms precisely as the following under $CPT$: 
+\[{\rm Tr}[\gamma^0\gamma^5\Psi^\top \gamma^5\gamma^0\gamma^5\Psi^*\gamma^5]= {\rm Tr}[\gamma^0\Psi^\top \gamma^0\Psi^*]=-{\rm Tr}[\Psi^\dagger \gamma^0\Psi\gamma^0]=-{\rm Tr}[\bar\Psi\Psi]\]
+In the penultimate step, taking the matrix transpose of Grassmann-valued variables systematically extracts an overarching minus sign.
+
+Far from being a mathematical pathology, this resulting minus sign encodes a profound physical truth. The KD fermion framework explicitly dictates a two-sheeted spacetime geometry: positive-energy fermions occupy the forward sheet, while negative-energy fields occupy the backward sheet. Applying a global $CPT$ operator fundamentally mirrors the observer across these sheets (i.e., mapping the observer mathematically into the backward sheet). From this mirrored perspective, the fields of the backward sheet register as positive-definite, while the fermions of the forward sheet register as negative. It is this exact geometric sheet-inversion that manifests as the global sign flip in the $CPT$-reversed Lagrangian.
+
+% To systematically analyze the full symmetry of a single KD-Majorana field, we partition $\Psi'$ into $2\times2$ blocks, $\Psi'=\begin{pmatrix}a&b\\c&d\end{pmatrix}$. Setting $m=0$, the KD action (\ref{eq:S_KD_Lorentzian1p}) expands to:
+% \begin{equation}
+%   S_{KD}=\int d^{4}x\, i\,{\rm Tr}[a^{\dagger}\bar{\partial}\!\!\!\!\;\!/\;\!a-b^{\dagger}\bar{\partial}\!\!\!\!\;\!/\;\!b+c^{\dagger}\partial\!\!\!\!\;\!/\;\!c-d^{\dagger}\partial\!\!\!\!\;\!/\;\!d],
+% \end{equation}
+% where $\partial\!\!\!\!\;\!/=\sigma^{\mu}\partial_{\mu}$ and $\bar{\partial}\!\!\!\!\;\!/=\bar{\sigma}^{\mu}\partial_{\mu}$.
+% Prior to enforcing the KD-Majorana constraint, this Lagrangian exhibits an enormous internal symmetry group. For any $(U_{\Lambda},V_{L},V_{R})\in Spin(3,1)\times U(2,2)_{L}\times U(2,2)_{R}$, the action is strictly invariant under the independent block transformations:
+% \begin{eqnarray}
+%   (a\;\;b)&\to& U_{\Lambda}^{L}(a\;\;b)V_{L}, \nonumber\\
+%   (c\;\;d)&\to& U_{\Lambda}^{R}(c\;\;d)V_{R},
+% \end{eqnarray}
+% where $V_{L}$ and $V_{R}$ are arbitrary $4\times 4$ mixing matrices, and $U_{\Lambda}^{L}$ and $U_{\Lambda}^{R}$ represent the upper and lower $2\times2$ irreducible blocks of the Lorentz matrix $U_{\Lambda}$. However, imposing the KD-Majorana condition rigidly locks these degrees of freedom (forcing $d=-\sigma^{2}a^{\ast}\sigma^{2}$ and $c=\sigma^{2}b^{\ast}\sigma^{2}$). This constraint simultaneously requires $U_{\Lambda}^{R}=(i\sigma^{2})U_{\Lambda}^{L\ast}(i\sigma^{2})$ (which is naturally satisfied by the Lorentz algebra) and $V_{R}=(i\gamma^{2})V_{L}^{\ast}(i\gamma^{2})$. As a result, the two internal $U(2,2)$ groups are no longer independent; they collapse into a single unified symmetry, reducing the total symmetry structure to $Spin(3,1)_{{\rm Lorentz}}\times U(2,2)_{{\rm internal}}$.
+
+% We now provide an alternative, more direct proof of this symmetry collapse. 
+
+
+\subsection{Constraints on the $U(2,2)$ Internal Symmetry}\label{subsec:KD-Majorana_constrain_internal_symm}
+
+Finally, we demand that the KD-Majorana condition remains invariant under the general transformation $\Psi'\to U_\Lambda\Psi'V$, and we evaluate the resulting constraints on the internal matrix $V$.
+
+The KD-Majorana condition is written as: 
+\[\Psi'=\Psi'^c =(i\gamma^2)\Psi'^*(i\gamma^2).\]
+
+Imposing invariance under the symmetry transformation requires:
+\[ U_\Lambda\Psi'^cV=(i\gamma^2)(U_\Lambda\Psi'V)^*(i\gamma^2)
+    =(i\gamma^2)U_\Lambda^*\Psi'^*V^*(i\gamma^2). \]
+Utilizing the standard identity $(\gamma^\mu)^*=-(i\gamma^2)\gamma^\mu(i\gamma^2)$, we deduce that $U_\Lambda^*=(i\gamma^2)U_\Lambda(i\gamma^2)$.
+
+Substituting this into the right-hand side (RHS) gives: 
+\[ U_\Lambda(i\gamma^2)\Psi'^*V^*(i\gamma^2)=U_\Lambda\Psi'^c(i\gamma^2)V^*(i\gamma^2)\], where we use $(i\gamma^2)^2=\mathbbm{1}$.
+For this to remain equal to the left-hand side ($U_\Lambda\Psi'^cV$), the right-acting matrix must strictly satisfy $(i\gamma^2)V^*(i\gamma^2)=V$, or equivalently, $V^*=(i\gamma^2)V(i\gamma^2)$.
+
+Furthermore, physical consistency dictates that the internal transformation $V$ acting from the right must not mix the forward and backward sheets, requiring $V$ to be strictly block-diagonal. 
+Assuming $V=\begin{pmatrix} A & 0\\0&B\end{pmatrix}$, we impose the two surviving conditions: (1) $V\Lambda V^\dagger=\Lambda$, and (2) $V^*=(i\gamma^2)V(i\gamma^2)$.
+
+Expanding $V$ under condition (1) yields the unitarity constraints $AA^\dagger=BB^\dagger=\mathbbm{1}$.
+Applying condition (2) yields the coupling equations $A=\sigma^2B^*\sigma^2$ and $B=\sigma^2A^*\sigma^2$. 
+This mathematically demonstrates that $A$ and $B$ must be $U(2)$ matrices that act as exact charge-conjugate partners (since the mapping $X\to \sigma^2 X^*\sigma^2$ is the charge conjugation operator for Weyl spinors). Interestingly, $U(2)\times U(2)$ is the maximum \textbf{compact} subgroup of $U(2,2)$. And since it is compact and diagonal, it could be gauge group interacting with fermions without mixing the two sheets. 
+
+We can further decompose this internal symmetry as $U(2)\to U(1)\times SU(2)$, parametrizing the matrices as: 
+$A=e^{i\theta/2}U$ and $B=e^{-i\theta/2}U^c$ (where $U^c=\sigma^2 U^*\sigma^2$). Because the matrix $V$ acts from the right, inherently mixing the fermionic columns within a given sheet, this decomposition provides a compelling theoretical hint that $V$ directly corresponds to the Standard Model weak force $SU(2)$ and electromagnetic force $U(1)$. Under the KD-Majorana condition, these gauge forces must act upon the fermions identically across both sheets, which is precisely why $A$ and $B$ emerge as locked charge-conjugate partners. For instance, the phase inversion $A\propto e^{i\theta/2}$ versus $B\propto e^{-i\theta/2}$ organically enforces the requirement that the $U(1)$ electromagnetic field couples to particles and their mirror antiparticles with equal but opposite charges. 
+
+This overarching unified picture will be fully developed in the subsequent chapter.
+
+\begin{subappendices}
+
+% Editor's note: Formalized the derivation text in the appendix to align with the main chapter.
+\section{The Spin Connection Term for $U_\Lambda\Psi$} \label{sec:Lorentz_spin_connec_fermions}
+
+If we first assume the bi-spinor covariant derivative have spin connection terms acting from both sides: $D_\mu\Psi=\partial_\mu\Psi +\omega_\mu\Psi-\Psi\omega_\mu$. 
+Under a Lorentz transformation $U_\Lambda\Psi$, this transforms as:
+\begin{equation}
+\begin{aligned}
+U_\Lambda(D_\mu\Psi)=D'_\mu\Psi=\partial_\mu(U_\Lambda\Psi)+\omega_\mu'(U_\Lambda\Psi)-(U_\Lambda\Psi)\omega_\mu'.
+\end{aligned}
+\end{equation}
+
+For the left-hand side (LHS) and right-hand side (RHS) to be physically equivalent, the terms must match identically:
+\begin{equation}
+\begin{aligned}
+    \omega_\mu'(U_\Lambda \Psi )&=U_\Lambda \omega_\mu\Psi -(\partial_\mu U_\Lambda) \Psi \dots\circled{1}\\
+    (U_\Lambda \Psi )\omega_\mu'&=U_\Lambda \Psi\omega_\mu \dots\circled{2}
+\end{aligned}
+\end{equation}
+
+For condition \circled{1} to hold, the modified spin connection must transform as:
+\begin{equation}
+  \omega_{\mu}'= U_{\Lambda}\omega_{\mu} U_{\Lambda}^{-1}-(\partial_{\mu}U_{\Lambda})U_{\Lambda}^{-1},
+\end{equation}
+which precisely matches the geometric derivation provided in \cref{sec:Lorentz_spin_connection}.
+
+However, condition \circled{2} mandates that $\omega_{\mu}'=\omega_{\mu}$, which directly contradicts the transformation rule derived above. To resolve this mathematical contradiction and preserve Lorentz covariance without inducing right-acting sheet mixing, the fermionic covariant derivative must be strictly redefined as $D_\mu\Psi=\partial_\mu\Psi +\omega_\mu\Psi$, wherein the spin connection acts exclusively from the left.
+
+
+\end{subappendices}
+
+\printbibliography[heading=subbibintoc, title={References for Chapter \thechapter}]

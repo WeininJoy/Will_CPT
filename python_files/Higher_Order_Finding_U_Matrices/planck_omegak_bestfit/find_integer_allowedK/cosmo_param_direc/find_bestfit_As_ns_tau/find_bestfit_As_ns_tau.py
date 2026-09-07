@@ -34,49 +34,37 @@ m_ncdm = 0.06
 epsilon = 1e-2
 k_cons = 0.05  # Mpc^-1, pivot scale for power spectrum
 cosmo_param_bool = True
-nu_spacing4_bestfit = [0.45531269806747615, -0.0397827163256654, 0.15804679013016237, 0.5647692899377309, 2.068999, 0.977273, 0.051376] # cosmo_param_direc
+nu_spacing4_bestfit = [0.4444730086581741, -0.03940583926181416, 0.16336760287147203, 0.5615471381223595, 2.149037570071961, 0.9643873518055414, 0.06402059001822309] # cosmo_param_direc 
+# nu_spacing4_bestfit = [0.45531269806747615, -0.0397827163256654, 0.15804679013016237, 0.5647692899377309, 2.068999, 0.977273, 0.051376] # cosmo_param_direc_OmegabStep
 ## folders and files
 name_str = 'cosmo_param_direc'
 data_dir = f'./data'
 cca_file = f"./cca_2D_dk_penalty_results_{name_str}.pickle"
 
-try_num = 1
 # Write to the local RAM disk instead of the network drive
-dat_name = f'/dev/shm/PPS_{try_num}_{os.getpid()}.dat'
-file_root = f'{data_dir}/find_bestfit_{try_num}.txt'
-############
-# read start params from files 
-if os.path.isfile(file_root):
-    print('Use start_params from '+ file_root)
-    with open(file_root,'rb') as f:
-        # [plik, lowl, lowE, lensing, chi_eff_sq, As, ns, tau]
-        # [  0 ,   1 ,   2 ,    3   ,     4    ,  5 , 6  ,  7 ]
-        data_ini = f.read().split()
-        start_params = [float(ele) for ele in data_ini[5:8]]
-else: 
-    print('Set start_params as default ')
-    start_params = nu_spacing4_bestfit[5:8] # [As, ns, tau]
-############
-
+dat_name = f'/dev/shm/PPS_{os.getpid()}.dat'
+file_root = f'{data_dir}/find_bestfit.txt'
+# Persistent SQLite DB so Optuna continues from previous runs
+DB_URL = f"sqlite:///{data_dir}/optuna_bestfit_As_ns_tau.db?timeout=60"
+all_samples_file = f'{data_dir}/all_samples_As_ns_tau.txt'
+start_params = nu_spacing4_bestfit[4:7]  # [As, ns, tau] — SQLite handles continuation
 
 class PlanckLikelihood(object):
     """Baseline Planck Likelihood"""
+    # Use TTTEEE, without lensing
     
     def __init__(self):
         self.plik = clik.clik(os.path.join(data, "hi_l/plik/plik_rd12_HM_v22b_TTTEEE.clik"))
         self.lowl = clik.clik(os.path.join(data, "low_l/commander/commander_dx12_v3_2_29.clik"))
         self.lowE = clik.clik(os.path.join(data, "low_l/simall/simall_100x143_offlike5_EE_Aplanck_B.clik"))
-        self.lensing = clik.clik_lensing(os.path.join(data, "lensing/smicadx12_Dec5_ftl_mv2_ndclpp_p_teb_consext8.clik_lensing"))
     
     def __call__(self, cls, nuis):
         lkl = []
-        for like in [self.plik, self.lowl, self.lowE, self.lensing]:
+        for like in [self.plik, self.lowl, self.lowE]:
             #        for like in [self.plik]:
             lmaxes = like.get_lmax()
             dat = []
             order = ['tt','ee','bb','te','tb','eb']
-            if like is self.lensing:
-                order = ['pp'] + order
             
             # print(order,len(lmaxes),len(order))
             for spec, lmax in zip(order, lmaxes):
@@ -327,8 +315,8 @@ def run_TT(params, eigenvecs_sparse, k_values, dat_name, filename, lkl):
     #-------------------------------------------------------------------
     }
 
-    plik, lowl, lowE, lensing = -2 * lkl(cls, nuis)
-    chi_eff_sq = plik + lowl + lowE + lensing
+    plik, lowl, lowE = -2 * lkl(cls, nuis)
+    chi_eff_sq = plik + lowl + lowE
     print('chi_eff_sq='+str(chi_eff_sq))
 
     # except CosmoComputationError:
@@ -357,9 +345,9 @@ def run_TT(params, eigenvecs_sparse, k_values, dat_name, filename, lkl):
     if chi_eff_sq < best_chisq:
         best_chisq = chi_eff_sq
         with open(filename, 'w') as f:
-            print(plik, lowl, lowE, lensing, chi_eff_sq, *params, 'False', file=f)
-    
-    return plik, lowl, lowE, lensing, chi_eff_sq
+            print(plik, lowl, lowE, chi_eff_sq, *params, 'False', file=f)
+
+    return plik, lowl, lowE, chi_eff_sq
 
 
 print("Initializing Planck Likelihood...")
@@ -373,25 +361,26 @@ def objective(trial):
     ns = trial.suggest_float('ns', 0.9, 1.1)
     tau = trial.suggest_float('tau', 0.03, 0.08)
     params = [As, ns, tau]
-    
+
     # Create a unique RAM-disk filename
     worker_pid = os.getpid()
     unique_dat_name = f'/dev/shm/PPS_{worker_pid}.dat'
-    
-    # run_TT uses the globally initialized lkl
+
+    plik = lowl = lowE = chi_eff_sq = 2e+30
     try:
-        plik, lowl, lowE, lensing, chi_eff_sq = run_TT(
+        plik, lowl, lowE, chi_eff_sq = run_TT(
             params, eigenvecs_sparse, k_physical, unique_dat_name, file_root, lkl
         )
     except Exception as e:
-        # If CLASS crashes for physical reasons, tell Optuna this is a bad region
         print(f"Trial failed: {e}")
-        return 2e+30
     finally:
-        # Clean up the RAM disk file so memory doesn't fill up
         if os.path.exists(unique_dat_name):
             os.remove(unique_dat_name)
-            
+
+    # Log every trial (including failed ones) for post-analysis
+    with open(all_samples_file, 'a') as f:
+        f.write(f"{plik:.6e} {lowl:.6e} {lowE:.6e} {chi_eff_sq:.6e} {As:.8f} {ns:.8f} {tau:.8f}\n")
+
     return chi_eff_sq
 
 
@@ -423,18 +412,48 @@ def objective(trial):
 #     print(f"Worker {os.getpid()} finished. Local best: {study.best_value}")
 
 def get_data_optuna():
-    # NO SQLite database. Pure sequential optimization just like interactive mode.
-    study = optuna.create_study(direction="minimize")
-    
-    print("Starting sequential Optuna optimization in SLURM...")
-    # Set n_jobs=1, and increase n_trials to your desired total amount
-    study.optimize(objective, n_trials=200, n_jobs=1) 
-    
+    # Connect to (or create) the persistent SQLite study.
+    # load_if_exists=True means subsequent runs continue where the previous left off.
+    for attempt in range(10):
+        try:
+            study = optuna.create_study(
+                study_name="bestfit_As_ns_tau",
+                storage=DB_URL,
+                direction="minimize",
+                load_if_exists=True,
+            )
+            break
+        except Exception as e:
+            print(f"DB connection attempt {attempt + 1} failed: {e}")
+            time.sleep(2)
+    else:
+        raise RuntimeError("Could not connect to Optuna database after 10 attempts.")
+
+    # Write the all-samples header only if the file is new
+    if not os.path.exists(all_samples_file):
+        with open(all_samples_file, 'w') as f:
+            f.write("# plik lowl lowE chi_eff_sq As ns tau\n")
+
+    completed = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
+    if len(completed) == 0:
+        # Fresh study — seed with start_params so the first trial isn't random
+        study.enqueue_trial({'As': start_params[0], 'ns': start_params[1], 'tau': start_params[2]})
+        print(f"Fresh study — seeding first trial from start_params: {start_params}")
+    else:
+        print(f"Resuming study: {len(completed)} completed trials found.")
+        try:
+            print(f"Current best: chi_eff_sq = {study.best_value:.4f} at {study.best_params}")
+        except ValueError:
+            print("No completed trials with a finite value yet.")
+
+    print("Starting sequential Optuna optimization...")
+    study.optimize(objective, n_trials=1000, n_jobs=1)
+
     best = study.best_params
     with open(file_root, 'w') as f:
         f.write(f"Best chi_eff_sq: {study.best_value}\n")
         f.write(f"{best['As']} {best['ns']} {best['tau']}\n")
-        
+
     print(f"Optimization finished! Best chi_eff_sq: {study.best_value}")
 
 if __name__ == '__main__':
@@ -480,3 +499,19 @@ if __name__ == '__main__':
     ### Run the optimization to find best-fit parameters
     get_data_optuna()
 
+
+    # ##################### 
+    # # Calculate Deltachi^2 for best-fit parameters
+    # #####################
+    # params_try0 = [2.1259161237019573, 0.9684295926650386, 0.052581245881857024] # try 0 from optuna
+    # params_try1 = [2.261939738410725, 0.9585453987226333, 0.07997707936499121]  # try 1 from optuna
+    # params_try2 = [2.068999, 0.977273, 0.051376] # from Planck 2018 best-fit
+
+    # params = params_try2
+
+    # # Create a unique RAM-disk filename for this trial
+    # unique_dat_name = f'{data_dir}/PPS_{os.getpid()}_Planck2018.dat'
+    # plik, lowl, lowE, lensing, chi_eff_sq = run_TT(
+    #             params, eigenvecs_sparse, k_physical, unique_dat_name, file_root, lkl)
+
+    # print(f"Chi-squared values for the Planck 2018 best-fit parameters: {chi_eff_sq}")

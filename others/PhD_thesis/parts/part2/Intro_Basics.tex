@@ -1,0 +1,375 @@
+\chapter{Introduction and Basics}\label{chapter:Intro_Basics}
+
+\chapterabstract{In this chapter, I provide an introduction to Kähler-Dirac (KD) fermions, with a particular focus on their application in lattice gauge theory, and outline the mathematical foundations of KD fields. Starting with the KD equation expressed in terms of differential forms, I detail how to construct the corresponding spinor formulation by utilizing these forms as the linear combination coefficients of the $\gamma$ matrices. Under this mapping, the KD equation takes the form of the standard Dirac equation, but it fundamentally acts on a $4\times 4$ bi-spinor matrix rather than a conventional $4\times 1$ column spinor. To ensure the Lorentz invariance of the Lagrangian for this $4\times 4$ spinor, an additional $\gamma^0$ matrix must be inserted into the adjoint bilinear; however, this structural modification inadvertently causes half of the field's states to acquire a negative norm and negative energy. Finally, I examine the behavior of the KD field in curved spacetime. Due to the matrix structure of the spinor, an additional spin connection term acting from the right is mathematically required. I demonstrate that spin connection terms can be rigorously derived directly from the differential formulation of the KD equation, which naturally accommodates the geometry of curved spacetime.}
+% - Introduction:
+% (1) what is KD equation (differential forms) (2) Its application in lattice field theory. But in Euclidean space (3) Lorentzian space --> implication of CPT-symmetric universe.
+
+% Basics:
+% - KD equation in differential forms. Derive Proca and Maxwell equations.
+% - Direct derivation of KD equation from differential formulation to spinor formulation -> Dirac equation! Question: is it boson or fermions? Discuss later.
+% - In curved spacetime --> derive spin connection term from connection with differential forms.
+% - Lorentz transform: additional $U_\Lambda^{-1}$ acting from the right (connection with differential forms) -> extra $\gamma^0$ in the Lagrangian.
+% - Negative norm states and energy during quantization: (1) u,v and a,d are both 4x1 spinors (2) u,v are 4x4 spinors, a,d are constant. The two ways are consistent. Also discuss the additional gamma0 in anti-commutation relation, and Fock space --> inner product and Hamiltonian. Put the detail derivation in appendix. Here only show the way of diagonalize extra $\gamma^0$. 
+
+
+\section{Introduction}\label{sec:KD_intro}
+
+% Editor's note: Elevated the tone of the opening paragraph. Replaced conversational phrases like "We know how to treat" and "works beautifully" with formal academic equivalents.
+The Standard Model is fundamentally a chiral gauge theory, wherein left- and right-handed fermions transform differently under gauge transformations \cite{Cheng:1984vwu, Peskin:1995ev, Schwartz:2014sze}. While such theories are well-understood within the framework of perturbation theory, defining them non-perturbatively (particularly on a lattice) remains highly challenging \cite{Montvay:1994cy, Smit_2002,Gattringer:2010zz}. This constitutes a critical problem of principle, suggesting a fundamental gap in our understanding of the geometric nature of spinors and their relationship to spacetime.  
+
+Wilson's formulation of lattice gauge theory \cite{Wilson:1974sk} is highly successful for bosonic fields, as the geometric interpretation of each field dictates its natural placement on the lattice: $0$-forms (scalar fields) reside on $0$-cells (vertices), $1$-forms (gauge fields) on $1$-cells (links), and $2$-forms (field strengths) on $2$-cells (plaquettes), etc. This allows for the direct application of the well-developed formalism of discrete exterior calculus on a discrete cell complex (see, {\it e.g.},\ \cite{desbrun2005discrete, desbrun2006discrete}).  
+
+However, incorporating spinors introduces significant complications. Because spinors lack a natural $p$-form interpretation, they are traditionally discretized by placing them on the vertices of the lattice. In the continuum limit, this approach famously yields more fermions than initially expected \cite{Montvay:1994cy,Smit_2002}. Furthermore, if one begins with a {\it chiral} theory, the process of discretizing and subsequently taking the continuum limit invariably results in a {\it non-chiral} theory \cite{Nielsen:1981hk, Nielsen:1980rz, Nielsen:1981xu}. These phenomena are collectively known as the ``fermion doubling" problems.
+
+Kähler–Dirac (KD) fermions \cite{Kähler1962} represent a leading approach to resolving these issues. KD fermions are variants of standard Dirac fermions that possess a dual interpretation in terms of $p$-forms. This allows them to be naturally discretized on a lattice such that the discrete and continuum theories share identical (co)homological properties, effectively eliminating unwanted doublers \cite{RABIN1982315, Becher1982TheDE, Montvay:1994cy}. For a cubic lattice in flat space, the KD approach has been shown \cite{Becher1982TheDE} to be mathematically equivalent to another widely used method known as staggered fermions \cite{Kogut:1974ag}. Conceptually, however, the KD approach is superior, as it seamlessly generalizes to arbitrary cell complexes in arbitrary curved spacetimes. Moreover, when considering chiral or ``restricted" KD fermions, anomaly cancellation conditions naturally lead to multiplets of four restricted KD fields. These multiplets automatically transform like a single generation of fermions within the Pati-Salam unification scheme \cite{Catterall:2022jky, Catterall:2023nww}, raising the compelling possibility that this improved geometrical picture of fermions may help explain the symmetry structure of the Standard Model.
+
+Because lattice simulations are overwhelmingly performed in Euclidean space, KD fermions are conventionally studied in Euclidean signature. However, given the strong theoretical motivations outlining their fundamental geometric importance, it is natural to investigate their quantization and physical properties in Lorentzian signature, which is the primary subject of the thesis.
+
+As we will review, transitioning the KD theory to Lorentzian spacetime naively yields a problematic Lagrangian, in which half of the fields possess a ``wrong sign" kinetic term. In this work, we propose a resolution: the fields inhabit ``two sheets of spacetime" related by a $PT$ symmetry (see \cref{chapter:two-sheet_KD_Majorana}). Within this framework, the states on both sheets exhibit positive energy and positive norm. We will subsequently discuss how this framework naturally accommodates the Standard Model (\cref{chapter:SM_Cosmology}), dramatically simplifies the Yukawa coupling terms, and aligns with the broader implications of the $CPT$-symmetric universe hypothesis \cite{Boyle:2018tzc, Boyle:2018rgh, Turok:2022fgq, Boyle:2022lcq}. Furthermore, considering KD fermions might help us to solve problems of Lagrangian in Euclidean signature. Some other possible Lagrangians are also discussed \cref{chapter:Lag_Euclidean}. The interesting direction of future work is mentioned in \cref{chapter:FutureWork}.
+
+
+\section{Basics}
+
+% Editor's note: Corrected minor grammar and improved the flow of the mathematical derivations. Integrated the orphaned sentence referencing Appendix A into the main text flow.
+
+In the section, I will first briefly walk through mathematical basics of KD equations, with detials provided in the following sections.
+
+We adopt the $(+,-,-,-)$ metric signature in this part of the thesis (except for \cref{chapter:Lag_Euclidean}, where Euclidean Lagrangian is discussed). The KD action in differential formulation is defined as \footnote{In most literature, the KD action don't have the "$i$" in front of the KD operator, since they are working in Euclidean space. However, in Lorentzian space, the "$i$" is necessary to ensure the action is real.}:
+\begin{equation}\label{eq:KD_action}
+  S_{KD}=\langle \bar{\Phi}|(iK-m)\Phi\rangle=
+  \int (\star\bar{\Phi})\wedge(iK-m)\Phi,
+\end{equation}
+where $\Phi=\sum_{p=0}^{4}\varphi_{\mu_1\ldots\mu_p}dx^{\mu_1}\wedge\ldots\wedge dx^{\mu_p}$ is a polyform field (comprising a sum of a 0-form, 1-form, 2-form, etc.), $\ast$ is the Hodge star operator, and $K=d-d^{\dagger}$. Here, $d$ represents the exterior derivative and $d^{\dagger}=\star d \star$ is its formal adjoint. Varying this action yields the KD equation:
+\begin{equation}\label{eq:KD_eq}
+    (i(d - d^\dagger) - m)\Phi = 0.
+\end{equation}
+Note that the KD operator $K$ squares directly to the Hodge-de Rham operator, $-K^2 = dd^\dagger + d^\dagger d = \square$, which is the standard wave operator on forms.
+
+In four dimensions, $\Phi$ is a superposition of $p$-forms ($p=0,\dots,4$) containing $1+4+6+4+1=16$ complex components. By applying the Clifford map, $dx^{\mu}\to\gamma^{\mu}$, these components can be assembled into a $4\times4$ matrix $\Psi$:
+\begin{equation}
+    \Psi = \sum_{p=0}^4 \frac{1}{p!}\phi_{\mu_1\dots \mu_p}\gamma^{\mu_1\dots \mu_p},
+\end{equation}
+where $\gamma^{\mu_1\dots \mu_p}$ denotes the fully antisymmetrized product of gamma matrices. Written in terms of this $4\times 4$ KD spinor field $\Psi$, the KD equation (\ref{eq:KD_eq}) translates into the matrix Dirac equation:
+\begin{equation}\label{eq:KD-Dirac}
+    (i\gamma^\mu \partial_\mu - m)\Psi = 0.
+\end{equation}
+A detailed mathematical proof of this equivalence is provided in \cref{sec:KD_diff_to_spinor}.
+
+Note that in curved spacetime, the $\partial_\mu$ needs to be replaced by $D_\mu=\partial_\mu+[\omega_\mu,\cdot]$ to preserve the direct connection between differential and spinor formulation. $\omega_\mu$ is the spin connection term, explaining how spatial curvature affects the spin. See \cref{sec:spin_connection_deriv_from_diff} for detail derivation.
+
+Returning to the KD equation, if we decompose $\Psi$ into its four constituent column vectors, $\Psi=(\psi_1,\cdots,\psi_4)$, each individual column obeys the ordinary Dirac equation. The corresponding KD action (\ref{eq:KD_action}) can therefore be rewritten as:
+\begin{equation}\label{eq:KD_action_Psi}
+  S_{KD}=\int d^{4}x\,{\rm Tr}[\bar{\Psi}(iD\!\!\!\!\;\!/-m)\Psi],\;\;\bar{\Psi}\equiv \textcolor{red}{\gamma^{0}}\Psi^{\dagger}\gamma^{0}.
+\end{equation}
+Note that, compared to the standard definition of the Dirac adjoint, this formulation features a crucial {\it additional} $\gamma^{0}$ acting from the {\it left}. Because of this extra $\gamma^{0}$, the action remains invariant under a Lorentz transformation $x\to \Lambda x$, provided $\Psi$ transforms as $\Psi\to U_{\Lambda}^{}\Psi U_{\Lambda}^{-1}$ (where $U_{\Lambda}$ is the standard $4\times4$ Dirac spinor representation of $\Lambda$. Please refer to \cref{sec:Lorentz_transform} for details of Lorentz transform). Because this transformation law involves two copies of $U_{\Lambda}$, it carries integer spin, strongly suggesting a bosonic nature (reflecting its fundamental $p$-form roots). Whether $\Psi$ is fundamentally best treated as a boson or a fermion will be addressed explicitly in \cref{sec:prevent_mixing_term}.
+
+The presence of the extra $\gamma^{0}$ in the action (\ref{eq:KD_action_Psi}) naively introduces a physical pathology: it implies that half of the component fields possess a ``wrong sign" Lagrangian (and thus negative norms). To demonstrate this, we can diagonalize the extra $\gamma^{0}$ as $\gamma^{0}=\Omega\Lambda\Omega^{T}$, where $\Lambda={\rm diag}(1,1,-1,-1)$ and $\Omega=(\Omega^{T})^{-1}\in O(4)$. Defining the rotated field $\Psi'\equiv\Psi\Omega$, the action becomes:
+\begin{equation}
+  \label{eq:S_KD_Lorentzian1p}
+  S_{KD}=\int d^{4}x\,{\rm Tr}[\Lambda\Psi'{}^{\dagger}\gamma^{0}(i\partial\!\!\!\!\;\!/-m)\Psi'].
+\end{equation}
+In this rotated basis, splitting $\Psi'$ into its four columns, $\Psi'=(\psi_1',\cdots,\psi_4')$, reveals that the KD Lagrangian splits into four independent ordinary Dirac Lagrangians, but with overall signs strictly determined by the diagonal matrix $\Lambda$. Specifically, the first two columns possess the correct physical sign, while the last two carry the problematic wrong sign! In the next chapter, we will provide the solutions via two sheeted spacetime picture.
+AIn following sections, we will discuss mathematical details, including (1) proof that KD equation in differential and spinor formulations are equivalent, (2) Lorentz transformation law for KD spinor (3) spin connection for KD spinors in curved spacetime.
+
+% Editor's note: Fixed "proof" to "prove", "indecies" to "indices", and formalized the prose in the appendices.
+\section{Equivalence of the Differential and Spinor Formulations of the KD Equation}\label{sec:KD_diff_to_spinor}
+
+Let us start from proving KD Equation in Differential and Spinor Formulation are equivalent.
+
+KD equation in differential formulation can be written as:
+\begin{equation}
+\begin{aligned}
+    &(i(d - d^\dagger) - m)\Phi = 0,\\ 
+    \Phi=\phi+\phi_\mu dx^\mu+\frac{1}{2!}\phi_{\mu\nu}dx^\mu \wedge dx^\nu+ &\frac{1}{3!}\phi_{\mu\nu\alpha}dx^\mu \wedge dx^\nu \wedge dx^\alpha +\frac{1}{4!}\phi_{\mu\nu\alpha\beta}dx^\mu\wedge dx^\nu\wedge dx^\alpha\wedge dx^\beta,
+\end{aligned}
+\end{equation}
+where $d^\dagger=-\star d\star$, and $\star$ is the Hodge star operator. The exterior derivative $d$ acts as a raising operator: $d(\phi_{\mu_1...\mu_p}dx^{\mu_1}\wedge\dots \wedge dx^{\mu_p})=\nabla_\mu_{p+1} \phi_{\mu_1...\mu_p}dx^{\mu_{p+1}}\wedge dx^{\mu_1}\wedge\dots \wedge dx^{\mu_p}$, mapping a $p$-form to a $(p+1)$-form. Conversely, the adjoint operator $d^\dagger$ acts as a lowering operator: $d^\dagger(\phi_{\mu_1...\mu_p}dx^{\mu_1}\wedge\dots \wedge dx^{\mu_p})=\nabla^{\mu_1}\phi_{\mu_1...\mu_p}dx^{\mu_2}\wedge\dots \wedge dx^{\mu_p}$, reducing a $p$-form to a $(p-1)$-form. Consequently, the exterior derivative of a 4-form identically vanishes, as does the adjoint derivative of a 0-form. 
+
+Expanding the equation $(i(d - d^\dagger) - m)\Phi=0$ yields a system of coupled equations for each $p$-form rank: 
+$i(d\phi_{p-1}-d^\dagger \phi_{p+1})-m\phi_p=0$. Written explicitly, this gives:
+\begin{equation}\label{eq:KD_eq_diff}
+\begin{aligned}
+    i\nabla^\mu\phi_\mu-m\phi=0 \qquad &\text{-- 0-form}\\
+    i(\nabla_\mu\phi+\nabla^\nu\phi_{\nu\mu})-m\phi_\mu=0 \qquad &\text{-- 1-form}\\
+    i(\nabla_\mu\phi_\nu-\nabla_\nu\phi_\mu+\nabla_\alpha\tilde \phi_{\beta}\epsilon^{\alpha\beta}_{\quad\mu\nu})-m\phi_{\mu\nu}=0 \qquad &\text{-- 2-form}\\
+    i(\frac{1}{2!}\nabla_\mu\phi_{\alpha\beta}+\frac{1}{3!}\nabla^\nu\phi_{\nu\mu\alpha\beta})-\frac{1}{3!}m\phi_{\mu\alpha\beta}=0 \qquad &\text{-- 3-form}\\
+    i\frac{1}{3!}\nabla_\mu\phi_{\nu\alpha\beta}-m\frac{1}{4!}\phi_{\mu\nu\alpha\beta}=0 \qquad &\text{-- 4-form}
+\end{aligned}
+\end{equation}
+where $\tilde\phi_{\mu\nu}=\frac{1}{2!}\epsilon^{\alpha\beta}_{\quad\mu\nu}\phi_{\alpha\beta}$ is the dual 2-form.
+
+In four dimensions, a 3-form contains exactly 4 independent degrees of freedom, which is symmetric to a 1-form. Similarly, a 4-form contains a single degree of freedom, mirroring a 0-form. This symmetry is made explicit by introducing the dual 3-form, $\tilde\phi_\mu=\frac{1}{3!}\epsilon^{\nu\alpha\beta}_{\quad \mu}\phi_{\nu\alpha\beta}$, and the dual 4-form, $\tilde\phi=\frac{1}{4!}\epsilon^{\mu\nu\alpha\beta}\phi_{\mu\nu\alpha\beta}$. The final two equations of the system can thus be rewritten as: 
+\begin{equation}
+    i(\nabla^\nu\tilde\phi_{\mu\nu}+\nabla_\mu\tilde\phi)-m\tilde\phi_\mu=0,\qquad
+    i\nabla^\mu\tilde\phi_\mu-m\tilde\phi=0,
+\end{equation}
+which perfectly match the structure of the equations governing the 1-forms and 0-forms, respectively. 
+
+This result demonstrates that the $1+4+6+4+1=16$ components of the differential forms can be bisected into two sets—dual and non-dual—that obey identical dynamics. Interestingly, upon quantization, half of these components inevitably acquire negative energy (or negative norm). If a dual component is assigned positive energy, its corresponding non-dual partner will carry negative energy. This precisely mirrors the physical challenges encountered in the spinor formulation.
+
+We now explicitly prove that these equations are isomorphic to those generated by the spinor formulation, where the basis differentials $dx^\mu$ are replaced by the Dirac matrices $\gamma^\mu$: 
+
+\begin{equation}\label{eq:Psi_spinor_formulation}
+\begin{aligned}
+    \Psi&=\sum_{p=0}^{4}\frac{1}{p!}(\gamma^{\mu_1}\gamma^{\mu_2}\dots\gamma^{\mu_p})\phi_{\mu_1\dots\mu_p}\\
+    &=\phi+\gamma^\mu\phi_\mu+\frac{1}{2!}\gamma^\mu\gamma^\nu\phi_{\mu\nu}+\frac{1}{3!}\gamma^\mu\gamma^\nu\gamma^\alpha\phi_{\mu\nu\alpha}+\frac{1}{4!}\gamma^\mu\gamma^\nu\gamma^\alpha\gamma^\beta\phi_{\mu\nu\alpha\beta}\\
+    &=\phi+\gamma^\mu\phi_\mu-\frac{i}{2!}\sigma^{\mu\nu}\phi_{\mu\nu}-\frac{i}{3!}\epsilon_\sigma^{\mu\nu\alpha}\gamma^\sigma\gamma^5\phi_{\mu\nu\alpha}-\frac{i}{4!}\epsilon^{\mu\nu\alpha\beta}\gamma^5\phi_{\mu\nu\alpha\beta}\\
+    &=\phi+\gamma^\mu\phi_\mu-\frac{i}{2!}\sigma^{\mu\nu}\phi_{\mu\nu}-i\gamma^\sigma\gamma^5\tilde\phi_\sigma-i\gamma^5\tilde\phi.\\
+\end{aligned}
+\end{equation}
+, where we use the following properties of the $\gamma^\mu$ matrices:
+\begin{equation}\label{eq:prperties_gamma_matrices}
+\begin{aligned}
+    \sigma^{\mu\nu}=\frac{i}{2}[\gamma^\mu,\gamma^\nu] \to \gamma^\mu\gamma^\nu&=\eta^{\mu\nu}-i\sigma^{\mu\nu}\\
+    \gamma^\mu\gamma^\nu\gamma^\alpha\gamma^\beta&=-i\epsilon^{\mu\nu\alpha\beta}\gamma^5\\
+    \gamma^\mu\gamma^\nu\gamma^\rho&=\eta^{\mu\nu}\gamma^\rho+\eta^{\nu\rho}\gamma^\mu-\eta^{\mu\rho}\gamma^\nu-i\epsilon^{\sigma\mu\nu\rho}\gamma_\sigma\gamma^5\\
+    \gamma^5\sigma^{\mu\nu}&=\sigma^{\mu\nu}\gamma^5=\frac{i}{2}\epsilon^{\alpha\beta\mu\nu}\sigma_{\alpha\beta}
+\end{aligned}
+\end{equation}
+
+The underlying reason these formulations produce identical equations is that the $\gamma^\mu$ matrices (Clifford algebra) and the exterior algebra of differential forms share the same fully antisymmetric mathematical structure. It can be explicitly shown that substituting \cref{eq:Psi_spinor_formulation} into the standard Dirac equation,
+\begin{equation}
+    i\gamma^\mu\partial_\mu \Psi-m\Psi=0,
+\end{equation}
+and applying the identities in \cref{eq:prperties_gamma_matrices} directly reproduces the coupled system in \cref{eq:KD_eq_diff}.
+
+Taking the 1-form sector $\Phi=\phi_\alpha dx^\alpha$ as a representative example, the KD equation is: 
+\begin{equation}\label{eq:diff_1form}
+    (i(d - d^\dagger) - m)\Phi =i(\partial_\mu \phi_\alpha dx^\mu\wedge dx^\alpha-\partial^\alpha \phi_\alpha)-m\phi_\alpha dx^\alpha.
+\end{equation}
+
+The corresponding spinor formulation is obtained by substituting $dx^\alpha \to \gamma^\alpha$, yielding $\Psi=\phi_\alpha \gamma^\alpha$. The action of the Dirac operator on this state is: 
+\begin{equation}
+\begin{aligned}
+    (i\gamma^\mu\partial_\mu -m)\Psi&=i\gamma^\mu\partial_\mu(\phi_\alpha \gamma^\alpha)-m\phi_\alpha \gamma^\alpha\\
+    &=i(\frac{1}{2}[\gamma^\mu,\gamma^\alpha]+\frac{1}{2}\{\gamma^\mu,\gamma^\alpha\}\partial_\mu\phi_\alpha)-m\phi_\alpha \gamma^\alpha\\
+    &=i(\frac{1}{2}[\gamma^\mu,\gamma^\alpha]\partial_\mu\phi_\alpha+\eta^{\mu\alpha}\partial_\mu\phi_\alpha)-m\phi_\alpha \gamma^\alpha.
+\end{aligned}
+\end{equation}
+By recognizing that $\frac{1}{2}[\gamma^\mu,\gamma^\alpha]$ is algebraically isomorphic to $dx^\mu\wedge dx^\alpha$, and $\gamma^\alpha$ to $dx^\alpha$, this expression exactly maps onto \cref{eq:diff_1form}.
+
+
+\section{Lorentz Transformation Laws for the KD Bi-Spinor}\label{sec:Lorentz_transform}
+
+% Editor's note: Rewrote this entire section to replace conversational/lecture-style transitions ("Well, if we display...", "What about the lower-case Latin indices?") with formal academic exposition suitable for a PhD thesis.
+
+Next, we would like to understand how KD spinor transform under Lorentz transformation.
+A Lorentz transformation matrix $\Lambda$ satisfies the metric invariance condition:
+\begin{equation}
+  \eta_{ab}=\eta_{mn}\Lambda^{m}_{\;\;\,a}\Lambda^{n}_{\;\;b},
+\end{equation}
+or, expressed in standard matrix notation (where the first and second indices represent the row and column, respectively):
+\begin{equation}
+  \eta=\Lambda^{T}\eta \Lambda.
+\end{equation}
+Rearranging this relationship yields:
+\begin{equation}
+  \Lambda^{-1}=\eta^{-1}\Lambda^{\top}\eta,
+\end{equation}
+which, when written with explicit indices, becomes:
+\begin{equation}
+  (\Lambda^{-1})^{a}_{\;\;b}=\eta^{a m}(\Lambda^{\top})_{m}^{\;\;\,n}\eta_{n b} 
+  =\eta^{a m}\Lambda^{n}_{\;\;m}\eta_{n b}  =\Lambda_{b}^{\;\;a}.
+\end{equation}
+Under a Lorentz transformation, a contravariant vector $v^{a}$ transforms as:
+\begin{equation}
+  v^{a}\to \Lambda^{a}_{\;\;b}v^{b},
+\end{equation}
+while a covariant vector transforms as:
+\begin{equation}
+  v_{a}\to \Lambda_{a}^{\;\;b}v_{b}=(\Lambda^{-1})^{b}_{\;\;a}v_{b}.
+\end{equation}
+For an ordinary Dirac spinor $\psi$, the transformation under $\Lambda$ is given by:
+\begin{equation}
+  \psi\to U_{\Lambda}\psi,
+\end{equation}
+or, displaying the spinor indices explicitly:
+\begin{equation}
+  \psi^{A}\to U^{A}_{\Lambda B}\psi^{B}.
+\end{equation}
+, where $U_{\Lambda}=e^{-\frac{i}{4}\lambda_{\mu\nu}\Sigma^{\mu\nu}}, \Sigma^{\mu\nu}=\frac{i}{2}[\gamma^\mu,\gamma^\nu]$ is a $4\times 4$ Lorentz transformation matrix for spinors.
+
+We now consider the transformation properties of the matrix $\gamma^{m}$. If we display all its indices, $(\gamma^{m})^{A}_{\;\;B}$, it assumes the structure of a rank-3 tensor, implying it should transform as:
+\begin{equation}
+  \gamma^{m}\to \Lambda^{m}_{\;\;\,n} U_{\Lambda}\gamma^{n}U_{\Lambda}^{-1}.
+\end{equation}
+However, using the standard $\gamma$-matrix identity (see, {\it e.g.},\ Eq.~(5.4.8) in Weinberg's QFT Vol.~1): 
+\begin{equation}
+  \label{eq:gamma_Lorentz}
+  U_{\Lambda}\gamma^{m}U_{\Lambda}^{-1}=\Lambda_{n}^{\;\;m}\gamma^{n}=(\Lambda^{-1})^{m}_{\;\;\;n}\gamma^{n},
+\end{equation}
+we find that treating $(\gamma^{m})^{A}_{\;\;B}$ as a standard 3-tensor mathematically reduces to:
+\begin{equation}
+  \gamma^{m}\to\gamma^{m}.
+\end{equation}
+This demonstrates that the $\gamma$-matrices are invariant under simultaneous transformations of both their vector and spinor indices.
+
+Applying this property to the flat-space Dirac operator gives:
+\begin{equation}
+\begin{aligned}
+    \gamma^{m}\partial_{m}\psi &\to\gamma^{m}\Lambda_{m}^{\;\;\,n}\partial_{n}(U_{\Lambda}\psi) \nonumber\\
+   &= U_{\Lambda}\gamma^{n}U_{\Lambda}^{-1}\partial_{n} (U_{\Lambda}\psi)\nonumber
+  = U_{\Lambda}\gamma^{\nu}\partial_{\nu}\psi.
+\end{aligned}
+\end{equation}
+ 
+Generalizing to curved spacetime, we construct the Kähler-Dirac combination using the tetrad field $e^{\alpha}_{a}$:
+ \begin{equation}
+   \Psi=\sum_{p=0}^{4}\chi_{\alpha_1\ldots\alpha_p}e^{\alpha_1}_{a_1}\ldots e^{\alpha_p}_{a_p}\gamma^{a_1}\ldots\gamma^{a_p}.
+ \end{equation}
+To determine how $\Psi$ transforms, we analyze its indices. The Greek indices transform under general coordinate transformations in the standard manner; however, because they are fully contracted in pairs, $\Psi$ behaves as a coordinate scalar. For the local Lorentz (Latin) indices, we utilize the fact that we can choose to treat $\gamma^{a}$ either as a 3-index tensor or as an invariant matrix—both perspectives are physically equivalent. Treating $\gamma^{a}$ as a 3-index tensor implies the lower-case Latin indices transform under local Lorentz transformations. Again, because these indices are fully contracted, their overall transformation cancels out. 
+
+The only uncontracted indices that remain are the "outer" spinor indices $A$ and $B$:
+\begin{equation}
+   \Psi^{A}_{\;\;B}=\sum_{p=0}^{4}\chi_{\alpha_1\ldots\alpha_p}e^{\alpha_1}_{a_1}\ldots e^{\alpha_p}_{a_p}
+   (\gamma^{a_1})^{A}_{\;\;C}\ldots
+   (\gamma^{a_p})^{D}_{\;\;B}.
+\end{equation}
+Because $\Psi$ possesses one contravariant and one covariant spinor index, it transforms under a local Lorentz transformation $\Lambda(x)$ as a bi-spinor:
+\begin{equation}
+  \label{eq:Psi_Lorentz}
+  \Psi(x)\to U_{\Lambda(x)}\Psi(x) U_{\Lambda(x)}^{-1}.
+\end{equation}
+Note that this result is robust regardless of the derivation method. For instance, if we alternatively treat $\gamma^{a}$ as invariant and the coefficients $\chi_{\alpha_1\ldots\alpha_p}e^{\alpha_1}_{a_1}\ldots e^{\alpha_p}_{a_p}=\chi_{a_1\ldots a_p}$ as transforming under local Lorentz transformations, applying the identity (\cref{eq:gamma_Lorentz}) yields the exact same transformation law.
+
+Given that $\Psi$ transforms according to (\cref{eq:Psi_Lorentz}), physical consistency demands that its covariant derivative must transform identically:
+\begin{equation}
+  D_{\mu}\Psi(x)\to U_{\Lambda(x)}[D_{\mu}\Psi(x)]U_{\Lambda(x)}^{-1}.
+\end{equation}
+This requirement is satisfied if we define the covariant derivative as a commutator involving the spin connection:
+\begin{equation}
+  D_{\mu}\Psi=\partial_{\mu}\Psi+[\omega_{\mu},\Psi],
+\end{equation}
+provided that the spin connection $\omega_{\mu}$ transforms under local Lorentz transformations as a gauge field:
+\begin{equation}
+  \omega_{\mu}(x)\to U_{\Lambda(x)}\omega_{\mu}(x) U_{\Lambda(x)}^{-1}-(\partial_{\mu}U_{\Lambda(x)})U_{\Lambda(x)}^{-1}.
+\end{equation}
+The detailed proof of this transformation rule is provided in \cref{sec:Lorentz_spin_connection}.
+
+Importantly, this derivation holds without making any a priori assumptions regarding the specific relationship between the tetrad $e^{a}_{\mu}$ and the spin connection $\omega_{\mu}$. However, requiring this formulation to remain strictly mathematically equivalent to the differential form of the Kähler-Dirac equation,
+\begin{equation}
+  (i(d-d^{\dagger})-m)\Phi=0,
+\end{equation}
+naturally imposes the standard Levi-Civita conditions (metric compatibility and zero torsion) that strictly link $\omega_{\mu}$ to $e^{a}_{\mu}$. The explicit proof of this relationship is detailed in the next section.
+
+
+\section{Derivation of the Spin Connection from the Differential Formulation}\label{sec:spin_connection_deriv_from_diff}
+
+In \cref{sec:KD_diff_to_spinor}, we proved the structural equivalence between the KD equation in the differential formulation and the Dirac equation in the spinor formulation for flat spacetime. We now extend this proof to curved spacetime, demonstrating that the kinetic term of the Dirac equation must naturally be modified to: 
+\begin{equation}
+    i\gamma^\mu\nabla_\mu\Psi=i\gamma^\mu(\partial_\mu-[\omega_\mu,\cdot])\Psi,\quad \omega_\mu=-\frac{1}{8}\omega_{\mu ab}[\gamma^a,\gamma^b],
+\end{equation}
+where $\omega_{\mu ab}$ represents the spin connection. In the following, we ignore the "$i$" in front of the kinetic term for simplicity.
+
+In curved spacetime, we employ the tetrad formalism: 
+$dx^\mu=e^\mu_a dx^a$, where $dx^a \in \Omega^1(\mathbb{V})$ is a 1-form on the orthonormal frame bundle. Consequently, $\gamma^\mu=e^\mu_a\gamma^a$, such that $dx^\mu$ and $dx^a$ map directly to $\gamma^\mu$ and $\gamma^a$, respectively.
+
+To prove this, we again focus on the 1-form sector $\Psi=\phi_\alpha \gamma^\alpha$, though this logic readily generalizes to all $p$-forms. 
+
+Expanding $\gamma^\mu \partial_\mu\Psi$, we obtain:
+\begin{equation}\label{eq:gamma_mu_partial_mu_Psi}
+\begin{aligned}
+    \gamma^\mu \partial_\mu(\phi_\alpha e^\alpha_a\gamma^a)&=\gamma^\mu e^\alpha_a\gamma^a \partial_\mu\phi_\alpha + \gamma^\mu \gamma^a\partial_\mu( e^\alpha_a)\phi_\alpha\\
+    &=\frac{1}{2}[\gamma^\mu,\gamma^\alpha]\partial_\mu\phi_\alpha+g^{\mu\alpha}\partial_\mu\phi_\alpha+\gamma^\mu \gamma^a\partial_\mu( e^\alpha_a)\phi_\alpha,
+\end{aligned}
+\end{equation}
+where the third term arises strictly due to the spacetime curvature.
+
+Since the metric is covariantly constant ($\nabla_\mu g^{\alpha\beta}=0$), we have:
+\[ \nabla_\mu g^{\alpha\beta}= \nabla_\mu(e^\alpha_a e^\beta_b \eta^{ab})=\nabla_\mu (e^\alpha_a) e^\beta_b \eta^{ab}+e^\alpha_a \nabla_\mu(e^\beta_b) \eta^{ab}=0 \quad \to \quad \nabla_\mu(e^\mu_a)=0. \]
+Furthermore, because the covariant derivative of the tetrad vanishes,
+\begin{equation}
+\begin{aligned}
+    \nabla_\mu(e^\alpha_a) =\partial_\mu e^\alpha_a+\tensor{\Gamma}{_\mu^\alpha_\lambda}  e^\lambda_a-\tensor{\omega}{_\mu^b_a}e^\alpha_b=0,
+\end{aligned}
+\end{equation}
+we can substitute this relation back into the additional curvature term, yielding: 
+\begin{equation}
+\begin{aligned}
+    \gamma^\mu \gamma^a\partial_\mu( e^\alpha_a)\phi_\alpha &= \gamma^\mu\gamma^a (-\tensor{\Gamma}{_\mu^\alpha_\lambda}  e^\lambda_a+\tensor{\omega}{_\mu^b_a}e^\alpha_b)\phi_\alpha\\
+    &= -\gamma^\mu\gamma^\lambda \tensor{\Gamma}{_\mu^\alpha_\lambda} \phi_\alpha+ e^\mu_c\gamma^c\gamma^a \tensor{\omega}{_\mu^b_a}e^\alpha_b\phi_\alpha.
+\end{aligned}
+\end{equation}
+
+Because the affine connection $\tensor{\Gamma}{_\mu^\alpha_\lambda}$ is symmetric in its lower indices ($\mu \leftrightarrow \lambda$), the first term simplifies to:
+\[ \gamma^\mu\gamma^\lambda \tensor{\Gamma}{_\mu^\alpha_\lambda} =(\frac{1}{2}[\gamma^\mu,\gamma^\lambda]+\frac{1}{2}\{\gamma^\mu,\gamma^\lambda\})\tensor{\Gamma}{_\mu^\alpha_\lambda}=\frac{1}{2}\{\gamma^\mu,\gamma^\lambda\}\tensor{\Gamma}{_\mu^\alpha_\lambda}=g^{\mu\lambda}\tensor{\Gamma}{_\mu^\alpha_\lambda}. \]
+
+Similarly, metric compatibility implies $\nabla_\mu\eta_{ab}=\partial_\mu\eta_{ab}-\tensor{\omega}{_\mu^c_a}\eta_{cb}-\tensor{\omega}{_\mu^c_b}\eta_{ca}=0 \to \omega_{\mu ba}+\omega_{\mu ab}=0$, confirming that $\omega_{\mu ab}$ is antisymmetric under $a\leftrightarrow b$. 
+
+We now demonstrate that the remaining term takes the form of a commutator with the spin connection: $e^\mu_c\gamma^c\gamma^a \tensor{\omega}{_\mu^b_a}e^\alpha_b\phi_\alpha =\gamma^\mu [\omega_\mu,\phi_\alpha\gamma^\alpha]$, where $\omega_\mu=-\frac{1}{8} \omega_{\mu ab} &[\gamma^a,\gamma^b]$:
+
+\begin{equation}
+\begin{aligned}
+    \omega_\mu=-\frac{1}{8} \omega_{\mu ab} &[\gamma^a,\gamma^b] \\
+    \to [\omega_\mu,\phi_\alpha\gamma^\alpha]&=\big[-\frac{1}{8} \omega_{\mu ab} [\gamma^a,\gamma^b],\phi_\alpha\gamma^\alpha\big]\\
+    &=-\frac{1}{8} \omega_{\mu ab}\phi_c\big[ [\gamma^a,\gamma^b],\gamma^c\big]=\frac{1}{2}\omega_{\mu ab}\eta^{bc}\phi_c\gamma^a + \frac{1}{2}\omega_{\mu ab}\eta^{ac}\phi_c \gamma^b\\
+    &=\frac{1}{2}\tensor{\omega}{_\mu_a^c}\phi_c\gamma^a - \frac{1}{2}\tensor{\omega}{_\mu_b^c}\phi_c \gamma^b=-\tensor{\omega}{_\mu_a^c}\phi_c \gamma^a=\gamma^a\tensor{\omega}{_\mu^b_a}\phi_b.
+\end{aligned}
+\end{equation}
+In the second line, we used $\phi_\alpha\gamma^\alpha=\phi_c e_\alpha^c\gamma^\alpha=\phi_c\gamma^c$ and the standard identity $\big[ [\gamma^a,\gamma^b],\gamma^c\big]=4(\eta^{bc}\gamma^a-\eta^{ac}\gamma^b)$. The antisymmetry property $\tensor{\omega}{_\mu^b_a}=-\tensor{\omega}{_\mu_a^b}$ was applied in the final step.
+
+Finally, inserting everything back into \cref{eq:gamma_mu_partial_mu_Psi} yields: 
+\begin{equation}
+\begin{aligned}
+    \gamma^\mu \partial_\mu(\phi_\alpha \gamma^\alpha)=\frac{1}{2}[\gamma^\mu,\gamma^\alpha]\partial_\mu\phi_\alpha+g^{\mu\alpha}\partial_\mu\phi_\alpha-g^{\mu\lambda}\tensor{\Gamma}{_\mu^\alpha_\lambda}\phi_\alpha+\gamma^\mu [\omega_\mu,\phi_\alpha\gamma^\alpha]\\
+    \rightarrow \gamma^\mu D_\mu\Psi=\gamma^\mu(\partial_\mu-[\omega_\mu,\cdot])(\phi_\alpha \gamma^\alpha)=\frac{1}{2}[\gamma^\mu, \gamma^\alpha]\partial_\mu\phi_\alpha +\nabla^\alpha\phi_\alpha=(d-d^\dagger)\Phi,
+\end{aligned}
+\end{equation}
+which perfectly reproduces the required geometric structure.
+
+\begin{subappendices}
+
+\section{Lorentz Transformation of the Spin Connection}\label{sec:Lorentz_spin_connection}
+
+The KD spinor transforms as $\Psi'=U_\Lambda \Psi U_\Lambda^{-1}$. Its covariant derivative is defined as $D_\mu \Psi=\partial_\mu\Psi+[\omega_\mu,\Psi]$. To guarantee that the action $\bar{\Psi}D_\mu\Psi$ is Lorentz invariant, we require the covariant derivative to transform covariantly: $U_\Lambda (D_\mu\Psi) U_\Lambda^{-1}$. 
+In other words, the following equivalence must hold:
+\begin{equation}
+\begin{aligned}
+    D_\mu'\Psi'=U_\Lambda (D_\mu\Psi) U_\Lambda^{-1},\quad \text{where } D_\mu'=\partial_\mu+[\omega_\mu',\cdot].
+\end{aligned}
+\end{equation}
+Expanding the left-hand side (LHS) of this requirement gives: 
+\begin{equation}
+\begin{aligned}
+    &\partial_\mu(U_\Lambda \Psi U_\Lambda^{-1})+[\omega_\mu',(U_\Lambda \Psi U_\Lambda^{-1})]\\
+    =(\partial_\mu U_\Lambda) \Psi U_\Lambda^{-1} &+ U_\Lambda (\partial_\mu\Psi) U_\Lambda^{-1}+ U_\Lambda \Psi (\partial_\mu U_\Lambda^{-1})+\omega_\mu'(U_\Lambda \Psi U_\Lambda^{-1})-(U_\Lambda \Psi U_\Lambda^{-1})\omega_\mu'.
+\end{aligned}
+\end{equation}
+
+Similarly, expanding the right-hand side (RHS) gives: 
+\begin{equation}
+\begin{aligned}
+    U_\Lambda (\partial_\mu\Psi+[\omega_\mu,\Psi]) U_\Lambda^{-1}= U_\Lambda (\partial_\mu\Psi) U_\Lambda^{-1}+U_\Lambda \omega_\mu\Psi U_\Lambda^{-1}-U_\Lambda \Psi\omega_\mu U_\Lambda^{-1}.
+\end{aligned}
+\end{equation}
+
+For the LHS and RHS to be identically equal, we require the matching of specific terms:
+\begin{equation}
+\begin{aligned}
+    \omega_\mu'(U_\Lambda \Psi U_\Lambda^{-1})&=U_\Lambda \omega_\mu\Psi U_\Lambda^{-1}-(\partial_\mu U_\Lambda) \Psi U_\Lambda^{-1} \dots \circled{1} \\
+    (U_\Lambda \Psi U_\Lambda^{-1})\omega_\mu'&=U_\Lambda \Psi (\partial_\mu U_\Lambda^{-1})+U_\Lambda \Psi\omega_\mu U_\Lambda^{-1} \dots \circled{2}
+\end{aligned}
+\end{equation}
+
+For condition \circled{1} to be satisfied, the transformed spin connection must obey: 
+\begin{equation}
+  \omega_{\mu}'(x)= U_{\Lambda(x)}\omega_{\mu}(x) U_{\Lambda(x)}^{-1}-(\partial_{\mu}U_{\Lambda(x)})U_{\Lambda(x)}^{-1}.
+\end{equation}
+Substituting this transformation rule into condition \circled{2} yields: 
+\begin{equation}
+\begin{aligned}
+    (U_\Lambda \Psi U_\Lambda^{-1})[U_{\Lambda}\omega_{\mu} U_{\Lambda}^{-1}-(\partial_{\mu}U_{\Lambda})U_{\Lambda}^{-1}]) \\
+    =U_\Lambda \Psi\omega_{\mu} U_{\Lambda}^{-1}-U_\Lambda \Psi U_\Lambda^{-1}(\partial_{\mu}U_{\Lambda})U_{\Lambda}^{-1}.
+\end{aligned}
+\end{equation}
+Because the spinor representation matrix takes the form $U_\Lambda=e^{-\frac{i}{4}\lambda_{\alpha\beta}\Sigma^{\alpha\beta}}$, its derivatives satisfy: 
+\begin{equation}
+\begin{aligned}
+    \partial_\mu U_\Lambda&=-\frac{i}{4}(\partial_\mu\lambda_{\alpha\beta})\Sigma^{\alpha\beta} U_\Lambda, \quad \partial_\mu U_\Lambda^{-1}=\frac{i}{4}(\partial_\mu\lambda_{\alpha\beta})\Sigma^{\alpha\beta} U_\Lambda^{-1}\\
+    &\to \quad \partial_\mu U_\Lambda=-\partial_\mu U_\Lambda^{-1}(U_\Lambda)^2.
+\end{aligned}
+\end{equation}
+Substituting this derivative identity back into condition \circled{2} proves that the LHS is indeed equal to the RHS, confirming the correct transformation law.
+\end{subappendices}
+
+\printbibliography[heading=subbibintoc, title={References for Chapter \thechapter}]

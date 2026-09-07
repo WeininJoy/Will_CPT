@@ -143,7 +143,7 @@ if __name__=="__main__":
     cmap = plt.get_cmap('RdGy')
     idx = sorted_index[0]
     solution = solution_1_list[idx].real
-    fig = plt.figure(figsize=(4.5,3))
+    fig = plt.figure(figsize=(5.5,3.5))
     plt.contourf(x, t, solution, 20, cmap=cmap)
     plt.xlabel(r'$x$')
     plt.ylabel(r'$t$')

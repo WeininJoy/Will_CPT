@@ -41,3 +41,9 @@ class_nu_spacing_As_theory/
 class_nu_spacing_coefficient_type/
 class_nu_spacing_weighting_try3/
 class_quantised/
+
+# ── Exception: keep everything under code_for_figures_matchTwo_BC/ despite the ──
+# broad data-directory patterns above; large .npy files here are tracked via Git LFS
+!python_files/code_for_figures_matchTwo_BC/
+!python_files/code_for_figures_matchTwo_BC/**/
+!python_files/code_for_figures_matchTwo_BC/**

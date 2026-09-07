@@ -1,0 +1,106 @@
+\contentsline {chapter}{Declaration}{i}{chapter*.2}%
+\contentsline {chapter}{Abstract}{ii}{chapter*.3}%
+\contentsline {chapter}{Acknowledgments}{iv}{chapter*.4}%
+\contentsline {chapter}{List of Figures}{xii}{chapter*.6}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {part}{I\hspace {1em}Cosmological Constraints from Perturbations in a Periodic Universe}{13}{part.1}%
+\contentsline {chapter}{\numberline {2}Predicting spatial curvature $\Omega _K$ in globally $CPT$-symmetric universes}{14}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction}{14}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Background and perturbations}{15}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Constraints from the future conformal boundary}{17}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Implications for spatial curvature \(\Omega _K\)}{18}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Conclusion}{20}{section.2.5}%
+\contentsline {section}{References for Chapter 2}{22}{section.2.5}%
+\contentsline {chapter}{\numberline {3}CMB constraint Cosmological Parameters}{23}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction}{23}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Theory}{24}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Perturbation equations and solution}{24}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Basic idea}{25}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Realistic Cosmological Model}{26}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Parameter transformation}{26}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Calculating $\Delta \tilde k$ considering radiation anisotropy and higher-order terms}{27}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}CMB Power Spectrum and Comparison with Planck Data}{29}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Modification of the Boltzmann Angular Power Spectrum Code}{29}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Post-processing \texttt {Planck 2018} MCMC Samples}{30}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Results and Discussion}{31}{section.3.5}%
+\contentsline {section}{Appendix \numberline {3.A}Taylor Expansion Coefficients}{34}{section.a.3.A}%
+\contentsline {section}{References for Chapter 3}{35}{equation.a.3.A.19}%
+\contentsline {chapter}{\numberline {4}Matching Spatial and Temporal Boundary Conditions in Low-$k$ Modes}{38}{appendix.4}%
+\contentsline {section}{\numberline {4.1}Introduction}{38}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Problem Formulation}{39}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Linear Combination Solutions}{40}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Fundamental Derivation}{41}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Alternative Perspective: Singular Value Decomposition}{42}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Two-Dimensional Geometric Analogy}{43}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Results for the Toy Model}{44}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Applications to Cosmological Perturbations}{46}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Determination of Cosmological Parameters}{47}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Coupled Multi-Field Perturbations}{50}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Phenomenologically Favored Solutions}{50}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}Generation of Primordial Power Spectra and CMB Spectra}{53}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Future Directions}{55}{section.4.7}%
+\contentsline {section}{Appendix \numberline {4.A}Canonical Correlation Analysis and Sparse Solutions}{56}{section.b.4.A}%
+\contentsline {subsection}{\numberline {4.A.1}Problem Statement}{56}{subsection.b.4.A.1}%
+\contentsline {subsection}{\numberline {4.A.2}Methodology of Canonical Correlation Analysis and Sparsity}{57}{subsection.b.4.A.2}%
+\contentsline {subsubsection}{The Stacked-SVD Approach}{57}{subsubsection*.31}%
+\contentsline {subsubsection}{Formulating Gram Matrices in Momentum Space }{58}{subsubsection*.32}%
+\contentsline {subsubsection}{Two-Vector Canonical Correlation Analysis}{58}{subsubsection*.33}%
+\contentsline {subsubsection}{Constructing Sparse Bases via Oblique Rotations}{59}{subsubsection*.34}%
+\contentsline {section}{References for Chapter 4}{60}{equation.b.4.A.27}%
+\contentsline {chapter}{\numberline {5}Conclusion and Future work}{62}{appendix.5}%
+\contentsline {section}{\numberline {5.1}Conclusion}{62}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Future work}{63}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Imaginary time period as an additional constraint}{63}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Theoretical prediction of cosmological parameters}{64}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Detecting the topology of the universe}{64}{subsection.5.2.3}%
+\contentsline {section}{\numberline {5.3}Matter field evolution near the Big Bang and the end of the universe}{66}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Negative matter density}{66}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Toy model: The scalar field}{67}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}The extension to fermions}{70}{subsection.5.3.3}%
+\contentsline {section}{References for Chapter 5}{71}{subsection.5.3.3}%
+\contentsline {part}{II\hspace {1em}$CPT$-Symmetric K\"{a}hler-Dirac Fermions}{72}{part.2}%
+\contentsline {chapter}{\numberline {6}Introduction and Basics}{73}{appendix.6}%
+\contentsline {section}{\numberline {6.1}Introduction}{73}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Basics}{75}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Equivalence of the Differential and Spinor Formulations of the KD Equation}{77}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Lorentz Transformation Laws for the KD Bi-Spinor}{79}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Derivation of the Spin Connection from the Differential Formulation}{82}{section.6.5}%
+\contentsline {section}{Appendix \numberline {6.A}Lorentz Transformation of the Spin Connection}{83}{section.c.6.A}%
+\contentsline {section}{References for Chapter 6}{84}{equation.c.6.A.45}%
+\contentsline {chapter}{\numberline {7}Two-sheeted spacetime and KD Majorana condition}{87}{appendix.7}%
+\contentsline {section}{\numberline {7.1}Two-Sheeted Spacetime}{87}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Negative Energy, Backward Time Propagation, and Antiparticles}{88}{subsection.7.1.1}%
+\contentsline {subsection}{\numberline {7.1.2}The Negative Lagrangian and the Two-Sheeted Solution}{89}{subsection.7.1.2}%
+\contentsline {subsection}{\numberline {7.1.3}Proof of a Positive-Definite Lagrangian in the Two-Sheeted Picture}{90}{subsection.7.1.3}%
+\contentsline {section}{\numberline {7.2}Preventing Mixing Terms via Decoupled Internal Symmetries}{92}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Mixing Induced by Lorentz Transformations and the Spin Connection}{92}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}Resolution via the $U(2,2)$ Internal Symmetry}{94}{subsection.7.2.2}%
+\contentsline {section}{\numberline {7.3}The KD-Majorana Condition}{95}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Charge Conjugation and the KD-Majorana Condition}{95}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Transformation Under $CPT$ Reversal}{97}{subsection.7.3.2}%
+\contentsline {subsection}{\numberline {7.3.3}Constraints on the $U(2,2)$ Internal Symmetry}{97}{subsection.7.3.3}%
+\contentsline {section}{Appendix \numberline {7.A}The Spin Connection Term for $U_\Lambda \Psi $}{99}{section.d.7.A}%
+\contentsline {section}{References for Chapter 7}{99}{equation.d.7.A.20}%
+\contentsline {chapter}{\numberline {8}Implications for the Standard Model and Cosmology}{101}{appendix.8}%
+\contentsline {section}{\numberline {8.1}Relation to the Standard Model}{101}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}The KD Kinetic Term}{102}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Yukawa Couplings}{103}{subsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.1.3}The Right-Handed Neutrino Majorana Mass Term}{105}{subsection.8.1.3}%
+\contentsline {section}{\numberline {8.2}Cosmological Implications}{106}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Connections to the $CPT$-Symmetric Universe }{106}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Application to the Black Hole Mirror Model}{107}{subsection.8.2.2}%
+\contentsline {section}{References for Chapter 8}{109}{figure.caption.38}%
+\contentsline {chapter}{\numberline {9}Euclidean Signature and Alternative Lagrangians}{111}{appendix.9}%
+\contentsline {section}{\numberline {9.1}van Nieuwenhuizen's Wick Rotation for the Standard Dirac Lagrangian}{112}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Extension to the KD Lagrangian}{114}{section.9.2}%
+\contentsline {section}{\numberline {9.3}Alternative Lagrangians}{116}{section.9.3}%
+\contentsline {subsection}{\numberline {9.3.1}Construction of Hermitian and Physical Lagrangians}{118}{subsection.9.3.1}%
+\contentsline {subsection}{\numberline {9.3.2}The KD-Majorana Condition}{121}{subsection.9.3.2}%
+\contentsline {section}{References for Chapter 9}{123}{subsection.9.3.2}%
+\contentsline {chapter}{\numberline {10}Conclusion and Future Work of KD fermions}{124}{appendix.10}%
+\contentsline {section}{\numberline {10.1}Conclusion}{124}{section.10.1}%
+\contentsline {section}{\numberline {10.2}Future work}{125}{section.10.2}%
+\contentsline {subsection}{\numberline {10.2.1}Applications to Lattice Chiral Gauge Theory}{126}{subsection.10.2.1}%
+\contentsline {subsection}{\numberline {10.2.2}Geometric Connections to Twistor Theory}{127}{subsection.10.2.2}%
+\contentsline {subsection}{\numberline {10.2.3}Towards a Four-Dimensional KD Superstring Theory}{128}{subsection.10.2.3}%
+\contentsline {section}{References for Chapter 10}{130}{Item.11}%

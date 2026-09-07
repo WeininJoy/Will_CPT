@@ -10,7 +10,7 @@ Parameters (param_index):
 
 Results are written to:
   data_folder/fix3params/log_<param_name>.txt        (per-parameter)
-  data_folder/fix3params/master_log_fix3param.txt    (combined, same format as master_log.txt)
+  data_folder/fix3params/master_log_fix3params.txt    (combined, same format as master_log.txt)
 """
 
 import os
@@ -35,9 +35,8 @@ from Higher_Order_Finding_Xrecs import compute_X_recs
 from Higher_Order_Solving_for_Vrinf import compute_allowedK
 
 # ── configuration ─────────────────────────────────────────────────────────────
-nu_spacing4_bestfit = [0.45531269806747615, -0.0397827163256654,
-                       0.15804679013016237,  0.5647692899377309,
-                       2.068999, 0.977273, 0.051376]
+nu_spacing4_bestfit = [0.4444730086581741, -0.03940583926181416, 0.16336760287147203, 0.5615471381223595, 2.106364,0.977438,0.059580] # cosmo_param_direc
+# nu_spacing4_bestfit = [0.45531269806747615, -0.0397827163256654, 0.15804679013016237, 0.5647692899377309, 2.068999, 0.977273, 0.051376] # cosmo_param_direc_OmegabStep
 
 best_params = np.array(nu_spacing4_bestfit[:4])   # [OmegaM, OmegaK, Omegab_ratio, h]
 param_names = ['OmegaM', 'OmegaK', 'Omegab_ratio', 'h']

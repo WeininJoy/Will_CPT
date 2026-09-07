@@ -1,0 +1,346 @@
+\documentclass[12pt,a4paper]{report}
+
+% --- Core Math & Physics Packages ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}             % Bold math
+\usepackage{bbm}            % \mathbbm{1} etc.
+\usepackage{xcolor}
+\usepackage{tensor}         % Properly spaced tensor indices
+\DeclareMathOperator{\Tr}{Tr}
+
+% --- Typography ---
+\usepackage[T1]{fontenc}    % Proper glyphs/hyphenation for accented characters
+\usepackage{microtype}      % Better justification and hyphenation
+\usepackage{CJKutf8}        % Renders Chinese names in the Acknowledgments under pdflatex
+
+% --- Graphics & TikZ ---
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{tikz}
+
+% --- Page Layout ---
+\usepackage{geometry}
+\geometry{a4paper, top=25mm, bottom=25mm, inner=35mm, outer=25mm}
+
+% --- Line Spacing ---
+\usepackage{setspace}
+\onehalfspacing
+
+% --- Headers & Footers ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\nouppercase{\leftmark}}
+\fancyhead[RO]{\small\nouppercase{\rightmark}}
+\fancyfoot[LE,RO]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+% Style for chapter-opening pages
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\small\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+% --- Chapter & Section Title Styling ---
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}
+  {\normalsize\scshape\chaptertitlename\ \thechapter}
+  {0pt}
+  {\Huge\bfseries}[\vspace{6pt}\rule{\textwidth}{0.5pt}]
+\titlespacing*{\chapter}{0pt}{30pt}{40pt}
+
+% --- Tables & Appendices ---
+\usepackage{booktabs}
+\usepackage{dcolumn}        % Align table columns on decimal point
+\usepackage[title,titletoc]{appendix}
+\usepackage{aas_macros}     % Astro journal macros
+
+% --- Hyperlinks & Clever References ---
+% Always keep hyperref before cleveref
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{cleveref}
+
+% --- Custom Macros ---
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{%
+    \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+% widetext is a REVTeX two-column environment; this document is single-column, so make it a no-op.
+\newenvironment{widetext}{}{}
+
+\usepackage{lipsum}
+
+% --- Chapter Abstract Style ---
+\newcommand{\chapterabstract}[1]{%
+  \vspace{0.5em}%
+  \begin{center}
+    \begin{minipage}{0.92\textwidth}
+      \small\itshape #1
+    \end{minipage}
+  \end{center}
+  \vspace{0.5em}%
+  \noindent\rule{\textwidth}{0.5pt}%
+  \vspace{1.5em}%
+}
+
+% --- Bibliography ---
+\usepackage[
+    backend=biber,
+    style=authoryear,
+    dashed=false,           % Repeat author names instead of using a dash for consecutive entries
+    natbib=true,
+    maxbibnames=99,
+    maxcitenames=1,
+    uniquename=false,
+    uniquelist=false,
+    refsection=chapter      % Keeps citations isolated per chapter
+]{biblatex}
+
+\addbibresource{Reference_Part1.bib}
+\addbibresource{Reference_Part2.bib}
+
+% Drop the (unused, occasionally malformed) abstract field pulled in from
+% ADS/arXiv-exported .bib entries so it can never break bbl parsing.
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map{
+      \step[fieldset=abstract, null]
+    }
+  }
+}
+
+% Plain \cite calls throughout the thesis were written for a numeric style
+% (which self-brackets); make them parenthetical author-year, e.g. (Smith, 2020).
+\let\cite\parencite
+
+% --- PDF Metadata ---
+\title{Cosmological Perturbations and K\"{a}hler-Dirac fermions in CPT-Symmetric Universes}
+\author{Wei-Ning Deng}
+\date{April 2026}
+
+\begin{document}
+
+% ==================== TITLE PAGE ====================
+\begin{titlepage}
+  \centering
+  \vspace*{1.5cm}
+
+  {\LARGE\bfseries Cosmological Perturbations and K\"{a}hler-Dirac fermions\\[0.5em]
+   in $CPT$-Symmetric Universes\par}
+
+  \vspace{0.8cm}
+  \rule{\textwidth}{1pt}
+  \vspace{0.cm}
+
+  {\Large Wei-Ning Deng\par}
+
+  \vspace{0.2cm}
+  \rule{\textwidth}{0.5pt}
+
+  \begin{figure}[htbp]
+     \centering
+     \includegraphics[width=0.6\textwidth]{figures/CPT_periodic.png}
+  \end{figure}
+  {\large Astrophysics Group, Cavendish Laboratory\\[0.3em]
+   University of Cambridge\par}
+
+    \vspace{0.3cm}
+
+
+  {Queens' College}
+
+
+  \vspace{1.3cm}
+
+  {\normalsize This dissertation is submitted for the degree of\par}
+  \vspace{0.4cm}
+  {\large\itshape Doctor of Philosophy in Physics\par}
+
+  \vspace{1.cm}
+  {\large September 2026\par}
+\end{titlepage}
+
+% ==================== FRONT MATTER ====================
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+% --- Declaration ---
+\chapter*{Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+
+\noindent I hereby declare that this dissertation is the result of my own work and includes nothing which is the outcome of work done in collaboration except as declared in the text and Acknowledgments. It is not substantially the same as any work that has already been submitted for any degree or other qualification. This dissertation does not exceed the prescribed word limit of the Degree Committee.
+
+\vspace{2.5cm}
+\noindent\textit{Wei-Ning Deng}\\[0.3em]
+\textit{Cambridge, September 2026}
+
+% --- Abstract ---
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+The $CPT$-symmetric universe model of Boyle and Turok posits that the Big Bang acts as a $CPT$-mirror joining our universe to a $CPT$-reversed ``anti-universe'' at the initial singularity. This single global boundary condition has been shown to address several outstanding problems in cosmology and particle physics simultaneously, including the cosmological constant problem, identity of dark matter, flatness and homogeneity, and the scale invariance of the primordial power spectrum, etc, without introducing particle content beyond three right-handed neutrinos, 36 dimension-zero scalar fields, and composite Higgs. The overview of the model is introduced in \cref{chapter:introduction}. 
+
+This thesis investigates two questions left open by this framework: how the requirement of global $CPT$-symmetry constrains the evolution of cosmological perturbations, and whether this macroscopic boundary condition can be justified from a more fundamental, quantum-field-theoretic description of fermions.
+
+Part~I addresses the first question by extending previous work on periodic, spatially flat universes to the spatially curved case. In \cref{chapter:theory} we show that the temporal boundary condition imposed by the future conformal boundary is generically incompatible with the spatial boundary condition required by a closed universe, and that consistency between the two is only possible for a discrete, quantized set of spatial curvatures, which remain consistent with \texttt{Planck 2018} constraints. In \cref{chapter:Observation}, the coupled Einstein--Boltzmann perturbation equations are solved numerically, including radiation anisotropy and higher-order moments, we demonstrate that imposing both boundary conditions simultaneously constrains not just the curvature but the full set of cosmological parameters governing the conformal age of the universe. In \cref{chapter:low-k}, we then relax the high-$k$ approximation used in this analysis and construct mode-mixed solutions that satisfy both boundary conditions at low wavenumber, uncovering distinct suppression and oscillatory features in the CMB power spectra. In \cref{chapter:conclusion_matter_evol}, the conclusion and future work are presented. Finally, we examine the assumptions underlying the matter density near the Big Bang and future conformal boundary, arguing that a classical treatment breaks down in these regimes and motivating a quantum field theoretic description of matter in curved spacetime. Since matter is formed by fermions, this naturally leads to the second question.
+
+Part~II addresses the second question by developing a formalism for fermions based on the K\"{a}hler-Dirac (KD) equation, which is naturally defined on curved spacetime using differential forms (\cref{chapter:Intro_Basics}). We show that the additional $\gamma^0$ required to construct a Lorentz-invariant KD Lagrangian introduces negative-norm and negative-energy states. In \cref{chapter:two-sheet_KD_Majorana}, we resolve this pathology by proposing a two-sheeted, $PT$-reversed spacetime geometry on which these ghost states are reinterpreted as ordinary, positive-energy fermions on a second sheet. Imposing a KD-Majorana condition relating the two sheets ensures that the fields on the second sheet are the exact $CPT$-conjugate antiparticles of those on the first, providing a microscopic justification for global $CPT$-symmetry. In \cref{chapter:SM_Cosmology}, we then show that all sixteen Standard Model fermions (in one generation), including right-handed neutrinos, can be accommodated within exactly four copies of the KD-Majorana field, with the Standard Model gauge group emerging from the symmetries relating these copies and internal symmetry of KD field. The corresponding KD kinetic, Yukawa, and Majorana mass terms are also constructed. As for cosmology, its implication to $CPT$-symmetric universe model is discussed, including its application to Balck hole mirror model. In \cref{chapter:Lag_Euclidean}, we further develop a Euclidean KD Lagrangian that avoids the non-Hermiticity and chiral anomaly present in the standard Euclidean Dirac formulation. Finally, in \cref{chapter:FutureWork_KD}, we outline prospects for extending this two-sheeted KD framework to lattice gauge theory, twistor theory, and string theory.
+
+% --- Acknowledgments ---
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+
+\begin{CJK}{UTF8}{bsmi}
+
+Completing a PhD is no small task, and I am deeply grateful to everyone who helped me along the way.
+
+In Taiwan, most high school students are encouraged to pursue a practical career, such as medical doctor or lawyer, so I owe a particular debt to the teachers who instead nurtured my interest in science and encouraged me to follow my own path. I am especially grateful to Wan-Ling Chung (鍾菀菱), who supported me in attending the Earth Science Olympiad, where I first discovered my interest in astronomy and cosmology. When I later struggled to choose between becoming a medical doctor and a scientist, Jing-Ting Xu (許靜婷) encouraged me to follow my dream. I still remember her telling me that ``even if the theory you work on turn out to be wrong, it is still precious for expanding human knowledge.'' I also want to thank my physics teacher Jing-Hua Lee (李京華), who helped me prepare for the university entrance examination and taught me to be humble in physics: even when a calculation gives the right answer, that does not mean one truly understands the physical meaning behind it, and that meaning is often far more profound than it first appears.
+
+I am grateful to all the teachers in the Department of Physics at National Taiwan University, especially Yeong-Chuan Kao (高涌泉), in whose course I learned that asking good questions matters more than solving problems for a good physicist. I would also like to thank Hiroyuki Hirashita, Pisin Chen (陳丕燊), and Hsi-Yu Schive (薛熙于) for supervising my undergraduate and master's research. I am especially grateful to Eugene Lim at King's College London, who supervised my summer research project, inspired my love of theoretical physics, and whose project ultimately became my master's thesis; without his help, I could not have applied for a PhD at the University of Cambridge.
+
+Since arriving in Cambridge, I have benefited enormously from its academic environment, particularly the Kavli Institute for Cosmology and the Institute of Astronomy, which host lots of seminars and activities offering opportunities to interact with excellent researchers from around the world. I also want to thank Queens' college, which provide such a warm environment for us to know people working in different research areas. 
+
+Above all, I want to thank my supervisor, Will Handley. When he learned that I was more drawn to theoretical work than to data analysis and model comparison, he pointed me towards the theoretical project that became Part~I of this thesis. I have been continually amazed by how versatile he is: although he specializes in Bayesian analysis, his knowledge is broad enough to span theoretical, observational, and even instrumental work. Because he understands how different people think, he is able to recognize what each of us needs and to work with us accordingly, and this is exactly how he worked with me. Over the course of the project, he taught me the entire process of building a theoretical model and comparing it with observation, training that has been invaluable to me as a cosmologist. He also encouraged me to work alongside AI tools, which greatly accelerated my research and placed me at the forefront of this new era of research, something I am truly grateful for. Moreover, once he learned of my interest in the $CPT$-symmetric universe model, he helped me reach out to Latham Boyle and Neil Turok, the originators of the theory, opening the door to my collaboration with Latham Boyle.
+
+Together with Latham, I worked on an entirely theoretical project in particle physics and theoretical cosmology, which became Part~II of this thesis. He taught me how to think as a theorist. I am continually amazed by how he thinks outside the box, connecting theories that at first seem far apart from one another and revealing relationships between them that are profound rather than merely superficial. I believe the secret lies in his genuine interest in many different theories, pursued without the arrogance sometimes found among theorists, and in the time he devotes to understanding those theories thoroughly. That is precisely what allows him to identify a loophole in one area and to find its resolution in a seemingly unrelated field. I deeply respect this way of thinking and hope to learn from it throughout my own career.
+
+Thanks to my parents, for their continuing love and support, be it financial, emotional, or moral. Last, and most of all, I want to thank my husband, Shih-Huan Huang. We have been classmates since our undergraduate years, applied to Cambridge together, and were both fortunate enough to be awarded scholarships for our PhDs there. Although we work in different fields of physics, I still treasure our discussions after dinner. We had a baby during our second year of the PhD, and he has been a truly wonderful husband and father. Without him, I could not have completed this PhD alongside raising our child.
+
+Finally, I want to thank the Cambridge Trusts Taiwanese Scholarship for their generous financial support, which made this PhD possible.
+
+\end{CJK}
+
+% WND was supported by a Cambridge Trusts Taiwanese Scholarship. WJH was supported by a Royal Society University Research Fellowship. This work was performed using the Cambridge Service for Data Driven Discovery (CSD3), part of which is operated by the University of Cambridge Research Computing on behalf of the STFC DiRAC HPC Facility (www.dirac.ac.uk). The DiRAC component of CSD3 was funded by BEIS capital funding via STFC capital grants ST/P002307/1 and ST/R002452/1 and STFC operations grant ST/R00689X/1. DiRAC is part of the National e-Infrastructure.
+% This work was also supported by the UKRI Frontier Research Guarantee [EP/X035344/1] and the UKRI GLITTER grant [EP/Y037332/1].
+
+% --- Tables of Contents & Figures ---
+\tableofcontents
+\clearpage
+
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+
+% ==================== MAIN CONTENT ====================
+\pagenumbering{arabic}
+
+\chapter{Introduction}\label{chapter:introduction}
+
+% Editor's note: Improved the flow of the opening paragraph. Changed colloquial phrasing to a more formal academic tone.
+The $\Lambda$CDM model and the Standard Model successfully explain a wide range of observational and theoretical phenomena in cosmology~\cite{2020A&A...641A...6P} and particle physics~\cite{1995iqft.book.....P}. However, several fundamental issues remain unresolved. In cosmology, these include the horizon~\cite{1972grun.book.....D} and flatness~\cite{1983Natur.305..673C} problems, as well as the unknown composition and nature of dark matter and dark energy. In the Standard Model (SM) of particle physics, outstanding challenges include the cosmological constant problem~\cite{1989RvMP...61....1W}, the Weyl anomaly~\cite{1994CQGra..11.1387D}, and the strong $CP$ problem~\cite{1976PhRvL..37....8T}. Attempts to address these challenges typically involve introducing new degrees of freedom, such as cosmic inflation~\cite{1981PhRvD..23..347G}, novel dark matter particle candidates~\cite{2019Univ....5..213P}, axions~\cite{1977PhRvL..38.1440P}, or modifications to General Relativity~\cite{2012PhR...513....1C}. Despite massive theoretical effort, no single framework has been able to resolve all these issues simultaneously, and such piecemeal additions compromise the apparent simplicity of our universe suggested by recent observations~\cite{2020A&A...641A...6P, 2024ApJ...966..157F}.
+
+To address these challenges comprehensively, \cite{2018PhRvL.121y1301B, 2022AnPhy.43868767B} proposed a novel cosmological model known as the $CPT$-symmetric universe. Rather than introducing ad hoc degrees of freedom, they posited that the universe is strictly $CPT$-symmetric at the Big Bang singularity. Given this single initial condition, many of the aforementioned issues could be solved without adding extraneous theoretical complexity~\cite{2021arXiv211006258B,2022arXiv220810396B,2024PhLB..84938442B,2023arXiv230200344T}.
+
+% Editor's note: Corrected "Big Band" to "Big Bang" and improved sentence structure. Capitalization of "Horizon" was removed.
+The foundational inspiration for this model stems from cosmic microwave background (CMB) observations, where primordial perturbations are empirically found to obey Neumann initial conditions ($\partial_t \Phi_k=0$). The conventional explanation for this relies on cosmic inflation: observable modes exited the horizon during the inflationary epoch (freezing out), and as the horizon subsequently grew to encompass these scales again, they began to oscillate, naturally satisfying a Neumann initial condition at horizon reentry. However, if there was no period of cosmic inflation---meaning the universe began at the Big Bang and transitioned directly into a radiation-dominated era---the most straightforward explanation is that the Big Bang itself acts as a temporal mirror. For cosmological perturbations to be differentiable at this initial singularity, they must inherently satisfy Neumann initial conditions (see \cref{fig:CPT_periodic}).
+
+\begin{figure}[htbp]
+    \centering
+    % Left Subfigure
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/CPT_periodic.png}
+        \caption{Evolution of the scale factor $a$ and perturbations in conformal time. The universe and anti-universe are connected at the Big Bang (a $CPT$-symmetric mirror).}
+        \label{fig:CPT_periodic}
+    \end{subfigure}%
+    \hfill
+    % Right Subfigure
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/ScaleFactorFigv2.png}
+        \caption{Solution of Friedmann equation in conformal time, which is periodic. The figure is fig.~1 in \protect\cite{2021arXiv210906204B}.}
+        \label{fig:a_eta}
+    \end{subfigure}
+
+    \caption{Scale factor evolution and periodic behavior in conformal time.}
+    \label{fig:a-eta}
+\end{figure}
+
+% Editor's note: Fixed grammatical issues regarding spacetime beginning and improved the flow of the transition into QFT.
+One might reasonably ask: if spacetime itself begins at the Bang, how can we define ``before'' or ``after'' the universe in a way that allows us to compute derivatives? The solution requires transitioning to conformal time, $d\eta=\frac{dt}{a}$. From the perspective of an observer co-expanding with the universe, the conformal age of the universe is finite, allowing one to mathematically pass through the boundaries of the universe to trace its continuous evolution. Indeed, the solution to the Friedmann equations in conformal time can be expressed as a Jacobi elliptic function~\cite{2021arXiv210906204B, 2024PhLB..84938442B}, which is inherently periodic (\cref{fig:a_eta}). Establishing that the scale factor satisfies this ``mirror'' condition at the Big Bang naturally raises the next question: how do particles and quantum fields behave under this symmetry?
+
+Interestingly, quantum field theory (QFT) possesses a fundamental global symmetry: $CPT$-symmetry, which states that physical laws remain invariant under the simultaneous reversal of charge, parity, and time. For instance, a left-handed electron moving forward in time follows the exact same physical laws as a right-handed positron moving backward in time. While this symmetry is traditionally applied locally, one may hypothesize the existence of a global $CPT$-symmetry. This would imply the existence of an ``anti-universe'' prior to the Big Bang that is exactly $CPT$-symmetric to ours, wherein all physical quantities are $CPT$-reversed but governed by identical physical laws. This conceptual leap led Boyle and Turok to construct the $CPT$-symmetric universe model. Remarkably, they found that numerous problems in both cosmology and the SM could be resolved under this framework without introducing additional complexity. A conceptual map of these solutions is provided in \cref{fig:CPT_solve_problems}, which includes citations to the relevant literature.
+
+\begin{figure}[htbp]
+     \centering
+     \includegraphics[width=\textwidth]{figures/CPT_univ_solve_problems.pdf}
+     \caption{Problems in cosmology (dark red) and the SM particle physics (brown) which could be solved by CPT-symmetric universe. The relationship between the concepts are shown with arrows, and the arXiv number to the related papers is included.}
+     \label{fig:CPT_solve_problems}
+\end{figure}
+
+% Editor's note: Fixed "seesaw machenism", corrected grammar in the 36 dimension-zero scalars, and tightened sentence structure.
+For example, by resolving the cosmological constant problem, the Weyl anomaly, and UV divergences when coupling QFT to gravity, it was shown that given the standard SM gauge group $SU(3)\times SU(2)\times U(1)$ (totaling 12 spin-1 degrees of freedom), consistency requires exactly three generations of fermions (including right-handed neutrinos) and 36 dimension-zero scalar fields, while forcing the Higgs boson to be composite \cite{2021arXiv211006258B, boyle2025fixedpointsclassicalgravity}. In other words, no exotic new particles are strictly required beyond 3 right-handed (RH) neutrinos and the dimension-zero scalar fields (see \cref{fig:SM_particles_dim0_RHnu}). The existence of RH neutrinos is already strongly supported by the observation of neutrino oscillations, which proves that left-handed (LH) neutrinos possess mass. The most natural explanation for this is the introduction of a Majorana mass term for the RH neutrinos. Through interactions with the Higgs boson, this effectively grants mass to the LH neutrinos via the seesaw mechanism, where lighter LH neutrinos naturally correspond to more massive RH neutrinos.
+
+\begin{figure}[htbp]
+     \centering
+     \includegraphics[width=0.75\textwidth]{figures/SM_particles_dim0_RHnu.png}
+     \caption{Table for fundamental particles in order to solve cosmological constant problem. 3 right-handed neutrinos and 36 dim-0 scalar field are included, while Higgs boson should be composite.}
+     \label{fig:SM_particles_dim0_RHnu}
+\end{figure}
+
+% Editor's note: Clarified "HPC" which contextually means "high-energy colliders" rather than high-performance computing. Fixed tense and flow.
+Consequently, since this framework limits the addition of new SM particles, dark matter (DM) must be composed of one of these RH neutrinos. Based on neutrino oscillation data, the mass-squared differences between the three neutrino generations are known, but their absolute mass scale remains undetermined. This ambiguity provides the freedom to set the lightest LH neutrino mass to exactly zero. By doing so, the seesaw mechanism is effectively ``switched off'' for one RH-LH neutrino pair, rendering that specific RH neutrino entirely stable. Because it does not interact with the Higgs boson or LH neutrinos, it cannot be produced via standard thermal bath freeze-out. Instead, it is produced through a mechanism analogous to Hawking radiation: particles are spontaneously created from the vacuum in an accelerating frame. Similarly, an observer in the late-time universe would observe particles created directly from the $CPT$-symmetric vacuum at the Big Bang. If we require this specific particle to account for $100\%$ of the observed dark matter density, the required RH neutrino mass is uniquely constrained to $4.8\times 10^8 $ GeV \cite{2018PhRvL.121y1301B, 2022AnPhy.43868767B}. Such an immense mass naturally explains why it has eluded detection at high-energy particle colliders. Furthermore, the requirement that the lightest neutrino is massless implies that the sum of the neutrino masses must sit at the absolute theoretical minimum ($0.06$ eV or $0.1$ eV for normal and inverted hierarchies, respectively). This prediction tightly aligns with ongoing cosmological observations from CMB and BAO surveys \cite{Adame_2025, PhysRevD.111.083535}, which continue to place increasingly stringent upper limits on this mass sum. \footnote{Interestingly, if empirical constraints allow the sum of neutrino masses to be mathematically negative, current data actually favor a slightly negative value. This anomaly might be related to other observational tensions in cosmology, such as larger-than-expected CMB lensing or dynamical dark energy \cite{PhysRevD.111.083507}. However, this remains an unresolved and highly active research topic.}
+
+% Editor's note: Rephrased the baryonic asymmetry explanation to sound more formal, removing casual phrasing like "nature prefer matter then anti-matter".
+Regarding the other two RH neutrinos, they provide an elegant mechanism for generating the observed baryon asymmetry. The dominant paradigm for this asymmetry relies on $CP$-violation. However, relying solely on standard SM processes yields a baryon asymmetry several orders of magnitude too small to match observations. By incorporating these two highly massive RH neutrinos, the situation changes: they rapidly decay into Higgs bosons and leptons (or their antiparticles) prior to electroweak symmetry breaking. Due to inherent $CP$-violation, the decay rates for these two channels are asymmetric, generating a net lepton asymmetry. These leptons are subsequently converted into baryons via non-perturbative sphaleron processes (\cite{PhysRevD.30.2212, PhysRevD.36.581}), efficiently transferring the lepton asymmetry into the observed baryon asymmetry. One might philosophically ask why nature seemingly prefers matter over antimatter in the first place. The $CPT$-symmetric universe model beautifully answers this: the pre-Bang ``anti-universe'' inherently contains an equal and opposite excess of antimatter. Across the entire global timeline, the net asymmetry identically cancels out, preserving fundamental balance.
+
+\footnote{While utilizing RH neutrinos is the most straightforward mechanism for explaining baryon asymmetry within the SM, making precise quantitative predictions to compare with data remains exceedingly difficult. Adding RH neutrinos to the SM introduces 10 new degrees of freedom, encompassing the new masses and mixing phases. Low-energy experiments (e.g., neutrino oscillations, neutrinoless double $\beta$ decay) can currently constrain only 4 of these parameters (3 masses and 1 phase). The remaining parameters predominantly govern physics at energy scales far beyond current experimental reach, rendering them difficult to constrain empirically.}
+
+% Editor's note: Corrected "Lymann-$\alpha$" to "Lyman-$\alpha$". Fixed grammar concerning the dimension-zero fields.
+Regarding the 36 dimension-zero scalar fields, their dimensionless nature means they possess no preferred physical scale, effectively behaving mathematically like white noise. Consequently, if the initial conditions of primordial perturbations are driven by the quantum fluctuations of these fields, the resulting spectrum is naturally scale-invariant. Strikingly, theoretical predictions for the scalar amplitude $A_s$ and the spectral index $n_s$ derived from this mechanism fall remarkably close to observed values \cite{2023arXiv230200344T}. This offers a completely novel genesis for the primordial power spectrum (PPS) without invoking cosmic inflation. Interestingly, recent observations by ACT, SPT, DESI, and Lyman-$\alpha$ forest surveys suggest a slightly larger value for $n_s$ alongside a non-zero running index $\alpha=dn_s/d\ln k$, placing intense pressure on standard inflationary models (e.g., Starobinsky and Higgs inflation for specific potentials and $e$-folds $N_\star$) \cite{Balkenhol2025, mcdonough2026spectrumnsconstraintsdesi, pwfl-mt4g}. When combined with stringent upper bounds on the tensor-to-scalar ratio $r$ \cite{PhysRevD.105.083524} (where the dimension-zero mechanism strictly predicts $r=0$), observational evidence may ultimately favor this non-inflationary PPS genesis.
+
+What, then, is the role of the Higgs boson? One hypothesis suggests that the Higgs is a composite state constructed from the 36 dimension-zero scalars. Following methodologies analogous to string theory, one can theoretically construct dimension-1 fields (such as the Higgs) from fundamental dimension-0 fields. Such a composite Higgs model possesses the potential to resolve the hierarchy problem: the exponential decay of the coupling constant could naturally explain why the electroweak scale (and consequently the Higgs mass) is vastly suppressed relative to the Planck scale. Nevertheless, this framework remains heavily under exploration and faces significant theoretical hurdles: (1) explaining how dimension-0 fields dynamically emerge from gravity, (2) the current inability to robustly form a standard Higgs doublet, and (3) the presence of non-unitary and non-Hermitian states (ghosts) arising from the four-derivative kinetic terms. \footnote{There are two potential pathways to eliminate these ghosts. First, as demonstrated by \citet{Bender:2007wu} and \cite{PhysRevD.97.045001}, fourth-order derivative $\mathcal{PT}$-symmetric theories are not inherently doomed by negative-norm ghosts. If one abandons the standard Dirac-Hermitian inner product and instead evaluates the $\mathcal{PT}$-symmetric Hamiltonian using a $\mathcal{PT}$ or $\mathcal{V}$ inner product, the energy spectrum remains strictly real and the Hilbert space maintains a positive-definite norm. Second, if the ghost is of the Ostrogradskian type---signifying a classical instability driven by higher-derivative terms---it might be resolved by strictly constraining the permissible classical trajectories \cite{Chen:2012au}.}
+
+These theoretical challenges point toward an alternative avenue for generating a scale-invariant PPS without inflation: quadratic gravity \cite{PhysRevD.97.126005}. Because it incorporates four derivatives, quadratic gravity serves as a UV-complete theory of quantum gravity. The four-derivative Lagrangian can generate a scale-invariant PPS via a mechanism conceptually similar to the dimension-zero scalar field; crucially, however, the PPS is generated directly by the quantum fluctuations of spacetime itself rather than an external matter field. This paradigm is highly attractive as it simultaneously provides a theory of quantum gravity and explains the scale-invariant PPS without discarding a fundamental Higgs boson. However, substantial theoretical development is still required to formalize this hypothesis.
+
+% Editor's note: Fixed "horizen", "then", and smoothed the explanation of standard inflationary solutions vs the CPT-symmetric thermodynamic solution.
+Finally, we must address the cosmological flatness and horizon problems. Cosmic inflation solves these by positing an era of exponential expansion, stretching the universe such that our observable patch is vastly smaller than the global volume. This inherently flattens local curvature and ensures that the entire observable universe was previously in causal, thermal contact.
+
+In stark contrast, the $CPT$-symmetric universe model resolves these issues using a completely different framework: thermodynamics. Because the scale factor solution is periodic in both real and imaginary conformal time, one can compute the gravitational entropy of the universe by integrating over one full period in imaginary time, directly mirroring the technique pioneered by Hawking and Gibbons for black hole thermodynamics~\cite{1977PhRvD..15.2752G}. Remarkably, this calculation reveals that the cosmological state possessing the maximum entropy---and thus the highest statistical probability---is one that is strictly homogeneous, isotropic, and flat \cite{2024PhLB..84938442B}.
+
+\begin{figure}[htbp]
+     \centering
+     \includegraphics[width=0.6\textwidth]{figures/TorusFig2.png}
+     \caption{Solution of scale factor in complex conformal time plane, and how they integrate through one conformal time to calculate gravitational entropy. This figure is fig.~1 in \cite{2024PhLB..84938442B}.}
+     \label{fig:a_Torus}
+\end{figure}
+
+Thus far, we have outlined how the $CPT$-symmetric universe elegantly resolves multiple longstanding crises in both cosmology and the SM. However, critical questions remain. First, how do cosmological perturbations evolve within such a universe, and do these global symmetry conditions impose novel constraints on the standard cosmological parameters? Second, while global $CPT$-symmetry is a powerful phenomenological tool for describing the macroscopic universe, is there a rigorous theoretical justification at the quantum scale demanding that this boundary condition be satisfied?
+
+Answering these two fundamental questions is the primary objective of this thesis, which is structured into Part~I and Part~II, respectively.
+
+In Part~I, we explore the precise impact of a globally periodic structure on cosmological perturbations. Lasenby and Handley previously investigated this dynamic within the context of spatially flat universes \cite{Lasenby_2022}. Their work demonstrated that temporal periodic conditions impose strict boundary constraints on perturbations, leading to observable effects in the CMB power spectrum \cite{Bartlett_2022,Prathaban_2022}. In \cref{chapter:theory}, I extend this investigation to spatially curved universes. Our analysis reveals that the temporal boundary constraints imposed by the end of the universe (Future Conformal Boundary, FCB) inherently conflict with the spatial boundary conditions demanded by a closed universe. To mathematically resolve this conflict, only a discrete set of specific spatial curvatures is permissible. Remarkably, we demonstrate that these strictly quantized curvature values remain consistent with current observational limits from the \texttt{Planck 2018} data release \cite{Planck2018}. The detailed methodology and implications of this discovery are based on our published work \cite{PhysRevD.110.103528}.
+
+% Editor's note: Improved flow and corrected grammatical issues ("our another"). Inserted "In Chapter 3" to logically organize the paragraph structure.
+In \cref{chapter:Observation}, we extend this framework to a realistic cosmological model by solving the coupled perturbations numerically, explicitly incorporating radiation anisotropy and higher-order Boltzmann moments. By simultaneously matching both the temporal and spatial boundary conditions (BCs), we demonstrate that not only the spatial curvature, but all cosmological parameters dictating the conformal age of the universe are constrained. This chapter is based on another of our published works \cite{pjz6-47jv}. Up to this point, our analysis relied on a high-$k$ approximation, where discrete wave vectors are assumed to be equally spaced. This approximation, however, breaks down in the low-$k$ regime. Consequently, in \cref{chapter:low-k}, we construct specific linear combination states to find a general solution that rigorously satisfies both spatial and temporal BCs at low frequencies. The resulting mode mixing and mode omissions introduce distinct suppression and oscillation features in the primordial and CMB power spectra; these findings form the basis of an upcoming publication. Finally, in \cref{chapter:conclusion_matter_evol}, we discuss the hidden symmetry assumptions regarding the matter density at the Big Bang and the future conformal boundary (FCB). One theoretical paradigm suggests that near these two extreme eras, classical approximations inevitably break down, necessitating a full quantum field theoretic treatment. Because matter is fundamentally composed of fermions, tracking its evolution requires solving the Dirac equation in highly curved spacetime, naturally leading us into the second part of this thesis.
+
+% Editor's note: Fixed "property" -> "properties", "normal" -> "standard". Changed "which could be ignored" to "which cannot be ignored" as curvature is extreme at the Bang (please verify this intent!). Fixed "Lorentzian" -> "Lorentz-invariant".
+In Part~II, we investigate the fundamental properties of fermions within the $CPT$-symmetric framework. Instead of the standard Dirac equation, the K\"{a}hler-Dirac (KD) equation is utilized. Because it is constructed using differential forms, the KD equation is naturally accommodated in curved spacetime---a feature that cannot be ignored near the singularities of the Big Bang and the FCB. In \cref{chapter:Intro_Basics}, the mathematical basics of KD fermions are introduced. Because the KD field is effectively a $4\times 4$ spinor matrix, an additional $\gamma^0$ matrix must be incorporated to formulate a Lorentz-invariant Lagrangian. However, this additional $\gamma^0$ dictates that half of the field components inherently exhibit negative norms or negative energies (ghosts). To resolve this problem, in \cref{chapter:two-sheet_KD_Majorana}, we propose a two-sheeted, $PT$-reversed spacetime geometry, where the negative-norm states exclusively reside on the second sheet. Due to this $PT$-reversal, these states physically manifest with negative energies to observers in the first sheet. To preserve physical consistency under charge conjugation, a KD-Majorana condition is applied, mathematically constraining the fermions on the second sheet to act as the exact anti-fermions of the first sheet. This elegantly explains why strict $CPT$-symmetry is conserved even at the quantum scale.
+
+% Editor's note: Smoothed the integration of the SM, fixed subject-verb agreements (e.g., "group emerge" -> "group emerges"), and corrected typographical errors like "BHs acting".
+In \cref{chapter:SM_Cosmology}, we apply this KD formalism directly to the Standard Model (SM) and cosmology. All 16 fundamental fermions (including the right-handed neutrinos) are elegantly accommodated into exactly four copies of the KD-Majorana field. We demonstrate how the SM gauge group naturally emerges from the transformations between these four copies and the internal symmetries of the KD algebra. Furthermore, the KD formulation of fermion kinetic terms, Yukawa couplings, and right-handed Majorana mass terms are provided. We also discuss the broader implications of this model for the $CPT$-symmetric universe, specifically exploring its application to Black Hole (BH) mirrors \cite{tzanavaris2025blackmirrorscptsymmetricalternatives}---a theory proposing that black holes act as localized $CPT$-symmetric mirrors bridging our universe and the anti-universe. In \cref{chapter:Lag_Euclidean}, we explore the Euclidean Lagrangian for KD fermions, which offers a potential resolution to the non-Hermitian and chiral anomalies inherent in the standard Euclidean Dirac Lagrangian. The properties of other possible KD Lagrangian formulations are also evaluated. Finally, \cref{chapter:FutureWork_KD} outlines compelling directions for future research, including the application of this framework to lattice gauge theory, twistor theory, and potentially superstring theory. Ultimately, framing KD fermions within this two-sheeted topological geometry appears to offer novel solutions to many longstanding problems in theoretical physics.
+
+\printbibliography[heading=subbibliography,title={References}]
+
+% ==================== PART I ====================
+\part{Cosmological Constraints from Perturbations in a Periodic Universe} \label{part:constraint_perturb}
+
+\include{parts/part1/Theory}
+\include{parts/part1/Observation}
+\include{parts/part1/low-k}
+\include{parts/part1/Conclusion_matter_evol}
+
+
+% ==================== PART II ====================
+\part{$CPT$-Symmetric K\"{a}hler-Dirac Fermions} \label{part:KD-fermions}
+
+\include{parts/part2/Intro_Basics}
+\include{parts/part2/TwoSheets_KD_Majo}
+\include{parts/part2/SM_Cosmo}
+\include{parts/part2/Euclidean_Lag}
+\include{parts/part2/FutureWork_KD}
+
+
+
+\end{document}
